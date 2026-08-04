@@ -18,6 +18,7 @@ import {
   Mail
 } from "lucide-react";
 import ConceptTeamView from "./components/ConceptTeamView";
+import ConceptDView from "./components/ConceptDView";
 
 // ----------------------------------------------------------------------
 // BRAND CONSTANTS & LINKS
@@ -34,6 +35,32 @@ const CORE_LINKS = [
   { label: "Personal Training", href: "/offerings/private-training" },
   { label: "Open Gym", href: "/offerings/open-gym" }
 ];
+
+/** Todd Aug 2026 — locked IA (Direction D) */
+const LOCKED_NAV_LINKS = [
+  { label: "Philosophy", href: "/about/philosophy", group: "ABOUT" },
+  { label: "Founder Story", href: "/about/founder", group: "ABOUT" },
+  { label: "Meet the Team", href: "/about/team", group: "ABOUT" },
+  { label: "The Space", href: "/about/the-space", group: "ABOUT" },
+  { label: "FAQ", href: "/about/faq", group: "ABOUT" },
+  { label: "BUILD", href: "/training/classes/build", group: "TRAINING" },
+  { label: "BURN", href: "/training/classes/burn", group: "TRAINING" },
+  { label: "BALANCE (Coming Soon)", href: "/training/classes/balance", group: "TRAINING" },
+  { label: "1-on-1 Coaching", href: "/training/personal/1-on-1", group: "TRAINING" },
+  { label: "Small Group Training", href: "/training/personal/small-group", group: "TRAINING" },
+  { label: "Private Group Training", href: "/training/personal/private-group", group: "TRAINING" },
+  { label: "Foundation", href: "/foundation", group: "FOUNDATION" },
+  { label: "Reflection", href: "/longevity/reflection", group: "LONGEVITY" },
+  { label: "The Strength Standard", href: "/longevity/strength-standard", group: "LONGEVITY" },
+  { label: "The Trials", href: "/longevity/the-trials", group: "LONGEVITY" },
+  { label: "Move the City", href: "/culture/move-the-city", group: "CULTURE" },
+  { label: "Cultivated", href: "/culture/cultivated", group: "CULTURE" },
+  { label: "Archive", href: "/culture/archive", group: "CULTURE" },
+  { label: "Membership", href: "/membership", group: "MEMBERSHIP" },
+  { label: "Shop / United Limited", href: "https://unitedlimited.com", group: "SHOP", external: true },
+  { label: "Experience United", href: "/start-here/experience", group: "START HERE" },
+  { label: "Apply for Membership", href: "/start-here/apply", group: "START HERE" },
+] as const;
 
 const FOOTER_LINKS = [
   { label: "FAQ", href: "/faq" },
@@ -89,7 +116,7 @@ function USCrestSVG({ className = "w-10 h-10", opacity = 1 }) {
 // MAIN APPLICATION COMPONENT
 // ----------------------------------------------------------------------
 export default function App() {
-  const [activeConcept, setActiveConcept] = useState<"A" | "C">("A");
+  const [activeConcept, setActiveConcept] = useState<"A" | "C" | "D">("D");
   const [activeTab, setActiveTab] = useState<"simulator" | "comparison" | "specs">("simulator");
   const [activeSimRoute, setActiveSimRoute] = useState<string>("/");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -101,7 +128,7 @@ export default function App() {
   const [teamRoute, setTeamRoute] = useState<string>("/team");
   const [isTeamVisible, setIsTeamVisible] = useState<boolean>(true);
 
-  // Dynamically constructed core links list
+  // Dynamically constructed core links list (A/C legacy). Direction D uses LOCKED_NAV_LINKS.
   const dynamicCoreLinks = [
     { label: "New here", href: "/new-here" },
     { label: "Memberships", href: "/memberships" },
@@ -115,10 +142,16 @@ export default function App() {
     { label: "Open Gym", href: "/offerings/open-gym" }
   ];
 
+  const overlayLinks =
+    activeConcept === "D"
+      ? LOCKED_NAV_LINKS.map(({ label, href }) => ({ label, href }))
+      : dynamicCoreLinks;
+
   // References for mobile frames to track manual scrolling
   const simScrollContainerRef = useRef<HTMLDivElement>(null);
   const compScrollContainerRefA = useRef<HTMLDivElement>(null);
   const compScrollContainerRefC = useRef<HTMLDivElement>(null);
+  const compScrollContainerRefD = useRef<HTMLDivElement>(null);
 
   // Format today's date exactly as requested: "Columbus, OH | Weekday, Month Day, Year"
   const getFormattedDate = () => {
@@ -135,7 +168,7 @@ export default function App() {
 
   // Handle fake navigation for interactive link testing
   const triggerNavigation = (href: string, label: string) => {
-    if (isTeamVisible && href === teamRoute) {
+    if (isTeamVisible && (href === teamRoute || href === "/about/team")) {
       setActiveSimRoute("/team");
       setIsMenuOpen(false);
       setIsScrolled(false);
@@ -197,7 +230,7 @@ export default function App() {
                 BETA EXPLORATION
               </span>
               <span className="text-xs text-neutral-500 font-mono">
-                Todd-approved Nav · Jul 2026
+                Direction D locked IA · Aug 2026 · Odd Ritual ref
               </span>
             </div>
             <h1 className="text-xl font-bold tracking-tight text-white mt-1">
@@ -282,7 +315,7 @@ export default function App() {
                     }}
                     className="w-full py-2.5 text-center rounded-lg bg-neutral-800 text-white font-bold transition-all text-xs uppercase tracking-widest hover:bg-neutral-700 cursor-pointer"
                   >
-                    ← Back to Landing Concepts (A/C)
+                    ← Back to Landing Concepts (A/C/D)
                   </button>
                 ) : (
                   <>
@@ -294,8 +327,8 @@ export default function App() {
                           : "text-neutral-400 hover:text-neutral-200 text-xs"
                       }`}
                     >
-                      <div className="text-xs tracking-wider uppercase">Direction A</div>
-                      <div className="text-[10px] opacity-75 font-mono">Editorial Cover</div>
+                      <div className="text-[10px] tracking-wider uppercase">Direction A</div>
+                      <div className="text-[9px] opacity-75 font-mono">Editorial</div>
                     </button>
                     <button
                       onClick={() => setActiveConcept("C")}
@@ -305,8 +338,19 @@ export default function App() {
                           : "text-neutral-400 hover:text-neutral-200 text-xs"
                       }`}
                     >
-                      <div className="text-xs tracking-wider uppercase">Direction C</div>
-                      <div className="text-[10px] opacity-75 font-mono">Gallery Wall</div>
+                      <div className="text-[10px] tracking-wider uppercase">Direction C</div>
+                      <div className="text-[9px] opacity-75 font-mono">Gallery</div>
+                    </button>
+                    <button
+                      onClick={() => setActiveConcept("D")}
+                      className={`flex-1 py-2 text-center rounded-lg transition-all ${
+                        activeConcept === "D"
+                          ? "bg-white text-[#181818] font-bold shadow-md"
+                          : "text-neutral-400 hover:text-neutral-200 text-xs"
+                      }`}
+                    >
+                      <div className="text-[10px] tracking-wider uppercase">Direction D</div>
+                      <div className="text-[9px] opacity-75 font-mono">Ritual</div>
                     </button>
                   </>
                 )}
@@ -368,9 +412,11 @@ export default function App() {
                         title="Return to Home"
                       >
                         {!isScrolled ? (
-                          /* SCROLLED UP: Full Wordmark */
+                          /* SCROLLED UP: Full Wordmark — Direction D uses tighter tracking */
                           <span
-                            className="font-semibold tracking-[0.22em] text-[10px] font-sans text-center transition-all uppercase leading-tight text-[#181818]"
+                            className={`font-semibold text-[10px] font-sans text-center transition-all uppercase leading-tight text-[#181818] ${
+                              activeConcept === "D" ? "tracking-[-0.03em]" : "tracking-[0.22em]"
+                            }`}
                           >
                             UNITED STRENGTH CLUB
                           </span>
@@ -408,6 +454,9 @@ export default function App() {
                         {activeConcept === "C" && (
                           <ConceptCView onNav={triggerNavigation} />
                         )}
+                        {activeConcept === "D" && (
+                          <ConceptDView onNav={triggerNavigation} />
+                        )}
                       </>
                     )}
                   </div>
@@ -444,10 +493,10 @@ export default function App() {
 
                     {/* Flat menu links list - white uppercase, left aligned */}
                     <div className="relative z-10 flex-1 flex flex-col justify-between pt-4">
-                      <nav className="flex flex-col gap-5 text-left">
-                        {dynamicCoreLinks.map((link) => (
+                      <nav className="flex flex-col gap-4 text-left overflow-y-auto max-h-[55vh] scrollbar-none pr-1">
+                        {overlayLinks.map((link) => (
                           <a
-                            key={link.href}
+                            key={link.href + link.label}
                             href={link.href}
                             onClick={(e) => {
                               e.preventDefault();
@@ -456,11 +505,11 @@ export default function App() {
                             }}
                             className="group flex items-baseline gap-2 transition-transform duration-200 hover:translate-x-1"
                           >
-                            <span className="font-sans font-extrabold tracking-widest text-[15px] text-white uppercase">
+                            <span className="font-sans font-extrabold tracking-widest text-[13px] text-white uppercase">
                               {link.label}
                             </span>
                             <span className="h-[1px] flex-1 bg-white/10 group-hover:bg-white/30 transition-colors"></span>
-                            <ChevronRight className="w-3.5 h-3.5 text-neutral-600 group-hover:text-neutral-400" />
+                            <ChevronRight className="w-3.5 h-3.5 text-neutral-600 group-hover:text-neutral-400 shrink-0" />
                           </a>
                         ))}
                       </nav>
@@ -627,6 +676,7 @@ export default function App() {
                     <h2 className="text-2xl font-extrabold text-white tracking-tight mt-1">
                       {activeConcept === "A" && "Direction A: Editorial Cover"}
                       {activeConcept === "C" && "Direction C: Gallery Wall"}
+                      {activeConcept === "D" && "Direction D: Ritual Progression"}
                     </h2>
                   </div>
                   <div className="bg-[#0A3C2E]/30 text-emerald-300 text-lg font-bold px-3 py-1 rounded-lg border border-emerald-900/40">
@@ -640,6 +690,9 @@ export default function App() {
                   )}
                   {activeConcept === "C" && (
                     "Inspired by Cereal and Nowness. Built like an art gallery wall layout with asymmetric crops, letters, and facility images. It showcases physical sculpture-like strength equipment as design artifacts. Overlay text is kept to the margins. It rejects the aggressive workout noise completely, offering an elegant aesthetic retreat for selective downtown Columbus members."
+                  )}
+                  {activeConcept === "D" && (
+                    "Active foundation (Todd Aug 2026). Odd Ritual–inspired numbered scroll chapters with locked IA: ABOUT · TRAINING · FOUNDATION · LONGEVITY · CULTURE · MEMBERSHIP · SHOP · START HERE. Homepage is a 7-section progression/reveal — seamless one-picture hero, then Believe → Pillars → Experience → Space → Membership → Start Here. Shop links out to United Limited. BALANCE shows Coming Soon. No public pricing."
                   )}
                 </p>
 
@@ -656,11 +709,11 @@ export default function App() {
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                        <span>Primary Font: <strong className="font-sans text-white">{activeConcept === "A" ? "Satoshi (Bold & Italic)" : "Space Grotesk"}</strong></span>
+                        <span>Primary Font: <strong className="font-sans text-white">{activeConcept === "A" ? "Satoshi (Bold & Italic)" : activeConcept === "D" ? "Satoshi tight + Instrument Serif" : "Space Grotesk"}</strong></span>
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                        <span>Photography: <strong className="font-sans text-white">{activeConcept === "A" ? "B&W Cinematic" : "Asymmetric Architectural"}</strong></span>
+                        <span>Photography: <strong className="font-sans text-white">{activeConcept === "A" ? "B&W Cinematic" : activeConcept === "D" ? "Full-bleed chapter stills" : "Asymmetric Architectural"}</strong></span>
                       </li>
                     </ul>
                   </div>
@@ -727,7 +780,7 @@ export default function App() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start justify-center max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start justify-center max-w-6xl mx-auto">
               
               {/* CONCEPT A */}
               <div className="flex flex-col items-center">
@@ -762,6 +815,23 @@ export default function App() {
                     <div className="w-4"></div>
                   </div>
                   <ConceptCView onNav={triggerNavigation} />
+                </div>
+              </div>
+
+              {/* CONCEPT D */}
+              <div className="flex flex-col items-center">
+                <div className="bg-[#0A3C2E] text-xs px-3 py-1 rounded-full text-emerald-100 font-mono uppercase tracking-widest mb-3 border border-emerald-900">
+                  Concept D: Ritual Progression
+                </div>
+                <div className="w-full max-w-[375px] h-[680px] bg-white text-[#181818] border border-neutral-800 rounded-3xl overflow-y-auto relative scrollbar-none shadow-xl flex flex-col" ref={compScrollContainerRefD}>
+                  <div className="sticky top-0 bg-white/90 backdrop-blur-xs z-20 px-4 py-3 border-b border-neutral-100 flex justify-between items-center select-none">
+                    <Menu className="w-4 h-4 text-neutral-800" />
+                    <span className="font-semibold tracking-[-0.03em] text-[8px] font-sans text-neutral-900">
+                      UNITED STRENGTH CLUB
+                    </span>
+                    <div className="w-4"></div>
+                  </div>
+                  <ConceptDView onNav={triggerNavigation} />
                 </div>
               </div>
 
@@ -1003,6 +1073,9 @@ export default function App() {
                   </a>
                   <a href="https://www.neuehouse.com" target="_blank" rel="noreferrer" className="hover:text-white flex items-center gap-1 bg-[#222]/40 p-2 rounded border border-neutral-800/80">
                     Neuehouse <ExternalLink className="w-2.5 h-2.5" />
+                  </a>
+                  <a href="https://oddritualgolf.com" target="_blank" rel="noreferrer" className="hover:text-white flex items-center gap-1 bg-[#222]/40 p-2 rounded border border-neutral-800/80 col-span-2">
+                    Odd Ritual Golf (Direction D) <ExternalLink className="w-2.5 h-2.5" />
                   </a>
                 </div>
               </div>
