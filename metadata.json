@@ -1,0 +1,6 @@
+{
+  "name": "United Strength Club Concepts",
+  "description": "Three elegant mobile homepage concepts for United Strength Club, a private fitness and wellness club in downtown Columbus, OH.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
