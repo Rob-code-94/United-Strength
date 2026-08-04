@@ -1,4 +1,4 @@
-import { ArrowDown, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
 interface SubViewProps {
   onNav: (href: string, label: string) => void;
@@ -27,41 +27,18 @@ function ChapterLabel({ n, title }: { n: string; title: string }) {
 /**
  * Direction D — Ritual Progression (Odd Ritual–inspired)
  * Todd Aug 2026 locked homepage: 7-section reveal.
+ * Hero: full-bleed image only — no overlay copy (Todd request).
  */
 export default function ConceptDView({ onNav }: SubViewProps) {
   return (
     <div className="flex-1 flex flex-col bg-white text-[#181818] animate-fade-in font-sans selection:bg-neutral-100 selection:text-neutral-900">
-      {/* 01 — Hero Statement: seamless ONE full-bleed picture */}
-      <section className="relative min-h-[620px] flex flex-col justify-end overflow-hidden">
+      {/* 01 — Hero: seamless ONE full-bleed picture, no wording */}
+      <section className="relative min-h-[620px] overflow-hidden" aria-label="Hero">
         <img
           src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=900&auto=format&fit=crop"
           alt="United Strength Club — cinematic facility"
-          className="absolute inset-0 w-full h-full object-cover grayscale contrast-110 brightness-90 select-none pointer-events-none"
+          className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-black/10" />
-
-        <div className="relative z-10 px-6 pb-10 pt-24 text-white flex flex-col gap-6">
-          <div className="flex justify-between items-baseline font-mono text-[9px] uppercase tracking-[0.25em] text-white/70">
-            <span>01</span>
-            <span>Columbus, OH</span>
-          </div>
-          <div className="space-y-1">
-            <h2 className="font-black text-[42px] leading-[0.88] tracking-[-0.04em] uppercase">
-              STRONGER
-            </h2>
-            <h2 className="font-black text-[42px] leading-[0.88] tracking-[-0.04em] uppercase">
-              UNITED.
-            </h2>
-          </div>
-          <div className="flex items-center justify-between border-t border-white/25 pt-3">
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/70">
-              Hero Statement
-            </span>
-            <span className="font-mono text-[9px] uppercase tracking-widest flex items-center gap-1 text-white/90">
-              Scroll <ArrowDown className="w-2.5 h-2.5 animate-bounce" />
-            </span>
-          </div>
-        </div>
       </section>
 
       {/* 02 — What We Believe */}
