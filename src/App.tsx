@@ -482,11 +482,11 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* SCROLLABLE SCREEN STAGE — container query height so chapters fill the phone */}
+                {/* SCROLLABLE SCREEN STAGE — snap chapters to fill the phone */}
                 <div
                   ref={simScrollContainerRef}
                   onScroll={handleSimScroll}
-                  className="relative flex-1 min-h-0 w-full bg-white text-[#181818] overflow-y-auto rounded-[36px] scrollbar-none flex flex-col [container-type:size]"
+                  className="relative flex-1 min-h-0 w-full bg-white text-[#181818] overflow-y-auto rounded-[36px] scrollbar-none flex flex-col [container-type:size] snap-y snap-mandatory scroll-smooth"
                 >
                   
                   {/* BRAND HEADER & TRANSITION CONTROLLER */}

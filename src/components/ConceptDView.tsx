@@ -5,10 +5,30 @@ interface SubViewProps {
 }
 
 const PILLARS = [
-  { n: "01", title: "Train", body: "Deliberate strength as daily practice." },
-  { n: "02", title: "Recover", body: "Rest as seriously as the work." },
-  { n: "03", title: "Community", body: "A selective circle, not a crowd." },
-  { n: "04", title: "Culture", body: "Columbus woven into everything we build." },
+  {
+    n: "01",
+    title: "Foundation",
+    body: "The base of the practice — deliberate strength, held to a standard.",
+    href: "/foundation",
+  },
+  {
+    n: "02",
+    title: "Longevity",
+    body: "Training built to last — durability over spectacle.",
+    href: "/longevity",
+  },
+  {
+    n: "03",
+    title: "Reflection",
+    body: "Measure the work. Own the progress.",
+    href: "/longevity/reflection",
+  },
+  {
+    n: "04",
+    title: "Move the City",
+    body: "Run club. Columbus in motion.",
+    href: "/culture/move-the-city",
+  },
 ];
 
 function ChapterLabel({ n, title, light = false }: { n: string; title: string; light?: boolean }) {
@@ -36,9 +56,9 @@ function ChapterLabel({ n, title, light = false }: { n: string; title: string; l
   );
 }
 
-/** Full phone-stage height inside the simulator scrollport (100cqh) */
+/** Full phone-stage height + snap stop inside the simulator scrollport */
 const SECTION =
-  "box-border w-full min-h-[100cqh] flex flex-col justify-center px-6 py-12 shrink-0";
+  "box-border w-full min-h-[100cqh] flex flex-col justify-center px-6 py-12 shrink-0 snap-start snap-always";
 
 /**
  * Direction D — Ritual Progression (Odd Ritual–inspired)
@@ -50,7 +70,10 @@ export default function ConceptDView({ onNav }: SubViewProps) {
   return (
     <div className="flex flex-col bg-white text-[#181818] animate-fade-in font-sans selection:bg-neutral-100 selection:text-neutral-900">
       {/* 01 — Hero: seamless ONE full-bleed picture, no wording */}
-      <section className="relative w-full min-h-[100cqh] shrink-0 overflow-hidden" aria-label="Hero">
+      <section
+        className="relative w-full min-h-[100cqh] shrink-0 overflow-hidden snap-start snap-always"
+        aria-label="Hero"
+      >
         <img
           src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=900&auto=format&fit=crop"
           alt="United Strength Club — cinematic facility"
@@ -72,25 +95,28 @@ export default function ConceptDView({ onNav }: SubViewProps) {
         </p>
       </section>
 
-      {/* 03 — The Four Pillars */}
+      {/* 03 — The Four Pillars (Todd Aug 6: Foundation · Longevity · Reflection · Move the City) */}
       <section className={`${SECTION} bg-white border-t border-neutral-100`}>
         <ChapterLabel n="03" title="The Four Pillars" />
         <div className="grid grid-cols-1 gap-0 border border-neutral-200">
           {PILLARS.map((p) => (
-            <div
+            <button
               key={p.n}
-              className="flex gap-4 px-4 py-5 border-b border-neutral-200 last:border-b-0"
+              type="button"
+              onClick={() => onNav(p.href, p.title)}
+              className="flex gap-4 px-4 py-5 border-b border-neutral-200 last:border-b-0 text-left w-full hover:bg-neutral-50 transition-colors min-h-[44px]"
             >
-              <span className="font-mono text-[10px] text-[#5C5C5C] tracking-widest shrink-0">
+              <span className="font-mono text-[10px] text-[#5C5C5C] tracking-widest shrink-0 pt-0.5">
                 {p.n}
               </span>
-              <div>
-                <h3 className="font-bold text-sm uppercase tracking-[-0.02em] text-[#181818]">
+              <div className="flex-1 min-w-0">
+                <h3 className="font-bold text-sm uppercase tracking-[-0.02em] text-[#181818] flex items-center gap-1.5">
                   {p.title}
+                  <ChevronRight className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
                 </h3>
                 <p className="mt-1 text-xs text-[#5C5C5C] leading-relaxed">{p.body}</p>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </section>
@@ -112,7 +138,7 @@ export default function ConceptDView({ onNav }: SubViewProps) {
       </section>
 
       {/* 05 — The Space */}
-      <section className="relative w-full min-h-[100cqh] shrink-0 overflow-hidden flex flex-col justify-end">
+      <section className="relative w-full min-h-[100cqh] shrink-0 overflow-hidden flex flex-col justify-end snap-start snap-always">
         <img
           src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=900&auto=format&fit=crop"
           alt="The Space — facility atmosphere"
@@ -180,8 +206,8 @@ export default function ConceptDView({ onNav }: SubViewProps) {
         </a>
       </section>
 
-      {/* Minimal footer */}
-      <footer className="px-6 py-10 bg-neutral-50 border-t border-neutral-100 space-y-4 shrink-0">
+      {/* Minimal footer — no snap so it can sit after the last chapter */}
+      <footer className="px-6 py-10 bg-neutral-50 border-t border-neutral-100 space-y-4 shrink-0 snap-end">
         <p className="font-mono text-[10px] uppercase tracking-wider text-[#5C5C5C] leading-relaxed">
           237 Cleveland Ave
           <br />
