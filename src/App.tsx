@@ -23,19 +23,6 @@ import ConceptDView from "./components/ConceptDView";
 // ----------------------------------------------------------------------
 // BRAND CONSTANTS & LINKS
 // ----------------------------------------------------------------------
-const CORE_LINKS = [
-  { label: "New here", href: "/new-here" },
-  { label: "Memberships", href: "/memberships" },
-  { label: "Offerings (hub)", href: "/offerings" },
-  { label: "About", href: "/#about" },
-  { label: "Team", href: "/team" },
-  { label: "Contact", href: "/contact" },
-  { label: "BUILD", href: "/offerings/build" },
-  { label: "BURN", href: "/offerings/burn" },
-  { label: "Personal Training", href: "/offerings/private-training" },
-  { label: "Open Gym", href: "/offerings/open-gym" }
-];
-
 /** Todd Aug 2026 — locked IA (Direction D) — exact hierarchy */
 type NavLeaf = { label: string; href: string; external?: boolean; comingSoon?: boolean };
 type NavBranch = { label: string; children: NavLeaf[] };
@@ -179,39 +166,23 @@ function USCrestSVG({ className = "w-10 h-10", opacity = 1 }) {
 // MAIN APPLICATION COMPONENT
 // ----------------------------------------------------------------------
 export default function App() {
-  const [activeConcept, setActiveConcept] = useState<"A" | "C" | "D">("D");
-  const [activeTab, setActiveTab] = useState<"simulator" | "comparison" | "specs">("simulator");
+  const [activeTab, setActiveTab] = useState<"simulator" | "archive" | "specs">("simulator");
+  const [archiveDirection, setArchiveDirection] = useState<"A" | "C">("A");
   const [activeSimRoute, setActiveSimRoute] = useState<string>("/");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [copiedColor, setCopiedColor] = useState<string | null>(null);
-  const [navigationNotification, setNavigationNotification] = useState<string | null>(null);
   /** Hide sticky beta chrome while scrolling so Direction preview is full-bleed on phone */
   const [chromeHidden, setChromeHidden] = useState(false);
+  const [copiedColor, setCopiedColor] = useState<string | null>(null);
+  const [navigationNotification, setNavigationNotification] = useState<string | null>(null);
 
   // User route configuration states
   const [teamRoute, setTeamRoute] = useState<string>("/team");
   const [isTeamVisible, setIsTeamVisible] = useState(true);
 
-  // Dynamically constructed core links list (A/C legacy). Direction D uses LOCKED_NAV hierarchy.
-  const dynamicCoreLinks = [
-    { label: "New here", href: "/new-here" },
-    { label: "Memberships", href: "/memberships" },
-    { label: "Offerings (hub)", href: "/offerings" },
-    { label: "About", href: "/#about" },
-    ...(isTeamVisible ? [{ label: "Team", href: teamRoute }] : []),
-    { label: "Contact", href: "/contact" },
-    { label: "BUILD", href: "/offerings/build" },
-    { label: "BURN", href: "/offerings/burn" },
-    { label: "Personal Training", href: "/offerings/private-training" },
-    { label: "Open Gym", href: "/offerings/open-gym" }
-  ];
-
   // References for mobile frames to track manual scrolling
   const simScrollContainerRef = useRef<HTMLDivElement>(null);
-  const compScrollContainerRefA = useRef<HTMLDivElement>(null);
-  const compScrollContainerRefC = useRef<HTMLDivElement>(null);
-  const compScrollContainerRefD = useRef<HTMLDivElement>(null);
+  const archiveScrollContainerRef = useRef<HTMLDivElement>(null);
   const lastWindowScrollY = useRef(0);
   const lastSimScrollY = useRef(0);
 
@@ -263,7 +234,7 @@ export default function App() {
     setTimeout(() => setCopiedColor(null), 1500);
   };
 
-  // Reset menu and scroll states when switching concepts
+  // Reset menu and scroll when returning home / switching archive direction
   useEffect(() => {
     setIsMenuOpen(false);
     setIsScrolled(false);
@@ -273,7 +244,10 @@ export default function App() {
     if (simScrollContainerRef.current) {
       simScrollContainerRef.current.scrollTop = 0;
     }
-  }, [activeConcept]);
+    if (archiveScrollContainerRef.current) {
+      archiveScrollContainerRef.current.scrollTop = 0;
+    }
+  }, [activeTab, archiveDirection]);
 
   // Hide beta chrome on scroll — stays collapsed until the BETA pill is tapped
   useEffect(() => {
@@ -333,7 +307,7 @@ export default function App() {
           </div>
 
           {/* MAIN CONTAINER TABS */}
-          <div className="flex items-center gap-2 bg-[#222] p-1 rounded-lg self-start md:self-auto">
+          <div className="flex items-center gap-2 bg-[#222] p-1 rounded-lg self-start md:self-auto flex-wrap">
             <button
               onClick={() => setActiveTab("simulator")}
               className={`px-3.5 py-1.5 rounded-md text-xs font-medium transition-all ${
@@ -344,20 +318,20 @@ export default function App() {
             >
               <span className="flex items-center gap-2">
                 <Compass className="w-3.5 h-3.5" />
-                Interactive Simulator
+                Direction D
               </span>
             </button>
             <button
-              onClick={() => setActiveTab("comparison")}
+              onClick={() => setActiveTab("archive")}
               className={`px-3.5 py-1.5 rounded-md text-xs font-medium transition-all ${
-                activeTab === "comparison"
+                activeTab === "archive"
                   ? "bg-[#0A3C2E] text-white shadow-sm"
                   : "text-neutral-400 hover:text-white"
               }`}
             >
               <span className="flex items-center gap-2">
                 <Layers className="w-3.5 h-3.5" />
-                Side-by-Side Canvas
+                Archive A &amp; C
               </span>
             </button>
             <button
@@ -409,8 +383,8 @@ export default function App() {
             {/* MOBILE PREVIEW COL */}
             <div className="lg:col-span-6 xl:col-span-5 flex flex-col items-center justify-center">
               
-              {/* Concept Selector Pills */}
-              <div className="w-full max-w-[375px] flex justify-between bg-[#1A1A1A] rounded-xl p-1 mb-4 border border-neutral-800">
+              {/* Active direction badge — live sim is Direction D only */}
+              <div className="w-full max-w-[375px] mb-4">
                 {activeSimRoute === "/team" ? (
                   <button
                     onClick={() => {
@@ -419,46 +393,24 @@ export default function App() {
                         simScrollContainerRef.current.scrollTop = 0;
                       }
                     }}
-                    className="w-full py-2.5 text-center rounded-lg bg-neutral-800 text-white font-bold transition-all text-xs uppercase tracking-widest hover:bg-neutral-700 cursor-pointer"
+                    className="w-full py-2.5 text-center rounded-lg bg-neutral-800 text-white font-bold transition-all text-xs uppercase tracking-widest hover:bg-neutral-700 cursor-pointer border border-neutral-700"
                   >
-                    ← Back to Landing Concepts (A/C/D)
+                    ← Back to Direction D
                   </button>
                 ) : (
-                  <>
-                    <button
-                      onClick={() => setActiveConcept("A")}
-                      className={`flex-1 py-2 text-center rounded-lg transition-all ${
-                        activeConcept === "A"
-                          ? "bg-white text-[#181818] font-bold shadow-md"
-                          : "text-neutral-400 hover:text-neutral-200 text-xs"
-                      }`}
-                    >
-                      <div className="text-[10px] tracking-wider uppercase">Direction A</div>
-                      <div className="text-[9px] opacity-75 font-mono">Editorial</div>
-                    </button>
-                    <button
-                      onClick={() => setActiveConcept("C")}
-                      className={`flex-1 py-2 text-center rounded-lg transition-all ${
-                        activeConcept === "C"
-                          ? "bg-white text-[#181818] font-bold shadow-md"
-                          : "text-neutral-400 hover:text-neutral-200 text-xs"
-                      }`}
-                    >
-                      <div className="text-[10px] tracking-wider uppercase">Direction C</div>
-                      <div className="text-[9px] opacity-75 font-mono">Gallery</div>
-                    </button>
-                    <button
-                      onClick={() => setActiveConcept("D")}
-                      className={`flex-1 py-2 text-center rounded-lg transition-all ${
-                        activeConcept === "D"
-                          ? "bg-white text-[#181818] font-bold shadow-md"
-                          : "text-neutral-400 hover:text-neutral-200 text-xs"
-                      }`}
-                    >
-                      <div className="text-[10px] tracking-wider uppercase">Direction D</div>
-                      <div className="text-[9px] opacity-75 font-mono">Ritual</div>
-                    </button>
-                  </>
+                  <div className="flex items-center justify-between gap-3 bg-[#1A1A1A] rounded-xl px-4 py-3 border border-neutral-800">
+                    <div>
+                      <div className="text-[10px] tracking-wider uppercase text-white font-bold">
+                        Direction D · Active
+                      </div>
+                      <div className="text-[9px] text-neutral-500 font-mono mt-0.5">
+                        Ritual Progression · locked IA
+                      </div>
+                    </div>
+                    <span className="bg-[#0A3C2E] text-emerald-300 text-[10px] font-mono px-2 py-1 rounded border border-emerald-900/50">
+                      LIVE
+                    </span>
+                  </div>
                 )}
               </div>
 
@@ -519,11 +471,7 @@ export default function App() {
                       >
                         {!isScrolled ? (
                           /* SCROLLED UP: Full Wordmark — Direction D uses tighter tracking */
-                          <span
-                            className={`font-semibold text-[10px] font-sans text-center transition-all uppercase leading-tight text-[#181818] ${
-                              activeConcept === "D" ? "tracking-[-0.03em]" : "tracking-[0.22em]"
-                            }`}
-                          >
+                          <span className="font-semibold text-[10px] font-sans text-center transition-all uppercase leading-tight text-[#181818] tracking-[-0.03em]">
                             UNITED STRENGTH CLUB
                           </span>
                         ) : (
@@ -548,22 +496,12 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* ACTIVE HOME-SCREEN CONCEPTS CONTENT */}
+                  {/* ACTIVE HOME-SCREEN — Direction D only */}
                   <div className="flex flex-col">
                     {activeSimRoute === "/team" ? (
                       <ConceptTeamView onNav={triggerNavigation} />
                     ) : (
-                      <>
-                        {activeConcept === "A" && (
-                          <ConceptAView onNav={triggerNavigation} />
-                        )}
-                        {activeConcept === "C" && (
-                          <ConceptCView onNav={triggerNavigation} />
-                        )}
-                        {activeConcept === "D" && (
-                          <ConceptDView onNav={triggerNavigation} />
-                        )}
-                      </>
+                      <ConceptDView onNav={triggerNavigation} />
                     )}
                   </div>
 
@@ -597,35 +535,12 @@ export default function App() {
                   </div>
 
                   <div className="relative z-10 flex-1 min-h-0 flex flex-col px-6 pb-8">
-                    {activeConcept === "D" ? (
-                      <LockedNavOverlay
-                        onNavigate={(href, label) => {
-                          setIsMenuOpen(false);
-                          triggerNavigation(href, label);
-                        }}
-                      />
-                    ) : (
-                      <nav className="flex-1 min-h-0 overflow-y-auto scrollbar-none pr-1 flex flex-col gap-4 text-left">
-                        {dynamicCoreLinks.map((link) => (
-                          <a
-                            key={link.href + link.label}
-                            href={link.href}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              setIsMenuOpen(false);
-                              triggerNavigation(link.href, link.label);
-                            }}
-                            className="group flex items-baseline gap-2 transition-transform duration-200 hover:translate-x-1"
-                          >
-                            <span className="font-sans font-extrabold tracking-widest text-[13px] text-white uppercase">
-                              {link.label}
-                            </span>
-                            <span className="h-[1px] flex-1 bg-white/10 group-hover:bg-white/30 transition-colors"></span>
-                            <ChevronRight className="w-3.5 h-3.5 text-neutral-600 group-hover:text-neutral-400 shrink-0" />
-                          </a>
-                        ))}
-                      </nav>
-                    )}
+                    <LockedNavOverlay
+                      onNavigate={(href, label) => {
+                        setIsMenuOpen(false);
+                        triggerNavigation(href, label);
+                      }}
+                    />
 
                     <div className="border-t border-neutral-800 pt-4 mt-4 text-[10px] font-mono text-neutral-400 flex flex-col gap-2 shrink-0">
                       <div className="flex justify-between gap-3">
@@ -776,7 +691,7 @@ export default function App() {
             {/* DESIGN SPECIFICATION / EXPLANATORY COL */}
             <div className="lg:col-span-6 xl:col-span-7 space-y-6">
               
-              {/* Active Direction Card */}
+              {/* Active Direction Card — D only */}
               <div className="bg-[#161616] border border-neutral-800 rounded-2xl p-6 shadow-md">
                 <div className="flex items-start justify-between mb-4">
                   <div>
@@ -784,26 +699,28 @@ export default function App() {
                       Active Direction Specification
                     </span>
                     <h2 className="text-2xl font-extrabold text-white tracking-tight mt-1">
-                      {activeConcept === "A" && "Direction A: Editorial Cover"}
-                      {activeConcept === "C" && "Direction C: Gallery Wall"}
-                      {activeConcept === "D" && "Direction D: Ritual Progression"}
+                      Direction D: Ritual Progression
                     </h2>
                   </div>
                   <div className="bg-[#0A3C2E]/30 text-emerald-300 text-lg font-bold px-3 py-1 rounded-lg border border-emerald-900/40">
-                    {activeConcept}
+                    D
                   </div>
                 </div>
 
                 <p className="text-sm text-neutral-400 leading-relaxed mb-6">
-                  {activeConcept === "A" && (
-                    "Inspired directly by Aimé Leon Dore and Kinfolk issue covers. This direction prioritizes calm editorial whitespace in the top third, emphasizing high-fashion cinematic fitness details. Layout structures are balanced, relying heavily on asymmetric image placement and precise margins. Typography focuses on the modern, high-fashion Satoshi font family, using heavy bold tracked uppercase headings locked directly with elegant stylish italics and natural light black-and-white strength photography."
-                  )}
-                  {activeConcept === "C" && (
-                    "Inspired by Cereal and Nowness. Built like an art gallery wall layout with asymmetric crops, letters, and facility images. It showcases physical sculpture-like strength equipment as design artifacts. Overlay text is kept to the margins. It rejects the aggressive workout noise completely, offering an elegant aesthetic retreat for selective downtown Columbus members."
-                  )}
-                  {activeConcept === "D" && (
-                    "Active foundation (Todd Aug 2026). Odd Ritual–inspired numbered scroll chapters with locked IA: ABOUT · TRAINING · FOUNDATION · LONGEVITY · CULTURE · MEMBERSHIP · SHOP · START HERE. Homepage is a 7-section progression/reveal — seamless one-picture hero, then Believe → Pillars → Experience → Space → Membership → Start Here. Shop links out to United Limited. BALANCE shows Coming Soon. No public pricing."
-                  )}
+                  Active foundation (Todd Aug 2026). Odd Ritual–inspired numbered scroll chapters with locked IA: ABOUT · TRAINING · FOUNDATION · LONGEVITY · CULTURE · MEMBERSHIP · SHOP · START HERE. Homepage is a 7-section progression/reveal — seamless one-picture hero, then Believe → Pillars → Experience → Space → Membership → Start Here. Shop links out to United Limited. BALANCE shows Coming Soon. No public pricing.
+                </p>
+
+                <p className="text-[11px] text-neutral-500 font-mono mb-6 border-t border-neutral-800 pt-4">
+                  Earlier explorations (A · Editorial, C · Gallery) live under{" "}
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("archive")}
+                    className="text-emerald-400 hover:underline"
+                  >
+                    Archive A &amp; C
+                  </button>
+                  .
                 </p>
 
                 {/* Concept Spec Checklist Grid */}
@@ -819,11 +736,11 @@ export default function App() {
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                        <span>Primary Font: <strong className="font-sans text-white">{activeConcept === "A" ? "Satoshi (Bold & Italic)" : activeConcept === "D" ? "Satoshi tight + Instrument Serif" : "Space Grotesk"}</strong></span>
+                        <span>Primary Font: <strong className="font-sans text-white">Satoshi tight + Instrument Serif</strong></span>
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                        <span>Photography: <strong className="font-sans text-white">{activeConcept === "A" ? "B&W Cinematic" : activeConcept === "D" ? "Full-bleed chapter stills" : "Asymmetric Architectural"}</strong></span>
+                        <span>Photography: <strong className="font-sans text-white">Full-bleed chapter stills</strong></span>
                       </li>
                     </ul>
                   </div>
@@ -879,72 +796,86 @@ export default function App() {
         )}
 
         {/* ================================================================= */}
-        {/* TAB 2: SIDE-BY-SIDE CANVAS                                         */}
+        {/* TAB 2: ARCHIVE — Directions A & C (revisit / salvage)             */}
         {/* ================================================================= */}
-        {activeTab === "comparison" && (
+        {activeTab === "archive" && (
           <div className="space-y-6">
-            <div className="bg-[#161616] border border-neutral-800 rounded-2xl p-6 text-center max-w-2xl mx-auto mb-4">
-              <h2 className="text-lg font-bold text-white tracking-tight">Concept Comparison Grid</h2>
-              <p className="text-xs text-neutral-400 mt-1 max-w-lg mx-auto">
-                Scroll through or inspect both concepts side-by-side to review typography weight, image cropping layouts, and whitespace balancing in real-time.
+            <div className="bg-[#161616] border border-neutral-800 rounded-2xl p-6 max-w-3xl mx-auto text-left">
+              <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest block">
+                Archived · Aug 2026 meeting
+              </span>
+              <h2 className="text-lg font-bold text-white tracking-tight mt-1">
+                Directions A &amp; C — revisit before delete
+              </h2>
+              <p className="text-xs text-neutral-400 mt-2 leading-relaxed">
+                Live work is Direction D. Keep A and C here so Todd can screenshot anything worth
+                salvaging. These are the interactive old builds — not the active foundation.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start justify-center max-w-6xl mx-auto">
-              
-              {/* CONCEPT A */}
-              <div className="flex flex-col items-center">
-                <div className="bg-[#222] text-xs px-3 py-1 rounded-full text-white font-mono uppercase tracking-widest mb-3 border border-neutral-800">
-                  Concept A: Editorial Cover
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
+              <button
+                type="button"
+                onClick={() => setArchiveDirection("A")}
+                className={`text-left rounded-2xl border p-5 transition-all min-h-[44px] ${
+                  archiveDirection === "A"
+                    ? "bg-[#0A3C2E]/25 border-emerald-800 text-white"
+                    : "bg-[#161616] border-neutral-800 text-neutral-300 hover:border-neutral-600"
+                }`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-bold text-sm uppercase tracking-wide">Direction A</span>
+                  <span className="font-mono text-[10px] text-neutral-500">Editorial</span>
                 </div>
-                <div className="w-full max-w-[375px] h-[680px] bg-white text-[#181818] border border-neutral-800 rounded-3xl overflow-y-auto relative scrollbar-none shadow-xl flex flex-col" ref={compScrollContainerRefA}>
-                  {/* Embedded Static Header (representing up state) */}
-                  <div className="sticky top-0 bg-white/90 backdrop-blur-xs z-20 px-4 py-3 border-b border-neutral-100 flex justify-between items-center select-none">
-                    <Menu className="w-4 h-4 text-neutral-800" />
-                    <span className="font-semibold tracking-[0.2em] text-[8px] font-sans text-neutral-900">
-                      UNITED STRENGTH CLUB
-                    </span>
-                    <div className="w-4"></div>
-                  </div>
+                <p className="text-[11px] text-neutral-400 mt-2 leading-relaxed">
+                  ALD / Kinfolk cover energy — Satoshi, B&amp;W cinematic, calm top-third whitespace.
+                </p>
+              </button>
+              <button
+                type="button"
+                onClick={() => setArchiveDirection("C")}
+                className={`text-left rounded-2xl border p-5 transition-all min-h-[44px] ${
+                  archiveDirection === "C"
+                    ? "bg-[#0A3C2E]/25 border-emerald-800 text-white"
+                    : "bg-[#161616] border-neutral-800 text-neutral-300 hover:border-neutral-600"
+                }`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-bold text-sm uppercase tracking-wide">Direction C</span>
+                  <span className="font-mono text-[10px] text-neutral-500">Gallery</span>
+                </div>
+                <p className="text-[11px] text-neutral-400 mt-2 leading-relaxed">
+                  Cereal / Nowness gallery wall — asymmetric crops, equipment as artifacts.
+                </p>
+              </button>
+            </div>
+
+            <div className="flex flex-col items-center pt-2">
+              <div className="bg-[#222] text-xs px-3 py-1 rounded-full text-white font-mono uppercase tracking-widest mb-3 border border-neutral-800">
+                {archiveDirection === "A"
+                  ? "Preview · Concept A: Editorial Cover"
+                  : "Preview · Concept C: Gallery Wall"}
+              </div>
+              <div
+                ref={archiveScrollContainerRef}
+                className="w-full max-w-[375px] h-[680px] bg-white text-[#181818] border border-neutral-800 rounded-3xl overflow-y-auto relative scrollbar-none shadow-xl flex flex-col"
+              >
+                <div className="sticky top-0 bg-white/90 backdrop-blur-xs z-20 px-4 py-3 border-b border-neutral-100 flex justify-between items-center select-none">
+                  <Menu className="w-4 h-4 text-neutral-800" />
+                  <span className="font-semibold tracking-[0.2em] text-[8px] font-sans text-neutral-900">
+                    UNITED STRENGTH CLUB
+                  </span>
+                  <div className="w-4"></div>
+                </div>
+                {archiveDirection === "A" ? (
                   <ConceptAView onNav={triggerNavigation} />
-                </div>
-              </div>
-
-              {/* CONCEPT C */}
-              <div className="flex flex-col items-center">
-                <div className="bg-[#222] text-xs px-3 py-1 rounded-full text-white font-mono uppercase tracking-widest mb-3 border border-neutral-800">
-                  Concept C: Gallery Wall
-                </div>
-                <div className="w-full max-w-[375px] h-[680px] bg-white text-[#181818] border border-neutral-800 rounded-3xl overflow-y-auto relative scrollbar-none shadow-xl flex flex-col" ref={compScrollContainerRefC}>
-                  {/* Embedded Static Header */}
-                  <div className="sticky top-0 bg-white/90 backdrop-blur-xs z-20 px-4 py-3 border-b border-neutral-100 flex justify-between items-center select-none">
-                    <Menu className="w-4 h-4 text-neutral-800" />
-                    <span className="font-semibold tracking-[0.2em] text-[8px] font-sans text-neutral-900">
-                      UNITED STRENGTH CLUB
-                    </span>
-                    <div className="w-4"></div>
-                  </div>
+                ) : (
                   <ConceptCView onNav={triggerNavigation} />
-                </div>
+                )}
               </div>
-
-              {/* CONCEPT D */}
-              <div className="flex flex-col items-center">
-                <div className="bg-[#0A3C2E] text-xs px-3 py-1 rounded-full text-emerald-100 font-mono uppercase tracking-widest mb-3 border border-emerald-900">
-                  Concept D: Ritual Progression
-                </div>
-                <div className="w-full max-w-[375px] h-[680px] bg-white text-[#181818] border border-neutral-800 rounded-3xl overflow-y-auto relative scrollbar-none shadow-xl flex flex-col" ref={compScrollContainerRefD}>
-                  <div className="sticky top-0 bg-white/90 backdrop-blur-xs z-20 px-4 py-3 border-b border-neutral-100 flex justify-between items-center select-none">
-                    <Menu className="w-4 h-4 text-neutral-800" />
-                    <span className="font-semibold tracking-[-0.03em] text-[8px] font-sans text-neutral-900">
-                      UNITED STRENGTH CLUB
-                    </span>
-                    <div className="w-4"></div>
-                  </div>
-                  <ConceptDView onNav={triggerNavigation} />
-                </div>
-              </div>
-
+              <p className="text-[10px] font-mono text-neutral-500 mt-4 text-center max-w-sm">
+                Tip: screenshot anything to keep, then we can fold it into D and retire this archive.
+              </p>
             </div>
           </div>
         )}
