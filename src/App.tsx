@@ -36,31 +36,94 @@ const CORE_LINKS = [
   { label: "Open Gym", href: "/offerings/open-gym" }
 ];
 
-/** Todd Aug 2026 — locked IA (Direction D) */
-const LOCKED_NAV_LINKS = [
-  { label: "Philosophy", href: "/about/philosophy", group: "ABOUT" },
-  { label: "Founder Story", href: "/about/founder", group: "ABOUT" },
-  { label: "Meet the Team", href: "/about/team", group: "ABOUT" },
-  { label: "The Space", href: "/about/the-space", group: "ABOUT" },
-  { label: "FAQ", href: "/about/faq", group: "ABOUT" },
-  { label: "BUILD", href: "/training/classes/build", group: "TRAINING" },
-  { label: "BURN", href: "/training/classes/burn", group: "TRAINING" },
-  { label: "BALANCE (Coming Soon)", href: "/training/classes/balance", group: "TRAINING" },
-  { label: "1-on-1 Coaching", href: "/training/personal/1-on-1", group: "TRAINING" },
-  { label: "Small Group Training", href: "/training/personal/small-group", group: "TRAINING" },
-  { label: "Private Group Training", href: "/training/personal/private-group", group: "TRAINING" },
-  { label: "Foundation", href: "/foundation", group: "FOUNDATION" },
-  { label: "Reflection", href: "/longevity/reflection", group: "LONGEVITY" },
-  { label: "The Strength Standard", href: "/longevity/strength-standard", group: "LONGEVITY" },
-  { label: "The Trials", href: "/longevity/the-trials", group: "LONGEVITY" },
-  { label: "Move the City", href: "/culture/move-the-city", group: "CULTURE" },
-  { label: "Cultivated", href: "/culture/cultivated", group: "CULTURE" },
-  { label: "Archive", href: "/culture/archive", group: "CULTURE" },
-  { label: "Membership", href: "/membership", group: "MEMBERSHIP" },
-  { label: "Shop / United Limited", href: "https://unitedlimited.com", group: "SHOP", external: true },
-  { label: "Experience United", href: "/start-here/experience", group: "START HERE" },
-  { label: "Apply for Membership", href: "/start-here/apply", group: "START HERE" },
-] as const;
+/** Todd Aug 2026 — locked IA (Direction D) — exact hierarchy */
+type NavLeaf = { label: string; href: string; external?: boolean; comingSoon?: boolean };
+type NavBranch = { label: string; children: NavLeaf[] };
+type NavSection =
+  | { title: string; kind: "links"; items: NavLeaf[] }
+  | { title: string; kind: "branches"; branches: NavBranch[] }
+  | { title: string; kind: "direct"; item: NavLeaf };
+
+const LOCKED_NAV: NavSection[] = [
+  {
+    title: "ABOUT",
+    kind: "links",
+    items: [
+      { label: "Philosophy", href: "/about/philosophy" },
+      { label: "Founder Story", href: "/about/founder" },
+      { label: "Meet the Team", href: "/about/team" },
+      { label: "The Space", href: "/about/the-space" },
+      { label: "FAQ", href: "/about/faq" },
+    ],
+  },
+  {
+    title: "TRAINING",
+    kind: "branches",
+    branches: [
+      {
+        label: "Classes",
+        children: [
+          { label: "BUILD", href: "/training/classes/build" },
+          { label: "BURN", href: "/training/classes/burn" },
+          { label: "BALANCE", href: "/training/classes/balance", comingSoon: true },
+        ],
+      },
+      {
+        label: "Personal Training",
+        children: [
+          { label: "1-on-1 Coaching", href: "/training/personal/1-on-1" },
+          { label: "Small Group Training", href: "/training/personal/small-group" },
+          { label: "Private Group Training", href: "/training/personal/private-group" },
+        ],
+      },
+    ],
+  },
+  {
+    title: "FOUNDATION",
+    kind: "direct",
+    item: { label: "Foundation", href: "/foundation" },
+  },
+  {
+    title: "LONGEVITY",
+    kind: "links",
+    items: [
+      { label: "Reflection", href: "/longevity/reflection" },
+      { label: "The Strength Standard", href: "/longevity/strength-standard" },
+      { label: "The Trials", href: "/longevity/the-trials" },
+    ],
+  },
+  {
+    title: "CULTURE",
+    kind: "links",
+    items: [
+      { label: "Move the City", href: "/culture/move-the-city" },
+      { label: "Cultivated", href: "/culture/cultivated" },
+      { label: "Archive", href: "/culture/archive" },
+    ],
+  },
+  {
+    title: "MEMBERSHIP",
+    kind: "direct",
+    item: { label: "Membership", href: "/membership" },
+  },
+  {
+    title: "SHOP",
+    kind: "direct",
+    item: {
+      label: "United Limited",
+      href: "https://unitedlimited.com",
+      external: true,
+    },
+  },
+  {
+    title: "START HERE",
+    kind: "links",
+    items: [
+      { label: "Experience United", href: "/start-here/experience" },
+      { label: "Apply for Membership", href: "/start-here/apply" },
+    ],
+  },
+];
 
 const FOOTER_LINKS = [
   { label: "FAQ", href: "/faq" },
@@ -123,12 +186,14 @@ export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [copiedColor, setCopiedColor] = useState<string | null>(null);
   const [navigationNotification, setNavigationNotification] = useState<string | null>(null);
+  /** Hide sticky beta chrome while scrolling so Direction preview is full-bleed on phone */
+  const [chromeHidden, setChromeHidden] = useState(false);
 
   // User route configuration states
   const [teamRoute, setTeamRoute] = useState<string>("/team");
-  const [isTeamVisible, setIsTeamVisible] = useState<boolean>(true);
+  const [isTeamVisible, setIsTeamVisible] = useState(true);
 
-  // Dynamically constructed core links list (A/C legacy). Direction D uses LOCKED_NAV_LINKS.
+  // Dynamically constructed core links list (A/C legacy). Direction D uses LOCKED_NAV hierarchy.
   const dynamicCoreLinks = [
     { label: "New here", href: "/new-here" },
     { label: "Memberships", href: "/memberships" },
@@ -142,16 +207,13 @@ export default function App() {
     { label: "Open Gym", href: "/offerings/open-gym" }
   ];
 
-  const overlayLinks =
-    activeConcept === "D"
-      ? LOCKED_NAV_LINKS.map(({ label, href }) => ({ label, href }))
-      : dynamicCoreLinks;
-
   // References for mobile frames to track manual scrolling
   const simScrollContainerRef = useRef<HTMLDivElement>(null);
   const compScrollContainerRefA = useRef<HTMLDivElement>(null);
   const compScrollContainerRefC = useRef<HTMLDivElement>(null);
   const compScrollContainerRefD = useRef<HTMLDivElement>(null);
+  const lastWindowScrollY = useRef(0);
+  const lastSimScrollY = useRef(0);
 
   // Format today's date exactly as requested: "Columbus, OH | Weekday, Month Day, Year"
   const getFormattedDate = () => {
@@ -205,27 +267,53 @@ export default function App() {
   useEffect(() => {
     setIsMenuOpen(false);
     setIsScrolled(false);
+    setChromeHidden(false);
+    lastSimScrollY.current = 0;
     setActiveSimRoute("/");
     if (simScrollContainerRef.current) {
       simScrollContainerRef.current.scrollTop = 0;
     }
   }, [activeConcept]);
 
+  // Hide beta chrome when the page scrolls (real phone viewport / tall page)
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY;
+      const delta = y - lastWindowScrollY.current;
+      if (delta > 6 && y > 32) setChromeHidden(true);
+      else if (delta < -6 || y < 16) setChromeHidden(false);
+      lastWindowScrollY.current = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   // Monitor scroll in simulator to handle crest wordmark/monogram transition
+  // and tuck away the sticky beta chrome so the phone frame is unobstructed.
   const handleSimScroll = () => {
-    if (simScrollContainerRef.current) {
-      setIsScrolled(simScrollContainerRef.current.scrollTop > 20);
-    }
+    if (!simScrollContainerRef.current) return;
+    const top = simScrollContainerRef.current.scrollTop;
+    setIsScrolled(top > 20);
+    const delta = top - lastSimScrollY.current;
+    if (delta > 6 && top > 24) setChromeHidden(true);
+    else if (delta < -8 || top < 12) setChromeHidden(false);
+    lastSimScrollY.current = top;
   };
 
   return (
     <div className="min-h-screen bg-[#111111] text-[#E5E5E5] flex flex-col font-sans">
       
-      {/* HEADER / CONTROL BAR */}
-      <header className="border-b border-neutral-800 bg-[#161616] sticky top-0 z-40 px-6 py-4">
+      {/* HEADER / CONTROL BAR — collapses on scroll so Direction preview is clear on phone */}
+      <header
+        className={`border-b border-neutral-800 bg-[#161616] sticky top-0 z-40 overflow-hidden transition-[max-height,opacity,padding] duration-300 ease-out ${
+          chromeHidden
+            ? "max-h-0 py-0 opacity-0 pointer-events-none border-transparent"
+            : "max-h-[320px] px-6 py-4 opacity-100"
+        }`}
+      >
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
               <span className="bg-[#0A3C2E] text-emerald-400 text-xs px-2 py-0.5 rounded-full font-mono uppercase tracking-wider font-semibold">
                 BETA EXPLORATION
               </span>
@@ -282,6 +370,18 @@ export default function App() {
           </div>
         </div>
       </header>
+
+      {/* Reveal beta chrome without scrolling back to top */}
+      {chromeHidden && (
+        <button
+          type="button"
+          onClick={() => setChromeHidden(false)}
+          className="fixed top-3 left-3 z-50 min-h-[44px] min-w-[44px] px-3 rounded-full bg-[#0A3C2E] text-emerald-400 text-[10px] font-mono font-semibold uppercase tracking-wider shadow-lg border border-emerald-900/60"
+          title="Show beta controls"
+        >
+          BETA
+        </button>
+      )}
 
       {/* SYSTEM ROUTE NOTIFICATION TOASTER */}
       {navigationNotification && (
@@ -475,7 +575,7 @@ export default function App() {
                     </div>
 
                     {/* Close Trigger top bar */}
-                    <div className="relative z-10 flex items-center justify-between mb-8">
+                    <div className="relative z-10 flex items-center justify-between mb-4">
                       {/* Close button on LEFT matching hamburger position */}
                       <button
                         onClick={() => setIsMenuOpen(false)}
@@ -491,31 +591,40 @@ export default function App() {
                       </span>
                     </div>
 
-                    {/* Flat menu links list - white uppercase, left aligned */}
-                    <div className="relative z-10 flex-1 flex flex-col justify-between pt-4">
-                      <nav className="flex flex-col gap-4 text-left overflow-y-auto max-h-[55vh] scrollbar-none pr-1">
-                        {overlayLinks.map((link) => (
-                          <a
-                            key={link.href + link.label}
-                            href={link.href}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              setIsMenuOpen(false);
-                              triggerNavigation(link.href, link.label);
-                            }}
-                            className="group flex items-baseline gap-2 transition-transform duration-200 hover:translate-x-1"
-                          >
-                            <span className="font-sans font-extrabold tracking-widest text-[13px] text-white uppercase">
-                              {link.label}
-                            </span>
-                            <span className="h-[1px] flex-1 bg-white/10 group-hover:bg-white/30 transition-colors"></span>
-                            <ChevronRight className="w-3.5 h-3.5 text-neutral-600 group-hover:text-neutral-400 shrink-0" />
-                          </a>
-                        ))}
-                      </nav>
+                    {/* Menu links — Direction D = locked hierarchy; A/C = flat legacy */}
+                    <div className="relative z-10 flex-1 flex flex-col justify-between pt-2 min-h-0">
+                      {activeConcept === "D" ? (
+                        <LockedNavOverlay
+                          onNavigate={(href, label) => {
+                            setIsMenuOpen(false);
+                            triggerNavigation(href, label);
+                          }}
+                        />
+                      ) : (
+                        <nav className="flex flex-col gap-4 text-left overflow-y-auto max-h-[55vh] scrollbar-none pr-1">
+                          {dynamicCoreLinks.map((link) => (
+                            <a
+                              key={link.href + link.label}
+                              href={link.href}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setIsMenuOpen(false);
+                                triggerNavigation(link.href, link.label);
+                              }}
+                              className="group flex items-baseline gap-2 transition-transform duration-200 hover:translate-x-1"
+                            >
+                              <span className="font-sans font-extrabold tracking-widest text-[13px] text-white uppercase">
+                                {link.label}
+                              </span>
+                              <span className="h-[1px] flex-1 bg-white/10 group-hover:bg-white/30 transition-colors"></span>
+                              <ChevronRight className="w-3.5 h-3.5 text-neutral-600 group-hover:text-neutral-400 shrink-0" />
+                            </a>
+                          ))}
+                        </nav>
+                      )}
 
                       {/* Footer lines inside Overlay */}
-                      <div className="border-t border-neutral-800 pt-5 mt-4 text-[10px] font-mono text-neutral-400 flex flex-col gap-2">
+                      <div className="border-t border-neutral-800 pt-4 mt-3 text-[10px] font-mono text-neutral-400 flex flex-col gap-2 shrink-0">
                         <div className="flex justify-between">
                           <span>237 Cleveland Ave</span>
                           <span>Columbus, OH 43215</span>
@@ -1100,6 +1209,77 @@ export default function App() {
       </footer>
 
     </div>
+  );
+}
+
+// ----------------------------------------------------------------------
+// DIRECTION D — LOCKED HIERARCHICAL OVERLAY NAV
+// ----------------------------------------------------------------------
+function LockedNavOverlay({
+  onNavigate,
+}: {
+  onNavigate: (href: string, label: string) => void;
+}) {
+  const linkRow = (item: NavLeaf, indent = false) => {
+    const label = item.comingSoon ? `${item.label} (Coming Soon)` : item.label;
+    return (
+      <a
+        key={item.href + item.label}
+        href={item.href}
+        onClick={(e) => {
+          e.preventDefault();
+          onNavigate(item.href, label);
+        }}
+        className={`group flex items-baseline gap-2 transition-transform duration-200 hover:translate-x-1 ${
+          indent ? "pl-3" : ""
+        } ${item.comingSoon ? "opacity-60" : ""}`}
+      >
+        <span className="font-sans font-semibold tracking-widest text-[12px] text-white uppercase">
+          {label}
+        </span>
+        <span className="h-[1px] flex-1 bg-white/10 group-hover:bg-white/30 transition-colors" />
+        {item.external ? (
+          <ExternalLink className="w-3 h-3 text-neutral-500 group-hover:text-neutral-300 shrink-0" />
+        ) : (
+          <ChevronRight className="w-3.5 h-3.5 text-neutral-600 group-hover:text-neutral-400 shrink-0" />
+        )}
+      </a>
+    );
+  };
+
+  return (
+    <nav className="flex flex-col gap-5 text-left overflow-y-auto max-h-[58vh] scrollbar-none pr-1 pb-2">
+      {LOCKED_NAV.map((section) => (
+        <div key={section.title} className="space-y-2">
+          <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-neutral-500">
+            {section.title}
+          </p>
+
+          {section.kind === "links" && (
+            <div className="flex flex-col gap-2.5">{section.items.map((item) => linkRow(item))}</div>
+          )}
+
+          {section.kind === "direct" && (
+            <div className="flex flex-col gap-2.5">{linkRow(section.item)}</div>
+          )}
+
+          {section.kind === "branches" && (
+            <div className="flex flex-col gap-3">
+              {section.branches.map((branch) => (
+                <div key={branch.label} className="space-y-2">
+                  <p className="font-sans text-[11px] font-bold uppercase tracking-[0.14em] text-white/85 pl-0">
+                    {branch.label}
+                  </p>
+                  <div className="flex flex-col gap-2 border-l border-white/15 ml-0.5">
+                    {branch.children.map((child) => linkRow(child, true))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </nav>
   );
 }
 

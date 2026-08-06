@@ -1,0 +1,17 @@
+# dependencies
+node_modules/
+
+# build
+dist/
+
+# env / secrets
+.env
+.env.*
+!.env.example
+
+# Vercel
+.vercel/
+
+# logs / OS
+*.log
+.DS_Store
