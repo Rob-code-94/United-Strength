@@ -275,30 +275,36 @@ export default function App() {
     }
   }, [activeConcept]);
 
-  // Hide beta chrome when the page scrolls (real phone viewport / tall page)
+  // Hide beta chrome on scroll — stays collapsed until the BETA pill is tapped
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY;
-      const delta = y - lastWindowScrollY.current;
-      if (delta > 6 && y > 32) setChromeHidden(true);
-      else if (delta < -6 || y < 16) setChromeHidden(false);
+      if (y - lastWindowScrollY.current > 6 && y > 32) setChromeHidden(true);
       lastWindowScrollY.current = y;
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Monitor scroll in simulator to handle crest wordmark/monogram transition
-  // and tuck away the sticky beta chrome so the phone frame is unobstructed.
+  // Crest wordmark/monogram + auto-collapse beta chrome (manual reopen only)
   const handleSimScroll = () => {
     if (!simScrollContainerRef.current) return;
     const top = simScrollContainerRef.current.scrollTop;
     setIsScrolled(top > 20);
-    const delta = top - lastSimScrollY.current;
-    if (delta > 6 && top > 24) setChromeHidden(true);
-    else if (delta < -8 || top < 12) setChromeHidden(false);
+    if (top - lastSimScrollY.current > 6 && top > 24) setChromeHidden(true);
     lastSimScrollY.current = top;
   };
+
+  // Lock phone-stage scroll while overlay menu is open
+  useEffect(() => {
+    const el = simScrollContainerRef.current;
+    if (!el) return;
+    if (isMenuOpen) {
+      el.style.overflow = "hidden";
+    } else {
+      el.style.overflow = "";
+    }
+  }, [isMenuOpen]);
 
   return (
     <div className="min-h-screen bg-[#111111] text-[#E5E5E5] flex flex-col font-sans">
@@ -460,13 +466,13 @@ export default function App() {
               <div className="relative w-[375px] h-[780px] bg-[#181818] rounded-[48px] p-3 shadow-2xl border-[10px] border-[#2c2c2c] overflow-hidden flex flex-col">
                 
                 {/* Speaker Grill & Camera (Notch Spacer) */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 h-6 w-32 bg-[#2c2c2c] rounded-b-2xl z-50 flex items-center justify-center gap-1.5">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 h-6 w-32 bg-[#2c2c2c] rounded-b-2xl z-[70] flex items-center justify-center gap-1.5 pointer-events-none">
                   <div className="w-10 h-1 bg-black/40 rounded-full"></div>
                   <div className="w-2.5 h-2.5 bg-black/60 rounded-full"></div>
                 </div>
 
                 {/* Status Bar */}
-                <div className="h-6 w-full px-6 flex justify-between items-center bg-transparent z-40 text-[#181818] text-[11px] font-mono select-none">
+                <div className="h-6 w-full px-6 flex justify-between items-center bg-transparent z-40 text-[#181818] text-[11px] font-mono select-none shrink-0">
                   <span className="font-bold">10:28</span>
                   <div className="flex items-center gap-1.5">
                     <span className="text-[9px]">5G</span>
@@ -476,11 +482,11 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* SCROLLABLE SCREEN STAGE */}
+                {/* SCROLLABLE SCREEN STAGE — container query height so chapters fill the phone */}
                 <div
                   ref={simScrollContainerRef}
                   onScroll={handleSimScroll}
-                  className="flex-1 w-full bg-white text-[#181818] overflow-y-auto rounded-[36px] relative scrollbar-none flex flex-col"
+                  className="relative flex-1 min-h-0 w-full bg-white text-[#181818] overflow-y-auto rounded-[36px] scrollbar-none flex flex-col [container-type:size]"
                 >
                   
                   {/* BRAND HEADER & TRANSITION CONTROLLER */}
@@ -543,7 +549,7 @@ export default function App() {
                   </div>
 
                   {/* ACTIVE HOME-SCREEN CONCEPTS CONTENT */}
-                  <div className="flex-1 flex flex-col">
+                  <div className="flex flex-col">
                     {activeSimRoute === "/team" ? (
                       <ConceptTeamView onNav={triggerNavigation} />
                     ) : (
@@ -561,98 +567,93 @@ export default function App() {
                     )}
                   </div>
 
-                  {/* FULL VIEWPORT OVERLAY MENU (ALD Mobile Menu Style) */}
-                  <div
-                    className={`absolute inset-0 z-50 bg-[#181818] text-white flex flex-col transition-all duration-500 ease-out p-6 rounded-[36px] overflow-hidden ${
-                      isMenuOpen
-                        ? "opacity-100 pointer-events-auto scale-100 translate-y-0"
-                        : "opacity-0 pointer-events-none scale-95 translate-y-4"
-                    }`}
-                  >
-                    {/* Background Stealth Logo Watermark at ~6% opacity */}
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-                      <USCrestSVG className="w-72 h-72 text-white/5 opacity-100" />
-                    </div>
+                </div>
 
-                    {/* Close Trigger top bar */}
-                    <div className="relative z-10 flex items-center justify-between mb-4">
-                      {/* Close button on LEFT matching hamburger position */}
-                      <button
-                        onClick={() => setIsMenuOpen(false)}
-                        className="p-1 -ml-1 text-white hover:opacity-80 transition-all"
-                        title="Close Overlay Menu"
-                      >
-                        <X className="w-5 h-5" />
-                      </button>
+                {/* FULL-SCREEN OVERLAY MENU — covers entire phone until closed */}
+                <div
+                  className={`absolute inset-0 z-[60] bg-[#181818] text-white flex flex-col transition-opacity duration-300 ease-out ${
+                    isMenuOpen
+                      ? "opacity-100 pointer-events-auto visible"
+                      : "opacity-0 pointer-events-none invisible"
+                  }`}
+                  aria-hidden={!isMenuOpen}
+                >
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+                    <USCrestSVG className="w-72 h-72 text-white/5" />
+                  </div>
 
-                      {/* Tiny subtle aesthetic detail */}
-                      <span className="font-mono text-[9px] text-neutral-500 tracking-widest uppercase">
-                        PRIVATE INVITATION ONLY
-                      </span>
-                    </div>
+                  <div className="relative z-10 flex items-center justify-between px-6 pt-10 pb-4 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="min-h-[44px] min-w-[44px] flex items-center justify-start -ml-1 text-white hover:opacity-80 transition-all"
+                      title="Close Overlay Menu"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                    <span className="font-mono text-[9px] text-neutral-500 tracking-widest uppercase">
+                      PRIVATE INVITATION ONLY
+                    </span>
+                  </div>
 
-                    {/* Menu links — Direction D = locked hierarchy; A/C = flat legacy */}
-                    <div className="relative z-10 flex-1 flex flex-col justify-between pt-2 min-h-0">
-                      {activeConcept === "D" ? (
-                        <LockedNavOverlay
-                          onNavigate={(href, label) => {
-                            setIsMenuOpen(false);
-                            triggerNavigation(href, label);
-                          }}
-                        />
-                      ) : (
-                        <nav className="flex flex-col gap-4 text-left overflow-y-auto max-h-[55vh] scrollbar-none pr-1">
-                          {dynamicCoreLinks.map((link) => (
-                            <a
-                              key={link.href + link.label}
-                              href={link.href}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                setIsMenuOpen(false);
-                                triggerNavigation(link.href, link.label);
-                              }}
-                              className="group flex items-baseline gap-2 transition-transform duration-200 hover:translate-x-1"
-                            >
-                              <span className="font-sans font-extrabold tracking-widest text-[13px] text-white uppercase">
-                                {link.label}
-                              </span>
-                              <span className="h-[1px] flex-1 bg-white/10 group-hover:bg-white/30 transition-colors"></span>
-                              <ChevronRight className="w-3.5 h-3.5 text-neutral-600 group-hover:text-neutral-400 shrink-0" />
-                            </a>
-                          ))}
-                        </nav>
-                      )}
-
-                      {/* Footer lines inside Overlay */}
-                      <div className="border-t border-neutral-800 pt-4 mt-3 text-[10px] font-mono text-neutral-400 flex flex-col gap-2 shrink-0">
-                        <div className="flex justify-between">
-                          <span>237 Cleveland Ave</span>
-                          <span>Columbus, OH 43215</span>
-                        </div>
-                        <div className="flex justify-between">
+                  <div className="relative z-10 flex-1 min-h-0 flex flex-col px-6 pb-8">
+                    {activeConcept === "D" ? (
+                      <LockedNavOverlay
+                        onNavigate={(href, label) => {
+                          setIsMenuOpen(false);
+                          triggerNavigation(href, label);
+                        }}
+                      />
+                    ) : (
+                      <nav className="flex-1 min-h-0 overflow-y-auto scrollbar-none pr-1 flex flex-col gap-4 text-left">
+                        {dynamicCoreLinks.map((link) => (
                           <a
-                            href="mailto:info@unitedstrengthgym.com"
-                            className="hover:text-white transition-colors"
+                            key={link.href + link.label}
+                            href={link.href}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setIsMenuOpen(false);
+                              triggerNavigation(link.href, link.label);
+                            }}
+                            className="group flex items-baseline gap-2 transition-transform duration-200 hover:translate-x-1"
                           >
-                            info@unitedstrengthgym.com
+                            <span className="font-sans font-extrabold tracking-widest text-[13px] text-white uppercase">
+                              {link.label}
+                            </span>
+                            <span className="h-[1px] flex-1 bg-white/10 group-hover:bg-white/30 transition-colors"></span>
+                            <ChevronRight className="w-3.5 h-3.5 text-neutral-600 group-hover:text-neutral-400 shrink-0" />
                           </a>
-                          <a
-                            href="https://www.instagram.com/united_strength/"
-                            target="_blank"
-                            rel="noreferrer"
-                            className="hover:text-white transition-colors flex items-center gap-1"
-                          >
-                            Instagram <ExternalLink className="w-2.5 h-2.5" />
-                          </a>
-                        </div>
+                        ))}
+                      </nav>
+                    )}
+
+                    <div className="border-t border-neutral-800 pt-4 mt-4 text-[10px] font-mono text-neutral-400 flex flex-col gap-2 shrink-0">
+                      <div className="flex justify-between gap-3">
+                        <span>237 Cleveland Ave</span>
+                        <span className="text-right">Columbus, OH 43215</span>
+                      </div>
+                      <div className="flex justify-between gap-3">
+                        <a
+                          href="mailto:info@unitedstrengthgym.com"
+                          className="hover:text-white transition-colors"
+                        >
+                          info@unitedstrengthgym.com
+                        </a>
+                        <a
+                          href="https://www.instagram.com/united_strength/"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="hover:text-white transition-colors flex items-center gap-1 shrink-0"
+                        >
+                          Instagram <ExternalLink className="w-2.5 h-2.5" />
+                        </a>
                       </div>
                     </div>
                   </div>
-
                 </div>
 
                 {/* Device Home Indicator Bar */}
-                <div className="absolute bottom-1 left-1/2 -translate-x-1/2 h-1 w-28 bg-[#2c2c2c] rounded-full z-40 select-none pointer-events-none"></div>
+                <div className="absolute bottom-1 left-1/2 -translate-x-1/2 h-1 w-28 bg-[#2c2c2c] rounded-full z-[65] select-none pointer-events-none"></div>
 
               </div>
 
@@ -1248,9 +1249,9 @@ function LockedNavOverlay({
   };
 
   return (
-    <nav className="flex flex-col gap-5 text-left overflow-y-auto max-h-[58vh] scrollbar-none pr-1 pb-2">
+    <nav className="flex-1 min-h-0 overflow-y-auto scrollbar-none pr-1 flex flex-col gap-5 text-left pb-2">
       {LOCKED_NAV.map((section) => (
-        <div key={section.title} className="space-y-2">
+        <div key={section.title} className="space-y-2 shrink-0">
           <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-neutral-500">
             {section.title}
           </p>
