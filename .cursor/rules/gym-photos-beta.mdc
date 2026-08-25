@@ -1,0 +1,55 @@
+---
+description: Canonical gym photography source folder and website wiring
+alwaysApply: true
+---
+
+# GYM PHOTOS BETA — facility photography
+
+**Source folder (repo root):** `GYM PHOTOS BETA/`
+
+This is the master library for all United Strength facility photos. Do **not** use Unsplash or stock placeholders when a real asset exists here. When adding or swapping site imagery, pick from this folder first.
+
+## Current subfolders
+
+| Folder | Purpose |
+|--------|---------|
+| *(root)* | General facility shots not yet sorted |
+| `B Roll aesthitc ` | Aesthetic b-roll — atmosphere, architecture, cinematic crops (note trailing space in folder name) |
+| `Equipment` | Equipment close-ups and rack/detail shots |
+
+**More folders will be added.** When new subfolders appear, update this table with name + intended use. Do not rename source folders unless the client asks.
+
+## Source files (Aug 2025 shoot)
+
+All files prefixed `6.3.25 - United-*.jpg` (June 3, 2025 session).
+
+- **Root:** `6.3.25 - United-59.jpg`
+- **B Roll aesthitc :** 103, 119, 127, 129, 130, 132, 136
+- **Equipment:** 10, 96, 99, 100, 108, 109, 122, 125
+
+## Website wiring
+
+Copied/optimized assets live in `src/assets/images/gym/` and are exported from `src/assets/images/gym/index.ts`.
+
+| Web asset | Source | Used for |
+|-----------|--------|----------|
+| `hero-full-bleed.jpg` | root · United-59 | Concept D hero (full viewport) |
+| `space-atmosphere.jpg` | B Roll · United-103 | Concept D “The Space” chapter |
+| `architecture-raw.jpg` | B Roll · United-136 | Concept A hero (raw architecture) |
+| `gallery-cinematic.jpg` | B Roll · United-119 | Concept C gallery hero |
+| `equipment-close.jpg` | Equipment · United-108 | Concept C equipment detail |
+
+## When adding photos
+
+1. Drop new files into the appropriate `GYM PHOTOS BETA/` subfolder (or create a new subfolder and note it here).
+2. Copy chosen files to `src/assets/images/gym/` with a short semantic filename (kebab-case).
+3. Export from `src/assets/images/gym/index.ts` and import in components.
+4. Update the wiring table above.
+
+Coach/team headshots stay in `src/assets/images/` (separate from facility library).
+
+## Anti-patterns
+
+- Hardcoding Unsplash URLs for facility/space/equipment imagery
+- Importing directly from `GYM PHOTOS BETA/` in components (Vite bundle path — copy to `src/assets/images/gym/` instead)
+- Renaming or moving files inside `GYM PHOTOS BETA/` without updating this rule

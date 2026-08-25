@@ -1,4 +1,5 @@
 import { ChevronRight } from "lucide-react";
+import { gymPhotos } from "../assets/images/gym";
 
 interface SubViewProps {
   onNav: (href: string, label: string) => void;
@@ -75,7 +76,7 @@ export default function ConceptDView({ onNav }: SubViewProps) {
         aria-label="Hero"
       >
         <img
-          src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=900&auto=format&fit=crop"
+          src={gymPhotos.heroFullBleed}
           alt="United Strength Club — cinematic facility"
           className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
         />
@@ -140,7 +141,7 @@ export default function ConceptDView({ onNav }: SubViewProps) {
       {/* 05 — The Space */}
       <section className="relative w-full min-h-[100cqh] shrink-0 overflow-hidden flex flex-col justify-end snap-start snap-always">
         <img
-          src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=900&auto=format&fit=crop"
+          src={gymPhotos.spaceAtmosphere}
           alt="The Space — facility atmosphere"
           className="absolute inset-0 w-full h-full object-cover grayscale brightness-90 select-none pointer-events-none"
         />

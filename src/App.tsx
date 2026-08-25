@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import ConceptTeamView from "./components/ConceptTeamView";
 import ConceptDView from "./components/ConceptDView";
+import { gymPhotos } from "./assets/images/gym";
 
 // ----------------------------------------------------------------------
 // BRAND CONSTANTS & LINKS
@@ -1248,7 +1249,7 @@ function ConceptAView({ onNav }: SubViewProps) {
         <div className="my-8 relative group">
           <div className="absolute inset-0 bg-neutral-900/5 mix-blend-multiply rounded-sm"></div>
           <img
-            src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=600&auto=format&fit=crop"
+            src={gymPhotos.architectureRaw}
             alt="Cinematic raw athletic studio, harsh concrete pillars with sunlight casting shadows"
             className="w-full h-[280px] object-cover grayscale contrast-115 brightness-95 rounded-sm select-none pointer-events-none"
           />
@@ -1392,7 +1393,7 @@ function ConceptCView({ onNav }: SubViewProps) {
         <div className="relative rounded-sm overflow-hidden my-4">
           <div className="absolute inset-0 bg-neutral-900/10 mix-blend-multiply"></div>
           <img
-            src="https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=600&auto=format&fit=crop"
+            src={gymPhotos.galleryCinematic}
             alt="Moody, cinematic light casting on athlete resting, museum-like stillness"
             className="w-full h-[220px] object-cover filter brightness-95 rounded-xs select-none pointer-events-none"
           />
@@ -1402,7 +1403,7 @@ function ConceptCView({ onNav }: SubViewProps) {
         <div className="grid grid-cols-12 gap-3 my-4">
           <div className="col-span-7">
             <img
-              src="https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=600&auto=format&fit=crop"
+              src={gymPhotos.equipmentClose}
               alt="Sculptural metal custom gym equipment close up"
               className="w-full h-[120px] object-cover grayscale rounded-xs select-none pointer-events-none"
             />
