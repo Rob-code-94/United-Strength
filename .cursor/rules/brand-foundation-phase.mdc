@@ -1,0 +1,60 @@
+---
+description: >-
+  Brand foundation phase — read this rule and attached skills when running
+  website-brand-foundation on any client. Foundation only; no npm dev or src/
+  changes until direction is approved.
+alwaysApply: false
+---
+
+# Brand Foundation Phase
+
+Invoke when the user runs `website-brand-foundation` or asks for palette, moodboard, inspo analysis, or look-and-feel before build.
+
+## Phase gate
+
+**Foundation only.** Do NOT scaffold routes, edit `src/**`, or run `npm dev` until the user approves a direction and invokes `website-frontend-build`.
+
+## Skills to read (every foundation run)
+
+| Skill | Path / trigger | Role |
+|-------|----------------|------|
+| **website-brand-foundation** | `~/.cursor/skills/website-brand-foundation/SKILL.md` | Primary workflow |
+| **canvas** | `~/.cursor/skills-cursor/canvas/SKILL.md` | Brand Direction Canvas |
+| **firecrawl** | Firecrawl plugin skill | Scrape fallback, bulk text |
+| **browser-automation** | Browse plugin skill | Fallback browser MCP |
+| **united-strength-brand** | `.cursor/skills/united-strength-brand/SKILL.md` | Project brand context (this client) |
+| **high-end-minimalist-ui** | `.cursor/skills/high-end-minimalist-ui/SKILL.md` | Editorial spacing, section rhythm |
+| **luxury-motion-micro-interactions** | `.cursor/skills/luxury-motion-micro-interactions/SKILL.md` | Motion pacing (600–800ms) |
+| **premium-mobile-touch-ux** | `.cursor/skills/premium-mobile-touch-ux/SKILL.md` | Mobile nav / drawer for sitemap notes |
+| **high-performance-media** | `.cursor/skills/high-performance-media/SKILL.md` | Hero video/still guidance |
+| **knowledge-capture** | Notion plugin skill | Optional Notion export |
+| **create-rule** | `~/.cursor/skills-cursor/create-rule/SKILL.md` | Validate brand-tokens.mdc |
+
+**Not in foundation phase:** `website-frontend-build` (build phase only).
+
+## MCP checklist
+
+| MCP / tool | When |
+|------------|------|
+| cursor-ide-browser | Inspo extraction, CDP CSS inspection, screenshots |
+| plugin-browse-browser | Fallback browser |
+| Firecrawl CLI | `~/.npm-global/bin/firecrawl scrape` when browser blocked |
+| plugin-notion-workspace-notion | Client deliverables (optional) |
+
+## Project deliverables (United Strength)
+
+- `.firecrawl/extraction-summary.md` — real extracted values
+- `canvases/` → Cursor-managed: `~/.cursor/projects/Users-cherobinson-Devolpment-Apps-United-Strength/canvases/{slug}-brand-direction.canvas.tsx`
+- `.cursor/skills/united-strength-brand/SKILL.md` — draft until client approves
+- `.cursor/rules/brand-tokens.mdc`
+- `moodboard.html`
+- `docs/brand-foundation-notion-export.md`
+
+## IA reference
+
+Use Sukha-first sitemap from [docs/information-architecture.md](../docs/information-architecture.md) — not a simplified `/apply`-only map.
+
+## Related
+
+- [docs/toolkit/README.md](../docs/toolkit/README.md)
+- [docs/client/client-direction-brief-2026-06-24.md](../docs/client/client-direction-brief-2026-06-24.md)

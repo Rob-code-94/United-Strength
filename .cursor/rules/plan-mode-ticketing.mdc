@@ -1,0 +1,41 @@
+---
+description: Plan mode workflow — audit existing work, sync todos with plans, drive full completion without duplicate tickets
+alwaysApply: true
+---
+
+# Plan-mode ticketing
+
+United Strength plans must be **ticketed**, **audited**, and **completed**. Applies when the user is in Plan mode, when using CreatePlan, or when scoping/breakdown work for this repo.
+
+## Before creating or updating a plan
+
+1. **Audit** what is already done:
+   - Existing plan frontmatter `todos` in `.cursor/plans/*.plan.md` (read only; do not edit plan files unless the user asks).
+   - Current session **TodoWrite** list.
+   - Repo state (files that exist, `git status`) so completed work is not re-ticketed.
+2. Mark completed items `completed` or omit duplicate todos.
+
+## When a plan is created (CreatePlan)
+
+1. Break work into **high-level, verifiable** todos (outcomes, not micro-steps).
+2. Immediately sync **TodoWrite** with plan items (typically 4–10 todos).
+3. Keep plan markdown todos and TodoWrite aligned as one source of truth.
+
+## When executing after user approval (Agent mode)
+
+1. Mark the first todo `in_progress`, do the work, mark `completed`.
+2. Repeat until **all** todos are `completed`.
+3. Do not stop with pending todos unless the user explicitly descopes.
+4. If scope grows: update todos together; audit again for overlap.
+5. Before closing: reconcile plan todos vs TodoWrite; report skipped items or scope changes.
+
+## Rules
+
+- A plan without trackable todos is incomplete.
+- Never duplicate tickets for work already shipped.
+- Prefer full completion over partial handoff.
+- **Aesthetic pivots:** Freeze the outgoing look in [docs/brand/versions/](../docs/brand/versions/) (manifest + token CSS + git tag) before implementing a new numbered version.
+
+## Related
+
+- [united-strength-aesthetic.mdc](united-strength-aesthetic.mdc)

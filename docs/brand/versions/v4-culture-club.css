@@ -1,0 +1,45 @@
+/**
+ * FROZEN SNAPSHOT — United Strength aesthetic v4 — The Culture Club (ALD-primary).
+ * Frozen: 2026-06-24. Active source of truth during v4: src/styles/versions/v4-culture-club.css
+ */
+:root,
+html[data-aesthetic-version="v4"] {
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f3eee7;
+  --color-bg-warm: #f7f7f7;
+  --color-bg-dark: #181818;
+  --color-text-primary: #181818;
+  --color-text-muted: #5c5c5c;
+  --color-text-on-dark: #ffffff;
+  --color-accent: #0a3c2e;
+  --color-accent-spare: #d43f21;
+
+  --background: var(--color-bg-primary);
+  --surface: var(--color-bg-primary);
+  --foreground: var(--color-text-primary);
+  --primary: var(--color-bg-warm);
+  --primary-foreground: var(--color-text-primary);
+  --muted: var(--color-text-muted);
+  --accent: var(--color-accent);
+  --border: rgb(24 24 24 / 0.1);
+  --surface-subtle: var(--color-bg-secondary);
+  --hero-overlay: rgb(24 24 24 / 0.42);
+  --gradient-mid: var(--color-bg-secondary);
+  --gradient-deep: var(--color-bg-warm);
+
+  --font-brand: var(--font-satoshi), "Helvetica Neue", Arial, sans-serif;
+  --font-sans: var(--font-brand);
+  --font-serif: var(--font-instrument-serif), "Libre Baskerville", Georgia, serif;
+  --font-mono: var(--font-ibm-plex-mono), ui-monospace, monospace;
+
+  --space-section: 120px;
+  --space-block: 48px;
+  --transition-slow: 700ms ease;
+  --ease-luxury: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+html[data-aesthetic-version="v4"]:focus-visible,
+html[data-aesthetic-version="v4"] :focus-visible {
+  outline: 2px solid rgb(24 24 24 / 0.35);
+  outline-offset: 2px;
+}

@@ -1,0 +1,40 @@
+---
+description: Direction E Odd Ritual patterns — chapter scroll, overlay accordion, Culture Club tokens
+alwaysApply: true
+---
+
+# Direction E — Odd Ritual Editorial
+
+**Active working surface** in the beta simulator: **Direction EF (E+F)** — default. **EF homepage is FROZEN** — see [direction-ef-home-frozen.mdc](direction-ef-home-frozen.mdc); do not edit home composition without unlock. Direction E remains the frozen Odd Ritual baseline (`direction-e/`; toggle hidden). Direction F (Awake lookbook) is also **hidden** for now. Direction D remains the locked IA source of truth in docs but is hidden in the UI. Active polish: **EF About** · **EF Training** · **Culture** (`direction-ef/culture/`) · journey (`direction-ef/journey/`). Todd extras still toast: Foundation · Longevity×3. **Off Centered Stack** (Archive): sticky mechanism locked — [.cursor/rules/off-centered-stack.mdc](off-centered-stack.mdc).
+
+Wireframes: [docs/wireframes/home-direction-e.md](../docs/wireframes/home-direction-e.md) · [docs/wireframes/about-direction-e.md](../docs/wireframes/about-direction-e.md)  
+Skill: [.cursor/skills/odd-ritual/SKILL.md](../.cursor/skills/odd-ritual/SKILL.md)  
+Catalog pairing: attach `odd-ritual` + personal `shadcn-space-catalog` — filter per odd-ritual `reference.md`  
+Mood ref: [oddritualgolf.com](https://oddritualgolf.com) — pacing only; never clone golf/shop grids
+
+## Patterns (shipped)
+
+| Pattern | Spec |
+|---------|------|
+| Chapter numbers | Large mono `01` + `// Title` |
+| Next-preview | `Scroll` / `↓` / next chapter title |
+| Overlay nav | Numbered accordion sections (~20px titles); one open at a time |
+| Interior pages | `DirectionEPageShell` — `01 // ABOUT` eyebrow + page title + back to `/` |
+| Motion | 600–800ms ease `[0.21, 0.47, 0.32, 0.98]`; honor `prefers-reduced-motion` |
+| Tokens | `#FFFFFF` · `#181818` · `#5C5C5C` · `#F3EEE7` · Apply `#0A3C2E` only |
+| Media | `src/assets/images/gym` (`gymPhotos`) — no shadcnspace CDN |
+
+## Catalog DNA
+
+Adapt layout/motion from ArmorATD shadcn-space blocks — do **not** CLI-install into this Vite app (no `components/ui`).
+
+Homepage: `portfolio-08` (Pillars) · `about-us-13` · `gallery-01` · `cta-08` · Act 1 custom + `services-03` easing  
+About: `about-us-09`/`13` · `team-03` · `gallery-01` · `faq-02`
+
+## Anti-patterns
+
+- Blue SaaS badges, purple gradients, rounded-full pill clusters
+- Odd Ritual product/shop grids
+- Dense always-expanded overlay lists (use accordion)
+- Public Buy / Reserve / Book in marketing chrome
+- Hardcoded Unsplash for facility imagery when gym photos exist

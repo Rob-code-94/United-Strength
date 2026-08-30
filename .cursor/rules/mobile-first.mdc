@@ -1,0 +1,43 @@
+---
+description: Mobile-first layout and UX — design and build for phones first, desktop second
+alwaysApply: true
+---
+
+# Mobile first
+
+United Strength is **mobile first**. Most members will book and browse on their phone. The mobile experience must be the best version of every screen; desktop is an enhancement, not the primary target.
+
+## Design and build order
+
+1. **Layout mobile first** — Default styles target small viewports (~320px–428px). Add `md:` / `lg:` (or min-width media queries) only to enhance larger screens.
+2. **Touch first** — Tap targets at least 44×44px. Adequate spacing between links and buttons. No hover-only interactions.
+3. **Navigation** — Hamburger or compact nav on mobile; full nav on desktop. Keep Reserve / Buy reachable without deep menus (sticky bar or prominent footer CTAs if needed).
+4. **Typography** — Readable body size on mobile (16px minimum for inputs to avoid iOS zoom). Headlines scale up on desktop, not down on mobile.
+5. **Media** — Heroes and images crop well on portrait; avoid critical copy in corners that safe-area or notches clip. Prefer `object-cover` with mobile-safe focal points.
+6. **Forms** — Single column, full-width inputs, large submit buttons. Membership and contact forms must be usable one-handed.
+7. **Embeds** — `/buy`, `/schedule`, `/account` must be full-width and scrollable on small screens; test iframe height on iOS Safari.
+
+## Tailwind / CSS convention
+
+```css
+/* Prefer: base = mobile, then enhance */
+.element { /* mobile styles */ }
+@screen md { .element { /* desktop enhancements */ } }
+```
+
+Avoid `max-width` “desktop first” breakpoints unless fixing a specific desktop-only bug.
+
+## Review checklist
+
+Before marking UI done, verify on a **narrow viewport** (375px) and real mobile Safari/Chrome:
+
+- No horizontal scroll (except intentional carousels)
+- CTAs visible without excessive scrolling
+- Nav and footer usable
+- Embed pages bookable on phone
+
+## Related
+
+- Skill **premium-mobile-touch-ux** (`.cursor/skills/premium-mobile-touch-ux/`) — full-screen drawer, body scroll lock, 44px targets
+- [docs/brand/united-strength-aesthetic.md](../docs/brand/united-strength-aesthetic.md) — layout and components
+- [docs/wireframes/](../docs/wireframes/) — mobile order noted per page

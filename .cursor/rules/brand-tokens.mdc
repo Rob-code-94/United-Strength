@@ -1,0 +1,56 @@
+---
+description: Enforces approved brand color and typography tokens for United Strength frontend files (The Culture Club — ALD-primary)
+globs: "**/*.{css,scss,tsx,jsx,html,vue,svelte}"
+alwaysApply: false
+---
+
+# United Strength Brand Tokens
+
+Read `.cursor/skills/united-strength-brand/SKILL.md` for full brand context. Status: **approved** — Culture Club Editorial (v5).
+
+## CSS variables (required)
+
+Define these in your global stylesheet or `:root`. Use semantic names — never hardcode hex in components.
+
+```css
+:root {
+  /* Colors — The Culture Club (ALD-primary) */
+  --color-bg-primary: #FFFFFF;
+  --color-bg-secondary: #F3EEE7;
+  --color-bg-warm: #F7F7F7;
+  --color-bg-dark: #181818;
+  --color-text-primary: #181818;
+  --color-text-muted: #5C5C5C;
+  --color-text-on-dark: #FFFFFF;
+  --color-accent: #0A3C2E;
+  --color-accent-spare: #D43F21;
+  --color-border-editorial: #D9D9D9;
+
+  /* Typography — Satoshi Bold (Fontshare, self-hosted) */
+  --font-brand: "Satoshi", "Helvetica Neue", Arial, sans-serif;
+  --font-primary: var(--font-brand);
+  --font-editorial: "Instrument Serif", "Libre Baskerville", Georgia, serif;
+  --font-caption: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Spacing rhythm */
+  --space-section: 120px;
+  --space-block: 48px;
+
+  /* Motion */
+  --transition-slow: 700ms ease;
+}
+```
+
+## Rules
+
+1. **No hardcoded hex** in component files — use `var(--color-*)` only.
+2. **No Inter, Roboto, or Space Grotesk** — Work Sans is the Sohne substitute.
+3. **Forest green (`--color-accent`)** — membership CTAs only, not global accent.
+4. **CTA copy** must match the brand skill — "Apply for Membership", not "Sign Up".
+5. **Type:** body 12–16px with restrained tracking on small copy; nav labels 10px uppercase.
+6. **Motion:** CSS transitions 600–800ms ease; no bouncy defaults.
+7. **Images:** full-bleed heroes use `object-fit: cover`; photography leads, type follows (ALD rule).
+
+## When tokens change
+
+Update this file and `.cursor/skills/united-strength-brand/SKILL.md` together via `website-brand-foundation` iteration mode.

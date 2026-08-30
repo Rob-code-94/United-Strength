@@ -1,0 +1,56 @@
+---
+description: EF About pages — shared chrome + differentiated layout recipes
+globs:
+  - src/components/direction-ef/about/**
+  - src/components/direction-ef/lookbook/**
+  - src/data/about-copy.ts
+---
+
+# EF About — cohesion + layout mix
+
+All **Direction EF** About interiors (`direction-ef/about/*`) share **chrome and tokens**, not identical section stacks. Do **not** clone Philosophy onto every page.
+
+**Canonical page playbook:** [.cursor/skills/odd-ritual-pages/SKILL.md](../skills/odd-ritual-pages/SKILL.md) (+ [reference.md](../skills/odd-ritual-pages/reference.md))  
+Wireframe: [docs/wireframes/about-direction-ef.md](../../docs/wireframes/about-direction-ef.md)
+
+## Shared chrome (required)
+
+| Layer | Component / pattern |
+|-------|---------------------|
+| Page wrapper | `LookbookAboutPageShell` + `SiteIndexFooter` |
+| Opener | `LookbookPageOpener` — back row, title/lede, metadata (density may vary by page) |
+| Motion | `LookbookScrollReveal`, `LookbookStaggerBody`, `LOOKBOOK_EASE` |
+| Tokens | `#FFFFFF` · `#F3EEE7` · `#181818` · `#5C5C5C` · Apply `#0A3C2E` on CTAs only |
+| Scroll | No `snap-y` on EF About routes in `App.tsx` |
+| Copy | `src/data/about-copy.ts` |
+
+## Shared design rules
+
+1. **Hairline separation** — `border-b border-neutral-200/60` between sections; index rows use `border-t`.
+2. **No card chrome** — no bordered/shadowed section boxes; no Buy / Reserve / Book in marketing chrome.
+3. **Off-center when images appear** — 12-col / 7–4 asymmetrical grids; never centered 6/6 card stacks.
+4. **Do not** use `DirectionEPageShell` or snap `LookbookPhotoChapter` blocks on EF About.
+
+## Layout mix matrix (per-page recipes)
+
+| Page | Keep | Differentiate toward |
+|------|------|----------------------|
+| **Philosophy** | Editorial chapters + manifesto + four-areas index | **Canonical reference** — minimal change; image splits + manifesto OK |
+| **Founder** | Opener + story copy | **Story-led** — fewer image splits; pull-quote band; credentials as **ruled index** (about-us-13 DNA) |
+| **Space** | Opener | **Photo-first** — mosaic/gallery dominates; short captions; less manifesto density |
+| **Team** | Alternating `LookbookTeamPortrait` rows | Already distinct — polish spacing/rows only; **no Apply CTA** |
+| **FAQ** | Accordion | **Full-width index** / faq-02 feel; lighter opener; optional cream band |
+
+## Freeze guard
+
+- Do **not** apply this to frozen `direction-e/about/**`.
+- Do **not** import from `direction-f/**` — adapt into `direction-ef/lookbook/`.
+- Homepage is frozen — see [direction-ef-home-frozen.mdc](direction-ef-home-frozen.mdc).
+
+## New About page checklist
+
+- [ ] Shared chrome (`LookbookAboutPageShell` + opener + footer)
+- [ ] Layout matches the mix matrix recipe above (not Philosophy clone)
+- [ ] Copy from `about-copy.ts` / live site sources
+- [ ] EF route excluded from snap scroll in `App.tsx`
+- [ ] Mobile 375px: back nav, 44px targets, footer usable

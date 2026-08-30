@@ -1,0 +1,34 @@
+---
+description: Todd-approved ALD navigation patterns (Jul 2026 foundation review)
+alwaysApply: true
+---
+
+# Todd navigation preferences (Jul 2026)
+
+Client direction from foundation review. Full spec: [.cursor/skills/united-strength-brand/SKILL.md](../.cursor/skills/united-strength-brand/SKILL.md) § Todd-approved navigation.
+
+## Required patterns
+
+- **Overlay menu:** Full-viewport dark overlay — not a right-slide drawer. Links left-aligned. Stealth US monogram watermark in background (~5–8% opacity).
+- **Hamburger:** Left side of header.
+- **Crest transition:** Scroll up → **UNITED STRENGTH CLUB** wordmark centered; scroll down → monogram only.
+- **Top bar:** `Columbus, OH | {weekday}, {date}` below header when scrolled (ALD `top-bar`).
+
+## Public nav guardrails
+
+- Marketing nav: Info · Offerings · Memberships · New here only.
+- **Do not** add Buy, Reserve, Member, or booking CTAs to public header or overlay.
+- Triib routes (`/buy`, `/schedule`, `/account`) remain embed pages — direct-link / post-login only.
+
+## Homepage
+
+- **Direction E+F (active default):** Lookbook merge — two-act homepage + accordion overlay. See [`docs/wireframes/home-direction-ef.md`](../docs/wireframes/home-direction-ef.md). Frozen E / Awake F toggles hidden for now.
+- **Direction D (Todd Aug 2026):** Locked IA source of truth in docs — two-act ritual progression. Simulator currently **hides** D; keep [`home-direction-d.md`](../docs/wireframes/home-direction-d.md) for reference.
+- Satoshi Bold hero — tighter tracking, artistic club-home feel.
+- Selective membership application (reviewed by team) — not open checkout on marketing layer.
+
+## Anti-patterns
+
+- Right-aligned overlay drawer with light surface
+- Public "Book a class" / "Buy credits" in nav
+- Gym-app chrome density on homepage hero

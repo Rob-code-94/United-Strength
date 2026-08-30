@@ -63,8 +63,9 @@ const SECTION =
 
 /**
  * Direction D — Ritual Progression (Odd Ritual–inspired)
- * Todd Aug 2026 locked homepage: 7-section reveal.
- * Hero: full-bleed image only — no overlay copy (Todd request).
+ * Todd Aug 2026 locked homepage: two-act structure — 4 intro chapters + 6 content sections.
+ * Spec: docs/wireframes/home-direction-d.md · docs/client/todd-homepage-direction-aug-2026.md
+ * NOTE: Current preview is partial — see wireframe implementation backlog.
  * Each chapter fills the phone viewport (min-h-full of scroll stage).
  */
 export default function ConceptDView({ onNav }: SubViewProps) {

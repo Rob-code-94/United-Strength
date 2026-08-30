@@ -34,10 +34,11 @@ Copied/optimized assets live in `src/assets/images/gym/` and are exported from `
 | Web asset | Source | Used for |
 |-----------|--------|----------|
 | `hero-full-bleed.jpg` | root · United-59 | Concept D hero (full viewport) |
-| `space-atmosphere.jpg` | B Roll · United-103 | Concept D “The Space” chapter |
+| `space-atmosphere.jpg` | B Roll · United-103 | Concept D “The Space” chapter · Direction E ch. 02 |
 | `architecture-raw.jpg` | B Roll · United-136 | Concept A hero (raw architecture) |
-| `gallery-cinematic.jpg` | B Roll · United-119 | Concept C gallery hero |
+| `gallery-cinematic.jpg` | B Roll · United-119 | Concept C gallery · Direction E ch. 01 |
 | `equipment-close.jpg` | Equipment · United-108 | Concept C equipment detail |
+| `experience-broll.jpg` | B Roll · United-127 | Direction E ch. 04 Experience United (STRONGER mural) |
 
 ## When adding photos
 
@@ -46,7 +47,16 @@ Copied/optimized assets live in `src/assets/images/gym/` and are exported from `
 3. Export from `src/assets/images/gym/index.ts` and import in components.
 4. Update the wiring table above.
 
-Coach/team headshots stay in `src/assets/images/` (separate from facility library).
+Coach/team headshots stay in `src/assets/images/team/` (separate from facility library).
+
+| Web asset | Source | Used for |
+|-----------|--------|----------|
+| `todd-johnson.jpg` | unitedstrengthgym.com/our-team | EF Team page |
+| `jenna-farkas.jpg` | unitedstrengthgym.com/our-team | EF Team page |
+| `jason-katz.jpg` | unitedstrengthgym.com/our-team | EF Team page |
+| `kara-shaffer.jpg` | unitedstrengthgym.com/our-team | EF Team page |
+
+Exported from `src/assets/images/team/index.ts`. Team portraits use `LookbookTeamPortrait` — B&W, grain, high-contrast CSS treatment (`editorialTreatment: true`).
 
 ## Anti-patterns
 

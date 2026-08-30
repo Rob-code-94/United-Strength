@@ -1,0 +1,55 @@
+---
+description: Off Centered Stack — mandatory sticky stack mechanics for LookbookOffCenteredStack
+globs: src/components/direction-ef/lookbook/LookbookOffCenteredStack.tsx,src/components/direction-ef/culture/**
+alwaysApply: false
+---
+
+# Off Centered Stack (locked mechanism)
+
+**Say:** “use an Off Centered Stack”  
+**Primitive:** [`LookbookOffCenteredStack`](../../src/components/direction-ef/lookbook/LookbookOffCenteredStack.tsx)  
+**Shipped on:** Culture Archive (`/culture/archive`)
+
+When asked for an Off Centered Stack, **always** implement (or reuse) this sticky mechanic. Do not invent a spaced flex column, horizontal swipe deck, or “lookalike” that only fades cards in.
+
+## Required mechanism (do not regress)
+
+| Requirement | Spec |
+|-------------|------|
+| Pin | Each plate wrapper is `position: sticky` with shared `top` (under crest, e.g. `4.5rem`) |
+| Layer | Rising `z-index` so later prints stack **on top** of earlier ones while scrolling |
+| Runway | Non-last plates need scroll padding (`paddingBottom` ~ `min(48vh, 22rem)`) so the next plate can climb over |
+| Gap | **No** `flex gap-*` / large vertical gutters between plates — gap was the bug that made stacks “not stack” |
+| Align | Off-center L/R with **edge inset** (`ml-2`–`md:ml-6` / matching `mr-*`) — not flush to the canvas edge |
+| Cue | `Scroll` / `↓` — not Swipe, not ticker marquee |
+| Motion | **Lead plate materializes on load** (opacity + y + slight scale/blur → settle, `LOOKBOOK_EASE`); later plates enter on scroll; honor `prefers-reduced-motion` |
+| Links | Whole plate or `[ Read ]` may open external / route; 44px targets |
+
+## Forbidden (causes the regression we already fixed)
+
+- `flex flex-col gap-10` (or similar) as the plate list — creates large empty space; cards never overlap
+- Document-flow only (`relative` plates, no sticky) with fade-in pretending to be a stack
+- Cloning homepage [`Act2LookbookStack`](../../src/components/direction-ef/Act2LookbookStack.tsx) into interiors (home is frozen; different free-scroll / crest coupling)
+- Horizontal snap “note deck” as a substitute for Off Centered Stack
+- Infinite marquees, SaaS card chrome, rounded pills, Buy/Reserve/Book
+
+## When to use
+
+- Publication / issue series (Culture Archive and future magazine-style lists)
+- Photo-led stacks where the user should **scroll to layer** prints, not swipe sideways
+
+## When not to use
+
+- FAQ / ruled indexes → faq-02 accordion
+- Team portraits → team-03 alternating rows
+- Frozen homepage lookbook close → `Act2LookbookStack` only
+
+## Agent checklist
+
+Before marking Off Centered Stack done:
+
+1. Reuse `LookbookOffCenteredStack` — do not fork a new spaced list
+2. Sticky wrappers present; list has **no** large flex gap between plates
+3. On scroll, later plate visibly covers earlier (overlap) under shared sticky top
+4. Labels match request (e.g. `// Archives`, `01 // Archive`)
+5. Mobile 375: no horizontal page bleed; touch targets ≥ 44px

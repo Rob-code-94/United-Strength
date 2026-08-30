@@ -1,0 +1,48 @@
+---
+description: EF Training pages — shared chrome + differentiated layout recipes
+globs:
+  - src/components/direction-ef/training/**
+  - src/data/training-copy.ts
+---
+
+# EF Training — cohesion + layout mix
+
+All **Direction EF** Training interiors (`direction-ef/training/*`) share **chrome and tokens** with About, not identical section stacks. Overlay section **02 TRAINING**.
+
+**Canonical page playbook:** [.cursor/skills/odd-ritual-pages/SKILL.md](../skills/odd-ritual-pages/SKILL.md)  
+Wireframe: [docs/wireframes/training-direction-ef.md](../../docs/wireframes/training-direction-ef.md)
+
+## Shared chrome (required)
+
+| Layer | Component / pattern |
+|-------|---------------------|
+| Page wrapper | `LookbookAboutPageShell` + `SiteIndexFooter` |
+| Opener | `LookbookPageOpener` |
+| Motion | `LookbookScrollReveal`, `LookbookStaggerBody`, `LOOKBOOK_EASE` |
+| Tokens | `#FFFFFF` · `#F3EEE7` · `#181818` · `#5C5C5C` · Apply `#0A3C2E` on CTAs only |
+| Scroll | No `snap-y` on EF Training routes in `App.tsx` |
+| Copy | `src/data/training-copy.ts` |
+
+## Shared design rules
+
+1. **Hairline separation** — `border-b border-neutral-200/60` between sections; schedule/index rows use `border-t`.
+2. **No card chrome** — no bordered/shadowed boxes.
+3. **No Buy / Reserve / Book / Sign up for classes** Triib chrome — class pages use **Free Trial Class** → `/start-here/experience` and Apply → `/start-here/apply`; PT uses mailto `training@`.
+4. **Schedule** = editorial **week strip** (Mon–Sun columns, hairline time plates) — not Triib embed, not SaaS calendar apps.
+5. Do **not** use `DirectionEPageShell` or mutate frozen `direction-e/**`.
+6. Homepage remains frozen — see [direction-ef-home-frozen.mdc](direction-ef-home-frozen.mdc).
+
+## Layout mix matrix
+
+| Page | Recipe |
+|------|--------|
+| **Build** | Opener + photo/editorial split + body + week-strip schedule + next → Burn |
+| **Burn** | Same DNA, alternate canvas/photo; week-strip schedule; next → Balance |
+| **Balance** | Sparse coming-soon; no schedule; no fake CTA |
+| **1-on-1** | Story-led PT + Team cue + inquire / Start Here |
+| **Small Group** | Format as ruled index (about-us-13 DNA) |
+| **Private Group** | Inquiry-forward band (cta-08 DNA, Apply green only); no prices |
+
+## Catalog DNA (adapt, don’t CLI-install)
+
+`services-03` easing · `about-us-13` ruled index · `cta-08` image statement (strip Book)

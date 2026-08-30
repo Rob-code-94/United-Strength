@@ -7,6 +7,7 @@ import spaceAtmosphere from "./space-atmosphere.jpg";
 import architectureRaw from "./architecture-raw.jpg";
 import galleryCinematic from "./gallery-cinematic.jpg";
 import equipmentClose from "./equipment-close.jpg";
+import experienceBroll from "./experience-broll.jpg";
 
 export const gymPhotos = {
   heroFullBleed,
@@ -14,4 +15,6 @@ export const gymPhotos = {
   architectureRaw,
   galleryCinematic,
   equipmentClose,
+  /** B Roll · United-127 — STRONGER mural (Experience United chapter) */
+  experienceBroll,
 } as const;

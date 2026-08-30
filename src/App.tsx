@@ -9,17 +9,94 @@ import {
   FileText,
   Info,
   Layers,
-  Sparkles,
   ExternalLink,
   ChevronRight,
   ArrowRight,
-  Clock,
   Instagram,
   Mail
 } from "lucide-react";
-import ConceptTeamView from "./components/ConceptTeamView";
-import ConceptDView from "./components/ConceptDView";
+import ConceptEView from "./components/ConceptEView";
+import ConceptEFView from "./components/ConceptEFView";
+import ConceptFView from "./components/ConceptFView";
+import {
+  FaqPage,
+  FounderPage,
+  PhilosophyPage,
+  SpacePage,
+  TeamPage,
+} from "./components/direction-e/about";
+import {
+  FaqPage as EfFaqPage,
+  FounderPage as EfFounderPage,
+  PhilosophyPage as EfPhilosophyPage,
+  SpacePage as EfSpacePage,
+  TeamPage as EfTeamPage,
+} from "./components/direction-ef/about";
+import {
+  BalancePage,
+  BuildPage,
+  BurnPage,
+  OneOnOnePage,
+  PrivateGroupPage,
+  SmallGroupPage,
+} from "./components/direction-ef/training";
+import {
+  ApplyPage,
+  ContactPage,
+  ExperiencePage,
+  MembershipPage,
+  PrivacyPage,
+  TermsPage,
+} from "./components/direction-ef/journey";
+import {
+  ArchivePage,
+  CultivatedPage,
+  MoveTheCityPage,
+} from "./components/direction-ef/culture";
 import { gymPhotos } from "./assets/images/gym";
+import { showDevChrome } from "./lib/dev-chrome";
+
+type WorkingDirection = "E" | "EF" | "F";
+
+const ABOUT_ROUTES = new Set([
+  "/about/philosophy",
+  "/about/founder",
+  "/about/team",
+  "/about/the-space",
+  "/about/faq",
+]);
+
+/** Navigable training leaves only — Coming Soon routes excluded */
+const TRAINING_ROUTES = new Set([
+  "/training/classes/build",
+  "/training/classes/burn",
+  "/training/personal/1-on-1",
+]);
+
+/** Live-site parity + Culture + legal shells */
+const PARITY_ROUTES = new Set([
+  "/start-here/experience",
+  "/start-here/apply",
+  "/membership",
+  "/contact",
+  "/culture/move-the-city",
+  "/culture/cultivated",
+  "/culture/archive",
+  "/privacy",
+  "/terms",
+]);
+
+/** Intentional roadmap — client-facing Coming Soon (pillars + overlay drafts) */
+const COMING_SOON_ROUTES = new Set([
+  "/foundation",
+  "/longevity",
+  "/longevity/reflection",
+  "/longevity/strength-standard",
+  "/longevity/the-trials",
+  "/training/classes/balance",
+  "/training/personal/small-group",
+  "/training/personal/private-group",
+]);
 
 // ----------------------------------------------------------------------
 // BRAND CONSTANTS & LINKS
@@ -28,8 +105,8 @@ import { gymPhotos } from "./assets/images/gym";
 type NavLeaf = { label: string; href: string; external?: boolean; comingSoon?: boolean };
 type NavBranch = { label: string; children: NavLeaf[] };
 type NavSection =
-  | { title: string; kind: "links"; items: NavLeaf[] }
-  | { title: string; kind: "branches"; branches: NavBranch[] }
+  | { title: string; kind: "links"; items: NavLeaf[]; comingSoon?: boolean }
+  | { title: string; kind: "branches"; branches: NavBranch[]; comingSoon?: boolean }
   | { title: string; kind: "direct"; item: NavLeaf };
 
 const LOCKED_NAV: NavSection[] = [
@@ -60,8 +137,16 @@ const LOCKED_NAV: NavSection[] = [
         label: "Personal Training",
         children: [
           { label: "1-on-1 Coaching", href: "/training/personal/1-on-1" },
-          { label: "Small Group Training", href: "/training/personal/small-group" },
-          { label: "Private Group Training", href: "/training/personal/private-group" },
+          {
+            label: "Small Group Training",
+            href: "/training/personal/small-group",
+            comingSoon: true,
+          },
+          {
+            label: "Private Group Training",
+            href: "/training/personal/private-group",
+            comingSoon: true,
+          },
         ],
       },
     ],
@@ -69,15 +154,16 @@ const LOCKED_NAV: NavSection[] = [
   {
     title: "FOUNDATION",
     kind: "direct",
-    item: { label: "Foundation", href: "/foundation" },
+    item: { label: "Foundation", href: "/foundation", comingSoon: true },
   },
   {
     title: "LONGEVITY",
     kind: "links",
+    comingSoon: true,
     items: [
-      { label: "Reflection", href: "/longevity/reflection" },
-      { label: "The Strength Standard", href: "/longevity/strength-standard" },
-      { label: "The Trials", href: "/longevity/the-trials" },
+      { label: "Reflection", href: "/longevity/reflection", comingSoon: true },
+      { label: "The Strength Standard", href: "/longevity/strength-standard", comingSoon: true },
+      { label: "The Trials", href: "/longevity/the-trials", comingSoon: true },
     ],
   },
   {
@@ -101,6 +187,7 @@ const LOCKED_NAV: NavSection[] = [
       label: "United Limited",
       href: "https://unitedlimited.com",
       external: true,
+      comingSoon: true,
     },
   },
   {
@@ -168,7 +255,11 @@ function USCrestSVG({ className = "w-10 h-10", opacity = 1 }) {
 // ----------------------------------------------------------------------
 export default function App() {
   const [activeTab, setActiveTab] = useState<"simulator" | "archive" | "specs">("simulator");
+  /** Production / Vercel: always simulator — Archive A&C and Specs never mount */
+  const studioTab = showDevChrome ? activeTab : "simulator";
   const [archiveDirection, setArchiveDirection] = useState<"A" | "C">("A");
+  /** Working homepage: E (default Odd Ritual) | F (Awake lookbook) */
+  const [workingDirection, setWorkingDirection] = useState<WorkingDirection>("EF");
   const [activeSimRoute, setActiveSimRoute] = useState<string>("/");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -176,10 +267,8 @@ export default function App() {
   const [chromeHidden, setChromeHidden] = useState(false);
   const [copiedColor, setCopiedColor] = useState<string | null>(null);
   const [navigationNotification, setNavigationNotification] = useState<string | null>(null);
-
-  // User route configuration states
-  const [teamRoute, setTeamRoute] = useState<string>("/team");
-  const [isTeamVisible, setIsTeamVisible] = useState(true);
+  /** EF lookbook zone — drop snap-mandatory for continuous stack scroll */
+  const [lookbookFreeScroll, setLookbookFreeScroll] = useState(false);
 
   // References for mobile frames to track manual scrolling
   const simScrollContainerRef = useRef<HTMLDivElement>(null);
@@ -200,32 +289,60 @@ export default function App() {
     return `Columbus, OH | ${dateStr}`;
   };
 
+  const scrollSimToTop = () => {
+    setTimeout(() => {
+      if (simScrollContainerRef.current) {
+        simScrollContainerRef.current.scrollTop = 0;
+      }
+    }, 50);
+  };
+
+  const goSimHome = () => {
+    setActiveSimRoute("/");
+    setIsMenuOpen(false);
+    setIsScrolled(false);
+    setLookbookFreeScroll(false);
+    scrollSimToTop();
+  };
+
   // Handle fake navigation for interactive link testing
   const triggerNavigation = (href: string, label: string) => {
-    if (isTeamVisible && (href === teamRoute || href === "/about/team")) {
-      setActiveSimRoute("/team");
+    let normalized = href === "/team" ? "/about/team" : href;
+    if (normalized === "/memberships") normalized = "/membership";
+
+    if (
+      ABOUT_ROUTES.has(normalized) ||
+      TRAINING_ROUTES.has(normalized) ||
+      PARITY_ROUTES.has(normalized)
+    ) {
+      setActiveSimRoute(normalized);
       setIsMenuOpen(false);
       setIsScrolled(false);
-      setTimeout(() => {
-        if (simScrollContainerRef.current) {
-          simScrollContainerRef.current.scrollTop = 0;
-        }
-      }, 50);
-    } else if (href === "/" || href === "/home") {
-      setActiveSimRoute("/");
-      setIsMenuOpen(false);
-      setIsScrolled(false);
-      setTimeout(() => {
-        if (simScrollContainerRef.current) {
-          simScrollContainerRef.current.scrollTop = 0;
-        }
-      }, 50);
-    } else {
-      setNavigationNotification(`Mock Route Request: "${label}" (${href})`);
+      scrollSimToTop();
+      return;
+    }
+
+    if (href === "/" || href === "/home") {
+      goSimHome();
+      return;
+    }
+
+    // Intentional roadmap — works on Vercel (not silent no-op; not Mock Route)
+    if (COMING_SOON_ROUTES.has(normalized)) {
+      setNavigationNotification(`Coming Soon — ${label}`);
       setTimeout(() => {
         setNavigationNotification(null);
-      }, 4000);
+      }, 3200);
+      return;
     }
+
+    // Studio-only mock toast — never on Vercel / production builds
+    if (!showDevChrome) return;
+
+    setNavigationNotification(`Mock Route Request: "${label}" (${href})`);
+    setTimeout(() => {
+      setNavigationNotification(null);
+    }, 4000);
   };
 
   // Copy color code to clipboard
@@ -239,7 +356,7 @@ export default function App() {
   useEffect(() => {
     setIsMenuOpen(false);
     setIsScrolled(false);
-    setChromeHidden(false);
+    setChromeHidden(activeTab === "simulator");
     lastSimScrollY.current = 0;
     setActiveSimRoute("/");
     if (simScrollContainerRef.current) {
@@ -262,13 +379,42 @@ export default function App() {
   }, []);
 
   // Crest wordmark/monogram + auto-collapse beta chrome (manual reopen only)
-  const handleSimScroll = () => {
-    if (!simScrollContainerRef.current) return;
-    const top = simScrollContainerRef.current.scrollTop;
-    setIsScrolled(top > 20);
+  const syncCrestFromScroll = () => {
+    const el = simScrollContainerRef.current;
+    if (!el) return;
+    const top = el.scrollTop;
+    const next = activeSimRoute !== "/" ? true : top > 40;
+    setIsScrolled(next);
     if (top - lastSimScrollY.current > 6 && top > 24) setChromeHidden(true);
     lastSimScrollY.current = top;
   };
+
+  const handleSimScroll = () => {
+    syncCrestFromScroll();
+  };
+
+  // Native listener — more reliable with snap-scroll than React onScroll alone
+  useEffect(() => {
+    const el = simScrollContainerRef.current;
+    if (!el) return;
+    const onScroll = () => syncCrestFromScroll();
+    el.addEventListener("scroll", onScroll, { passive: true });
+    syncCrestFromScroll();
+    return () => el.removeEventListener("scroll", onScroll);
+  }, [activeSimRoute, activeTab]);
+
+  // Re-sync crest when route changes (interiors always use compact chrome)
+  useEffect(() => {
+    if (activeSimRoute !== "/") {
+      setIsScrolled(true);
+      return;
+    }
+    const el = simScrollContainerRef.current;
+    if (el) setIsScrolled(el.scrollTop > 40);
+  }, [activeSimRoute]);
+
+  /** Home at top = ALD overlay; scrolled or interior = compact crest */
+  const crestCompact = isScrolled || activeSimRoute !== "/";
 
   // Lock phone-stage scroll while overlay menu is open
   useEffect(() => {
@@ -282,9 +428,10 @@ export default function App() {
   }, [isMenuOpen]);
 
   return (
-    <div className="min-h-screen bg-[#111111] text-[#E5E5E5] flex flex-col font-sans">
+    <div className="min-h-screen bg-[#111111] text-[#E5E5E5] flex flex-col font-sans overflow-x-hidden">
       
-      {/* HEADER / CONTROL BAR — collapses on scroll so Direction preview is clear on phone */}
+      {/* HEADER / CONTROL BAR — local DEV only */}
+      {showDevChrome ? (
       <header
         className={`border-b border-neutral-800 bg-[#161616] sticky top-0 z-40 overflow-hidden transition-[max-height,opacity,padding] duration-300 ease-out ${
           chromeHidden
@@ -351,177 +498,257 @@ export default function App() {
           </div>
         </div>
       </header>
+      ) : null}
 
-      {/* Reveal beta chrome without scrolling back to top */}
-      {chromeHidden && (
-        <button
-          type="button"
-          onClick={() => setChromeHidden(false)}
-          className="fixed top-3 left-3 z-50 min-h-[44px] min-w-[44px] px-3 rounded-full bg-[#0A3C2E] text-emerald-400 text-[10px] font-mono font-semibold uppercase tracking-wider shadow-lg border border-emerald-900/60"
-          title="Show beta controls"
-        >
-          BETA
-        </button>
-      )}
+      {/* Simulator dev controls + reveal beta chrome — local DEV only */}
+      {showDevChrome && activeTab === "simulator" ? (
+        <div className="fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] right-[max(0.75rem,env(safe-area-inset-right))] z-[100] flex items-center gap-2 flex-wrap justify-end max-w-[calc(100%-1.5rem)]">
+          {chromeHidden && (
+            <button
+              type="button"
+              onClick={() => setChromeHidden(false)}
+              className="min-h-[44px] min-w-[44px] px-3 rounded-full bg-[#0A3C2E] text-emerald-400 text-[10px] font-mono font-semibold uppercase tracking-wider shadow-lg border border-emerald-900/60"
+              title="Show beta controls"
+            >
+              BETA
+            </button>
+          )}
+          <div
+            className="flex rounded-lg border border-neutral-700/80 overflow-hidden shadow-lg bg-[#161616]/95 backdrop-blur-sm"
+            role="tablist"
+            aria-label="Working direction"
+          >
+            {/* E and F hidden for now — E+F is the active working surface */}
+            {(
+              [{ id: "EF" as const, label: "E+F" }] as const
+            ).map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                role="tab"
+                aria-selected={workingDirection === tab.id}
+                onClick={() => {
+                  setWorkingDirection(tab.id);
+                  goSimHome();
+                }}
+                className="px-3 py-2 min-h-[44px] min-w-[44px] text-[10px] font-mono uppercase tracking-widest transition-colors bg-[#F3EEE7] text-[#181818]"
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : showDevChrome && chromeHidden ? (
+          <button
+            type="button"
+            onClick={() => setChromeHidden(false)}
+            className="fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] right-[max(0.75rem,env(safe-area-inset-right))] z-50 min-h-[44px] min-w-[44px] px-3 rounded-full bg-[#0A3C2E] text-emerald-400 text-[10px] font-mono font-semibold uppercase tracking-wider shadow-lg border border-emerald-900/60"
+            title="Show beta controls"
+          >
+            BETA
+          </button>
+      ) : null}
 
-      {/* SYSTEM ROUTE NOTIFICATION TOASTER */}
+      {/* Route notification — Coming Soon (prod + DEV) · Mock Route (DEV only, set above) */}
       {navigationNotification && (
-        <div className="fixed top-24 left-1/2 -translate-x-1/2 bg-neutral-900 border border-emerald-950 text-white px-6 py-3 rounded-xl shadow-2xl z-50 flex items-center gap-3 animate-bounce">
-          <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
-          <p className="text-xs font-mono tracking-wide">{navigationNotification}</p>
+        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[110] max-w-[min(92vw,24rem)] bg-[#181818] border border-white/10 text-white px-5 py-3 rounded-sm shadow-2xl flex items-center gap-3">
+          <div className="w-1.5 h-1.5 rounded-full bg-[#F3EEE7] shrink-0" />
+          <p className="text-[11px] font-mono uppercase tracking-[0.14em] leading-snug">
+            {navigationNotification}
+          </p>
         </div>
       )}
 
       {/* MAIN CONTAINER AREA */}
-      <main className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
+      <main className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-6 lg:p-8 min-w-0 overflow-x-hidden">
         
         {/* ================================================================= */}
         {/* TAB 1: INTERACTIVE SIMULATOR                                      */}
         {/* ================================================================= */}
-        {activeTab === "simulator" && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            
-            {/* MOBILE PREVIEW COL */}
-            <div className="lg:col-span-6 xl:col-span-5 flex flex-col items-center justify-center">
-              
-              {/* Active direction badge — live sim is Direction D only */}
-              <div className="w-full max-w-[375px] mb-4">
-                {activeSimRoute === "/team" ? (
-                  <button
-                    onClick={() => {
-                      setActiveSimRoute("/");
-                      if (simScrollContainerRef.current) {
-                        simScrollContainerRef.current.scrollTop = 0;
-                      }
-                    }}
-                    className="w-full py-2.5 text-center rounded-lg bg-neutral-800 text-white font-bold transition-all text-xs uppercase tracking-widest hover:bg-neutral-700 cursor-pointer border border-neutral-700"
-                  >
-                    ← Back to Direction D
-                  </button>
-                ) : (
-                  <div className="flex items-center justify-between gap-3 bg-[#1A1A1A] rounded-xl px-4 py-3 border border-neutral-800">
-                    <div>
-                      <div className="text-[10px] tracking-wider uppercase text-white font-bold">
-                        Direction D · Active
-                      </div>
-                      <div className="text-[9px] text-neutral-500 font-mono mt-0.5">
-                        Ritual Progression · locked IA
-                      </div>
-                    </div>
-                    <span className="bg-[#0A3C2E] text-emerald-300 text-[10px] font-mono px-2 py-1 rounded border border-emerald-900/50">
-                      LIVE
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* PHYSICALLY BOUNDED MOBILE DEVICE FRAME */}
-              <div className="relative w-[375px] h-[780px] bg-[#181818] rounded-[48px] p-3 shadow-2xl border-[10px] border-[#2c2c2c] overflow-hidden flex flex-col">
-                
-                {/* Speaker Grill & Camera (Notch Spacer) */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 h-6 w-32 bg-[#2c2c2c] rounded-b-2xl z-[70] flex items-center justify-center gap-1.5 pointer-events-none">
-                  <div className="w-10 h-1 bg-black/40 rounded-full"></div>
-                  <div className="w-2.5 h-2.5 bg-black/60 rounded-full"></div>
-                </div>
-
-                {/* Status Bar */}
-                <div className="h-6 w-full px-6 flex justify-between items-center bg-transparent z-40 text-[#181818] text-[11px] font-mono select-none shrink-0">
-                  <span className="font-bold">10:28</span>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[9px]">5G</span>
-                    <div className="w-4 h-2 border border-current rounded-sm flex items-center p-0.5">
-                      <div className="w-full h-full bg-current rounded-2xs"></div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* SCROLLABLE SCREEN STAGE — snap chapters to fill the phone */}
-                <div
-                  ref={simScrollContainerRef}
-                  onScroll={handleSimScroll}
-                  className="relative flex-1 min-h-0 w-full bg-white text-[#181818] overflow-y-auto rounded-[36px] scrollbar-none flex flex-col [container-type:size] snap-y snap-mandatory scroll-smooth"
-                >
-                  
-                  {/* BRAND HEADER & TRANSITION CONTROLLER */}
+        {studioTab === "simulator" && (
+          <div className="fixed inset-0 z-20 flex flex-col bg-white min-h-[100dvh]">
+            <div className="relative flex-1 min-h-0 flex flex-col">
+              {/* ALD crest — fixed over the scrollport (not inside overflow content) */}
                   <div
-                    className={`sticky top-0 left-0 right-0 z-30 transition-all duration-300 ${
-                      isScrolled
-                        ? "bg-[#FFFFFF] border-b border-neutral-100 shadow-sm"
-                        : "bg-transparent"
+                    className={`absolute top-0 left-0 right-0 z-30 transition-all duration-500 pointer-events-none ${
+                      crestCompact
+                        ? "bg-white/85 backdrop-blur-md border-b border-black/[0.06]"
+                        : "bg-gradient-to-b from-black/50 via-black/20 to-transparent"
                     }`}
                   >
-                    {/* Header Primary Content */}
-                    <div className="px-5 py-4 flex items-center justify-between min-h-[56px] relative">
-                      {/* Left Side: Hamburger Menu on Left (Non-negotiable) */}
+                    <div className="px-5 pt-3 pb-2 flex items-start justify-between min-h-[56px] relative pointer-events-auto">
                       <button
+                        type="button"
                         onClick={() => setIsMenuOpen(true)}
-                        className={`hover:opacity-75 transition-all p-1 -ml-1 ${
+                        className={`hover:opacity-75 transition-all p-1 -ml-1 min-h-[44px] min-w-[44px] flex flex-col justify-center ${
                           isMenuOpen ? "opacity-0 pointer-events-none" : "opacity-100"
-                        } text-[#181818]`}
+                        } ${crestCompact ? "text-[#181818]" : "text-white"}`}
                         title="Open Overlay Menu"
                       >
-                        <div className="w-5 h-[2px] bg-current mb-1.5 transition-all"></div>
-                        <div className="w-3.5 h-[2px] bg-current transition-all"></div>
+                        <div className="w-5 h-[1.5px] bg-current mb-1.5 transition-all" />
+                        <div className="w-5 h-[1.5px] bg-current mb-1.5 transition-all" />
+                        <div className="w-3.5 h-[1.5px] bg-current transition-all" />
                       </button>
 
-                      {/* Center: Crest Transition Wordmark vs Monogram */}
                       <button
+                        type="button"
                         onClick={() => triggerNavigation("/", "Home")}
-                        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center cursor-pointer hover:opacity-75 transition-all w-2/3 z-10"
+                        className="absolute left-1/2 top-3 -translate-x-1/2 flex flex-col items-center gap-1.5 cursor-pointer hover:opacity-80 transition-opacity w-[78%] z-10 min-h-[44px]"
                         title="Return to Home"
                       >
-                        {!isScrolled ? (
-                          /* SCROLLED UP: Full Wordmark — Direction D uses tighter tracking */
-                          <span className="font-semibold text-[10px] font-sans text-center transition-all uppercase leading-tight text-[#181818] tracking-[-0.03em]">
-                            UNITED STRENGTH CLUB
+                        {/* Crossfade: wordmark at top · monogram when scrolled */}
+                        <span className="relative block h-6 w-full">
+                          <span
+                            className={`absolute inset-0 flex items-center justify-center font-bold text-[12px] font-sans uppercase leading-tight tracking-[-0.04em] transition-all duration-500 ${
+                              crestCompact
+                                ? "opacity-0 scale-95 pointer-events-none"
+                                : "opacity-100 scale-100 text-white"
+                            }`}
+                            style={{ fontFamily: "'Satoshi', sans-serif" }}
+                            aria-hidden={crestCompact}
+                          >
+                            UNITED STRENGTH
                           </span>
-                        ) : (
-                          /* SCROLLED DOWN: Monogram only (US Crest) */
-                          <div className="text-[#181818] animate-fade-in">
+                          <span
+                            className={`absolute inset-0 flex items-center justify-center transition-all duration-500 ${
+                              crestCompact
+                                ? "opacity-100 scale-100 text-[#181818]"
+                                : "opacity-0 scale-95 pointer-events-none text-white"
+                            }`}
+                            aria-hidden={!crestCompact}
+                          >
                             <USCrestSVG className="w-6 h-6" />
-                          </div>
-                        )}
+                          </span>
+                        </span>
+                        <span
+                          className={`font-mono text-[8px] uppercase tracking-[0.18em] text-center transition-opacity duration-500 ${
+                            crestCompact ? "text-[#5C5C5C] opacity-100" : "text-white/70 opacity-100"
+                          }`}
+                        >
+                          {getFormattedDate()}
+                        </span>
                       </button>
 
-                      {/* Right Balance spacer (empty as required for elegant nav) */}
-                      <div className="w-5"></div>
-                    </div>
-
-                    {/* TOP BAR below header when scrolled (Revealed dynamically) */}
-                    <div
-                      className={`overflow-hidden transition-all duration-500 bg-neutral-900 text-neutral-400 border-t border-neutral-800 text-[9px] font-mono tracking-widest text-center select-none uppercase ${
-                        isScrolled ? "max-h-[30px] py-1.5 border-b border-neutral-800 opacity-100" : "max-h-0 py-0 opacity-0"
-                      }`}
-                    >
-                      {getFormattedDate()}
+                      <div className="w-11 shrink-0" aria-hidden />
                     </div>
                   </div>
 
-                  {/* ACTIVE HOME-SCREEN — Direction D only */}
-                  <div className="flex flex-col">
-                    {activeSimRoute === "/team" ? (
-                      <ConceptTeamView onNav={triggerNavigation} />
-                    ) : (
-                      <ConceptDView onNav={triggerNavigation} />
-                    )}
+                  <div
+                    ref={simScrollContainerRef}
+                    onScroll={handleSimScroll}
+                    className={`relative flex-1 min-h-0 w-full bg-white text-[#181818] overflow-y-auto scrollbar-none flex flex-col [container-type:size] ${
+                      lookbookFreeScroll ? "" : "scroll-smooth"
+                    } ${
+                      (activeSimRoute === "/" && !lookbookFreeScroll) ||
+                      (workingDirection === "E" && activeSimRoute === "/about/philosophy")
+                        ? "snap-y snap-mandatory"
+                        : ""
+                    }`}
+                  >
+                    {/* ACTIVE SCREEN — E / EF / F home; About: EF tree when EF, else E (F home-only) */}
+                    <div className="flex flex-col">
+                      {activeSimRoute === "/about/philosophy" ? (
+                        workingDirection === "EF" ? (
+                          <EfPhilosophyPage onBack={goSimHome} onNav={triggerNavigation} />
+                        ) : (
+                          <PhilosophyPage onBack={goSimHome} />
+                        )
+                      ) : activeSimRoute === "/about/founder" ? (
+                        workingDirection === "EF" ? (
+                          <EfFounderPage onBack={goSimHome} onNav={triggerNavigation} />
+                        ) : (
+                          <FounderPage onBack={goSimHome} />
+                        )
+                      ) : activeSimRoute === "/about/team" ? (
+                        workingDirection === "EF" ? (
+                          <EfTeamPage onBack={goSimHome} onNav={triggerNavigation} />
+                        ) : (
+                          <TeamPage onBack={goSimHome} onNav={triggerNavigation} />
+                        )
+                      ) : activeSimRoute === "/about/the-space" ? (
+                        workingDirection === "EF" ? (
+                          <EfSpacePage onBack={goSimHome} onNav={triggerNavigation} />
+                        ) : (
+                          <SpacePage onBack={goSimHome} />
+                        )
+                      ) : activeSimRoute === "/about/faq" ? (
+                        workingDirection === "EF" ? (
+                          <EfFaqPage onBack={goSimHome} onNav={triggerNavigation} />
+                        ) : (
+                          <FaqPage onBack={goSimHome} />
+                        )
+                      ) : activeSimRoute === "/training/classes/build" ? (
+                        <BuildPage onBack={goSimHome} onNav={triggerNavigation} />
+                      ) : activeSimRoute === "/training/classes/burn" ? (
+                        <BurnPage onBack={goSimHome} onNav={triggerNavigation} />
+                      ) : activeSimRoute === "/training/classes/balance" ? (
+                        <BalancePage onBack={goSimHome} onNav={triggerNavigation} />
+                      ) : activeSimRoute === "/training/personal/1-on-1" ? (
+                        <OneOnOnePage onBack={goSimHome} onNav={triggerNavigation} />
+                      ) : activeSimRoute === "/training/personal/small-group" ? (
+                        <SmallGroupPage onBack={goSimHome} onNav={triggerNavigation} />
+                      ) : activeSimRoute === "/training/personal/private-group" ? (
+                        <PrivateGroupPage onBack={goSimHome} onNav={triggerNavigation} />
+                      ) : activeSimRoute === "/start-here/experience" ? (
+                        <ExperiencePage onBack={goSimHome} onNav={triggerNavigation} />
+                      ) : activeSimRoute === "/start-here/apply" ? (
+                        <ApplyPage onBack={goSimHome} onNav={triggerNavigation} />
+                      ) : activeSimRoute === "/membership" ? (
+                        <MembershipPage onBack={goSimHome} onNav={triggerNavigation} />
+                      ) : activeSimRoute === "/contact" ? (
+                        <ContactPage onBack={goSimHome} onNav={triggerNavigation} />
+                      ) : activeSimRoute === "/culture/move-the-city" ? (
+                        <MoveTheCityPage onBack={goSimHome} onNav={triggerNavigation} />
+                      ) : activeSimRoute === "/culture/cultivated" ? (
+                        <CultivatedPage onBack={goSimHome} onNav={triggerNavigation} />
+                      ) : activeSimRoute === "/culture/archive" ? (
+                        <ArchivePage onBack={goSimHome} onNav={triggerNavigation} />
+                      ) : activeSimRoute === "/privacy" ? (
+                        <PrivacyPage onBack={goSimHome} onNav={triggerNavigation} />
+                      ) : activeSimRoute === "/terms" ? (
+                        <TermsPage onBack={goSimHome} onNav={triggerNavigation} />
+                      ) : workingDirection === "F" ? (
+                        <ConceptFView onNav={triggerNavigation} />
+                      ) : workingDirection === "EF" ? (
+                        <ConceptEFView
+                          onNav={triggerNavigation}
+                          onFreeScrollZoneChange={setLookbookFreeScroll}
+                        />
+                      ) : (
+                        <ConceptEView onNav={triggerNavigation} />
+                      )}
+                    </div>
                   </div>
 
-                </div>
-
-                {/* FULL-SCREEN OVERLAY MENU — covers entire phone until closed */}
+                {/* FULL-SCREEN OVERLAY MENU — photo field + accordion keeps full IA */}
                 <div
-                  className={`absolute inset-0 z-[60] bg-[#181818] text-white flex flex-col transition-opacity duration-300 ease-out ${
+                  className={`absolute inset-0 z-[60] text-white flex flex-col transition-opacity duration-500 ease-out ${
                     isMenuOpen
                       ? "opacity-100 pointer-events-auto visible"
                       : "opacity-0 pointer-events-none invisible"
                   }`}
                   aria-hidden={!isMenuOpen}
                 >
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-                    <USCrestSVG className="w-72 h-72 text-white/5" />
+                  {/* Odd Ritual DNA: photo is the menu plane */}
+                  <img
+                    src={gymPhotos.architectureRaw}
+                    alt=""
+                    aria-hidden
+                    className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
+                  />
+                  {/* Soft vignette only — keep facility visible */}
+                  <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      background:
+                        "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.28) 38%, rgba(0,0,0,0.45) 72%, rgba(0,0,0,0.72) 100%)",
+                    }}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[1] overflow-hidden">
+                    <USCrestSVG className="w-[140%] max-w-none h-auto text-white/[0.06]" />
                   </div>
 
-                  <div className="relative z-10 flex items-center justify-between px-6 pt-10 pb-4 shrink-0">
+                  <div className="relative z-10 flex items-center justify-between px-6 pt-10 pb-2 shrink-0">
                     <button
                       type="button"
                       onClick={() => setIsMenuOpen(false)}
@@ -530,276 +757,57 @@ export default function App() {
                     >
                       <X className="w-5 h-5" />
                     </button>
-                    <span className="font-mono text-[9px] text-neutral-500 tracking-widest uppercase">
-                      PRIVATE INVITATION ONLY
-                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="font-sans text-[11px] font-bold uppercase tracking-[0.18em] text-white/90 min-h-[44px] px-1 hover:opacity-70 transition-opacity"
+                    >
+                      Close
+                    </button>
                   </div>
 
-                  <div className="relative z-10 flex-1 min-h-0 flex flex-col px-6 pb-8">
+                  <div className="relative z-10 flex-1 min-h-0 flex flex-col px-5 pb-0">
                     <LockedNavOverlay
+                      variant="oddRitual"
                       onNavigate={(href, label) => {
                         setIsMenuOpen(false);
                         triggerNavigation(href, label);
                       }}
                     />
 
-                    <div className="border-t border-neutral-800 pt-4 mt-4 text-[10px] font-mono text-neutral-400 flex flex-col gap-2 shrink-0">
-                      <div className="flex justify-between gap-3">
+                    {/* Place footer on the photo — left-aligned (not centered) */}
+                    <div className="shrink-0 pt-3 pb-7 flex flex-col items-start gap-2.5 text-left">
+                      <USCrestSVG className="w-9 h-9 text-white/90" />
+                      <p
+                        className="font-serif text-[10px] uppercase tracking-[0.14em] text-white/85 leading-relaxed"
+                        style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
+                      >
+                        United Strength Club · ©{new Date().getFullYear()}
+                        <br />
+                        Columbus, Ohio
+                      </p>
+                      <div className="flex items-center gap-4 text-[9px] font-mono uppercase tracking-[0.16em] text-white/55">
                         <span>237 Cleveland Ave</span>
-                        <span className="text-right">Columbus, OH 43215</span>
-                      </div>
-                      <div className="flex justify-between gap-3">
-                        <a
-                          href="mailto:info@unitedstrengthgym.com"
-                          className="hover:text-white transition-colors"
-                        >
-                          info@unitedstrengthgym.com
-                        </a>
                         <a
                           href="https://www.instagram.com/united_strength/"
                           target="_blank"
                           rel="noreferrer"
-                          className="hover:text-white transition-colors flex items-center gap-1 shrink-0"
+                          className="hover:text-white transition-colors"
                         >
-                          Instagram <ExternalLink className="w-2.5 h-2.5" />
+                          Instagram
                         </a>
                       </div>
                     </div>
                   </div>
                 </div>
-
-                {/* Device Home Indicator Bar */}
-                <div className="absolute bottom-1 left-1/2 -translate-x-1/2 h-1 w-28 bg-[#2c2c2c] rounded-full z-[65] select-none pointer-events-none"></div>
-
-              </div>
-
-              {/* SIMULATOR QUICK TOGGLES */}
-              <div className="mt-4 flex flex-wrap gap-2 justify-center max-w-[375px]">
-                <button
-                  onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  className="bg-[#222] border border-neutral-800 text-xs px-3 py-1.5 rounded-lg text-white hover:bg-[#333] transition-all flex items-center gap-1.5"
-                >
-                  <Menu className="w-3 h-3 text-neutral-400" />
-                  {isMenuOpen ? "Force Close Menu" : "Simulate Hamburger Click"}
-                </button>
-                <button
-                  onClick={() => setIsScrolled(!isScrolled)}
-                  className="bg-[#222] border border-neutral-800 text-xs px-3 py-1.5 rounded-lg text-white hover:bg-[#333] transition-all flex items-center gap-1.5"
-                >
-                  <Clock className="w-3 h-3 text-neutral-400" />
-                  {isScrolled ? "Scroll to Top" : "Scroll Down State"}
-                </button>
-              </div>
-
-              {/* INTERACTIVE ROUTE & VISIBILITY CONFIGURATOR */}
-              <div className="mt-5 bg-[#161616] border border-neutral-800 rounded-xl p-4 max-w-[375px] w-full text-left space-y-4">
-                <div className="flex items-center gap-2 pb-2 border-b border-neutral-800">
-                  <Sparkles className="w-4 h-4 text-emerald-400" />
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-white font-semibold">
-                    Interactive Team Route Config
-                  </span>
-                </div>
-
-                {/* VISIBILITY TOGGLE */}
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <label className="text-xs font-bold text-white uppercase tracking-wider block">
-                      Visible in Menu
-                    </label>
-                    <span className="text-[10px] text-neutral-400 block">
-                      Toggle if "Team" link appears in the navigation.
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => setIsTeamVisible(!isTeamVisible)}
-                    className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                      isTeamVisible ? "bg-[#0A3C2E]" : "bg-neutral-800"
-                    }`}
-                  >
-                    <span
-                      className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
-                        isTeamVisible ? "translate-x-5" : "translate-x-0"
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                {/* PATH INPUT FIELD */}
-                <div className="space-y-2">
-                  <div className="flex justify-between items-baseline">
-                    <label className="text-xs font-bold text-white uppercase tracking-wider block">
-                      Custom URL Route
-                    </label>
-                    <span className="font-mono text-[9px] text-neutral-500">[Current: {teamRoute}]</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={teamRoute}
-                      onChange={(e) => {
-                        let val = e.target.value;
-                        if (!val.startsWith("/")) {
-                          val = "/" + val;
-                        }
-                        setTeamRoute(val);
-                      }}
-                      className="flex-1 bg-neutral-900 border border-neutral-800 rounded px-2.5 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-emerald-600"
-                      placeholder="/team"
-                    />
-                    <button
-                      onClick={() => {
-                        setTeamRoute("/team");
-                      }}
-                      className="bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-[10px] uppercase font-mono px-2 py-1 rounded"
-                    >
-                      Reset
-                    </button>
-                  </div>
-                </div>
-
-                {/* SIMULATED LINK STATUS INFO */}
-                <div className="bg-neutral-900/55 rounded-lg p-2.5 border border-neutral-800/40 text-[10px] font-mono space-y-1">
-                  <div className="flex justify-between">
-                    <span className="text-neutral-500">Menu Link:</span>
-                    <span className={isTeamVisible ? "text-emerald-400" : "text-red-400"}>
-                      {isTeamVisible ? `Active (points to ${teamRoute})` : "Hidden"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-neutral-500">Live Simulator Test:</span>
-                    <button
-                      onClick={() => {
-                        if (isTeamVisible) {
-                          setActiveSimRoute("/team");
-                          if (simScrollContainerRef.current) {
-                            simScrollContainerRef.current.scrollTop = 0;
-                          }
-                        }
-                      }}
-                      disabled={!isTeamVisible}
-                      className={`underline hover:text-white transition-colors cursor-pointer ${
-                        isTeamVisible ? "text-neutral-300" : "text-neutral-600 pointer-events-none"
-                      }`}
-                    >
-                      Click here to jump to Team View
-                    </button>
-                  </div>
-                </div>
-              </div>
-
             </div>
-
-            {/* DESIGN SPECIFICATION / EXPLANATORY COL */}
-            <div className="lg:col-span-6 xl:col-span-7 space-y-6">
-              
-              {/* Active Direction Card — D only */}
-              <div className="bg-[#161616] border border-neutral-800 rounded-2xl p-6 shadow-md">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest block">
-                      Active Direction Specification
-                    </span>
-                    <h2 className="text-2xl font-extrabold text-white tracking-tight mt-1">
-                      Direction D: Ritual Progression
-                    </h2>
-                  </div>
-                  <div className="bg-[#0A3C2E]/30 text-emerald-300 text-lg font-bold px-3 py-1 rounded-lg border border-emerald-900/40">
-                    D
-                  </div>
-                </div>
-
-                <p className="text-sm text-neutral-400 leading-relaxed mb-6">
-                  Active foundation (Todd Aug 2026). Odd Ritual–inspired numbered scroll chapters with locked IA: ABOUT · TRAINING · FOUNDATION · LONGEVITY · CULTURE · MEMBERSHIP · SHOP · START HERE. Homepage is a 7-section progression/reveal — seamless one-picture hero, then Believe → Pillars → Experience → Space → Membership → Start Here. Shop links out to United Limited. BALANCE shows Coming Soon. No public pricing.
-                </p>
-
-                <p className="text-[11px] text-neutral-500 font-mono mb-6 border-t border-neutral-800 pt-4">
-                  Earlier explorations (A · Editorial, C · Gallery) live under{" "}
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("archive")}
-                    className="text-emerald-400 hover:underline"
-                  >
-                    Archive A &amp; C
-                  </button>
-                  .
-                </p>
-
-                {/* Concept Spec Checklist Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-neutral-800 pt-6">
-                  <div>
-                    <h4 className="text-xs font-mono text-neutral-400 uppercase tracking-wider mb-2.5">
-                      Visual System Pairings
-                    </h4>
-                    <ul className="space-y-2 text-xs text-neutral-300">
-                      <li className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                        <span>Canvas Background: <strong className="font-mono text-white">#FFFFFF</strong></span>
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                        <span>Primary Font: <strong className="font-sans text-white">Satoshi tight + Instrument Serif</strong></span>
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                        <span>Photography: <strong className="font-sans text-white">Full-bleed chapter stills</strong></span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div>
-                    <h4 className="text-xs font-mono text-neutral-400 uppercase tracking-wider mb-2.5">
-                      Nav Guardrails Checked
-                    </h4>
-                    <ul className="space-y-2 text-xs text-neutral-300">
-                      <li className="flex items-center gap-2 text-emerald-400">
-                        <Check className="w-3.5 h-3.5" />
-                        <span>Hamburger button positioned left</span>
-                      </li>
-                      <li className="flex items-center gap-2 text-emerald-400">
-                        <Check className="w-3.5 h-3.5" />
-                        <span>Crest wordmark/monogram on scroll</span>
-                      </li>
-                      <li className="flex items-center gap-2 text-emerald-400">
-                        <Check className="w-3.5 h-3.5" />
-                        <span>Columbus date/location topbar active</span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              {/* COGNITIVE REVELATION PANEL: NO GYM NOISE */}
-              <div className="bg-[#161616] border border-neutral-800 rounded-2xl p-6">
-                <h3 className="text-sm font-mono text-white uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <Info className="w-4 h-4 text-emerald-400" />
-                  PRIVATE CLUB DESIGN ARCHITECTURE
-                </h3>
-                <div className="space-y-3 text-xs text-neutral-400 leading-relaxed">
-                  <p>
-                    Unlike normal fitness templates that clutter the viewport with live class calendars, countdown timers, and pricing tiers, <strong>United Strength Club</strong> operates on an selective, high-integrity hospitality architecture:
-                  </p>
-                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2 font-mono text-[11px] text-neutral-300">
-                    <li className="bg-[#222]/40 p-2 rounded border border-neutral-800">
-                      <span className="text-red-400 block mb-0.5">❌ EXCLUDED (Gym Noise):</span>
-                      No pricing cards, schedules, Triib links, class credits, or buy routes.
-                    </li>
-                    <li className="bg-[#222]/40 p-2 rounded border border-neutral-800">
-                      <span className="text-emerald-400 block mb-0.5">✅ INCLUDED (Club Vibe):</span>
-                      Selective copy, application button (deep emerald), and "Start the Journey" text links only.
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-            </div>
-
           </div>
         )}
 
         {/* ================================================================= */}
         {/* TAB 2: ARCHIVE — Directions A & C (revisit / salvage)             */}
         {/* ================================================================= */}
-        {activeTab === "archive" && (
+        {studioTab === "archive" && (
           <div className="space-y-6">
             <div className="bg-[#161616] border border-neutral-800 rounded-2xl p-6 max-w-3xl mx-auto text-left">
               <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest block">
@@ -884,7 +892,7 @@ export default function App() {
         {/* ================================================================= */}
         {/* TAB 3: SPECIFICATIONS / THE CULTURE CLUB BRAND SHEET            */}
         {/* ================================================================= */}
-        {activeTab === "specs" && (
+        {studioTab === "specs" && (
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
             
             {/* Color Tokens Panel */}
@@ -1129,7 +1137,8 @@ export default function App() {
 
       </main>
 
-      {/* SYSTEM WORKSPACE FOOTER */}
+      {/* SYSTEM WORKSPACE FOOTER — local DEV only (never on Vercel) */}
+      {showDevChrome && activeTab !== "simulator" && (
       <footer className="border-t border-neutral-800 bg-[#141414] py-6 px-6 mt-12 text-center text-xs text-neutral-500 font-mono">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
           <span>UNITED STRENGTH CLUB © {new Date().getFullYear()} — PRIVATE MEMBERS WORKSPACE</span>
@@ -1140,6 +1149,7 @@ export default function App() {
           </div>
         </div>
       </footer>
+      )}
 
     </div>
   );
@@ -1147,14 +1157,37 @@ export default function App() {
 
 // ----------------------------------------------------------------------
 // DIRECTION D — LOCKED HIERARCHICAL OVERLAY NAV
+// Direction E — Odd Ritual variant: numbered sections, larger type, accordion
 // ----------------------------------------------------------------------
 function LockedNavOverlay({
   onNavigate,
+  variant = "default",
 }: {
   onNavigate: (href: string, label: string) => void;
+  variant?: "default" | "oddRitual";
 }) {
+  if (variant === "oddRitual") {
+    return <OddRitualNavOverlay onNavigate={onNavigate} />;
+  }
+
   const linkRow = (item: NavLeaf, indent = false) => {
     const label = item.comingSoon ? `${item.label} (Coming Soon)` : item.label;
+    if (item.comingSoon) {
+      return (
+        <span
+          key={item.href + item.label}
+          aria-disabled="true"
+          className={`flex items-baseline gap-2 opacity-60 cursor-default ${
+            indent ? "pl-3" : ""
+          }`}
+        >
+          <span className="font-sans font-semibold tracking-widest text-[12px] text-white uppercase">
+            {label}
+          </span>
+          <span className="h-[1px] flex-1 bg-white/10" />
+        </span>
+      );
+    }
     return (
       <a
         key={item.href + item.label}
@@ -1165,7 +1198,7 @@ function LockedNavOverlay({
         }}
         className={`group flex items-baseline gap-2 transition-transform duration-200 hover:translate-x-1 ${
           indent ? "pl-3" : ""
-        } ${item.comingSoon ? "opacity-60" : ""}`}
+        }`}
       >
         <span className="font-sans font-semibold tracking-widest text-[12px] text-white uppercase">
           {label}
@@ -1184,12 +1217,25 @@ function LockedNavOverlay({
     <nav className="flex-1 min-h-0 overflow-y-auto scrollbar-none pr-1 flex flex-col gap-5 text-left pb-2">
       {LOCKED_NAV.map((section) => (
         <div key={section.title} className="space-y-2 shrink-0">
-          <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-neutral-500">
+          <p
+            className={`font-mono text-[9px] uppercase tracking-[0.22em] ${
+              section.kind !== "direct" && section.comingSoon
+                ? "text-neutral-600"
+                : "text-neutral-500"
+            }`}
+          >
             {section.title}
+            {section.kind !== "direct" && section.comingSoon ? " (Coming Soon)" : ""}
           </p>
 
-          {section.kind === "links" && (
+          {section.kind === "links" && !section.comingSoon && (
             <div className="flex flex-col gap-2.5">{section.items.map((item) => linkRow(item))}</div>
+          )}
+
+          {section.kind === "links" && section.comingSoon && (
+            <p className="font-sans text-[11px] text-white/40 uppercase tracking-wider opacity-55">
+              Details forthcoming
+            </p>
           )}
 
           {section.kind === "direct" && (
@@ -1212,6 +1258,207 @@ function LockedNavOverlay({
           )}
         </div>
       ))}
+    </nav>
+  );
+}
+
+/**
+ * Photo-menu overlay: collapsed = sparse OR-scale titles;
+ * one accordion open at a time = full IA without dumping the sitemap.
+ */
+function OddRitualNavOverlay({
+  onNavigate,
+}: {
+  onNavigate: (href: string, label: string) => void;
+}) {
+  const [openId, setOpenId] = useState<string | null>(null);
+  const ease = "cubic-bezier(0.21, 0.47, 0.32, 0.98)";
+
+  const toggle = (id: string) => {
+    setOpenId((prev) => (prev === id ? null : id));
+  };
+
+  const childLink = (item: NavLeaf) => {
+    const label = item.comingSoon ? `${item.label} (Coming Soon)` : item.label;
+    if (item.comingSoon) {
+      return (
+        <span
+          key={item.href + item.label}
+          aria-disabled="true"
+          className="flex items-center justify-between gap-3 min-h-[44px] py-2.5 px-1 border-b border-white/15 last:border-b-0 opacity-55 cursor-default"
+        >
+          <span className="font-sans text-[14px] font-medium tracking-[0.1em] uppercase text-white/85">
+            {label}
+          </span>
+        </span>
+      );
+    }
+    return (
+      <a
+        key={item.href + item.label}
+        href={item.href}
+        onClick={(e) => {
+          e.preventDefault();
+          onNavigate(item.href, label);
+        }}
+        className="flex items-center justify-between gap-3 min-h-[44px] py-2.5 px-1 border-b border-white/15 last:border-b-0 group"
+      >
+        <span className="font-sans text-[14px] font-medium tracking-[0.1em] uppercase text-white/85 group-hover:text-white transition-colors">
+          {label}
+        </span>
+        {item.external ? (
+          <ExternalLink className="w-3.5 h-3.5 text-white/45 shrink-0" />
+        ) : (
+          <ChevronRight className="w-4 h-4 text-white/40 group-hover:text-white/75 shrink-0" />
+        )}
+      </a>
+    );
+  };
+
+  return (
+    <nav
+      className="flex-1 min-h-0 overflow-y-auto scrollbar-none pr-0.5 flex flex-col gap-0 text-left pb-2"
+      aria-label="Site navigation"
+    >
+      {LOCKED_NAV.map((section, index) => {
+        const n = String(index + 1).padStart(2, "0");
+        const id = section.title;
+        const isOpen = openId === id;
+        const sectionComingSoon =
+          section.kind === "direct"
+            ? Boolean(section.item.comingSoon)
+            : Boolean(section.comingSoon);
+
+        if (section.kind === "direct") {
+          const item = section.item;
+          const label = item.comingSoon
+            ? `${section.title} (Coming Soon)`
+            : section.title;
+
+          if (item.comingSoon) {
+            return (
+              <div
+                key={id}
+                aria-disabled="true"
+                className="flex items-baseline gap-3 min-h-[52px] py-3.5 border-b border-white/20 opacity-55 cursor-default"
+              >
+                <span className="font-mono text-[10px] tracking-[0.22em] text-white/45 shrink-0 pt-1.5">
+                  {n}
+                </span>
+                <span
+                  className="font-sans text-[22px] font-bold tracking-[-0.03em] uppercase text-white flex-1 drop-shadow-[0_1px_8px_rgba(0,0,0,0.45)]"
+                  style={{ fontFamily: "'Satoshi', sans-serif" }}
+                >
+                  {label}
+                </span>
+              </div>
+            );
+          }
+
+          return (
+            <a
+              key={id}
+              href={item.href}
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate(item.href, label);
+              }}
+              className="group flex items-baseline gap-3 min-h-[52px] py-3.5 border-b border-white/20"
+            >
+              <span className="font-mono text-[10px] tracking-[0.22em] text-white/45 shrink-0 pt-1.5">
+                {n}
+              </span>
+              <span
+                className="font-sans text-[22px] font-bold tracking-[-0.03em] uppercase text-white flex-1 group-hover:opacity-80 transition-opacity drop-shadow-[0_1px_8px_rgba(0,0,0,0.45)]"
+                style={{ fontFamily: "'Satoshi', sans-serif" }}
+              >
+                {section.title}
+              </span>
+              {item.external ? (
+                <ExternalLink className="w-4 h-4 text-white/45 shrink-0" />
+              ) : (
+                <ChevronRight className="w-5 h-5 text-white/40 group-hover:text-white/75 shrink-0" />
+              )}
+            </a>
+          );
+        }
+
+        // Whole section locked (e.g. Longevity) — gray header, no accordion
+        if (sectionComingSoon) {
+          return (
+            <div
+              key={id}
+              aria-disabled="true"
+              className="flex items-baseline gap-3 min-h-[52px] py-3.5 border-b border-white/20 opacity-55 cursor-default"
+            >
+              <span className="font-mono text-[10px] tracking-[0.22em] text-white/45 shrink-0 pt-1.5">
+                {n}
+              </span>
+              <span
+                className="font-sans text-[22px] font-bold tracking-[-0.03em] uppercase text-white flex-1 drop-shadow-[0_1px_8px_rgba(0,0,0,0.45)]"
+                style={{ fontFamily: "'Satoshi', sans-serif" }}
+              >
+                {section.title} (Coming Soon)
+              </span>
+            </div>
+          );
+        }
+
+        return (
+          <div key={id} className="border-b border-white/20 shrink-0">
+            <button
+              type="button"
+              onClick={() => toggle(id)}
+              aria-expanded={isOpen}
+              className="w-full flex items-baseline gap-3 min-h-[52px] py-3.5 text-left group"
+            >
+              <span className="font-mono text-[10px] tracking-[0.22em] text-white/45 shrink-0 pt-1.5">
+                {n}
+              </span>
+              <span
+                className="font-sans text-[22px] font-bold tracking-[-0.03em] uppercase text-white flex-1 drop-shadow-[0_1px_8px_rgba(0,0,0,0.45)]"
+                style={{ fontFamily: "'Satoshi', sans-serif" }}
+              >
+                {section.title}
+              </span>
+              <ChevronRight
+                className={`w-5 h-5 text-white/40 shrink-0 transition-transform duration-500 ${
+                  isOpen ? "rotate-90 text-white/80" : ""
+                }`}
+                style={{ transitionTimingFunction: ease }}
+              />
+            </button>
+
+            <div
+              className={`grid transition-[grid-template-rows,opacity] duration-500 ${
+                isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+              }`}
+              style={{ transitionTimingFunction: ease }}
+            >
+              <div className="overflow-hidden min-h-0">
+                <div className="mb-4 ml-7 mr-0 rounded-sm bg-black/40 backdrop-blur-md border border-white/10 px-3 py-1 shadow-[0_8px_32px_rgba(0,0,0,0.35)]">
+                  {section.kind === "links" && (
+                    <div className="flex flex-col">{section.items.map((item) => childLink(item))}</div>
+                  )}
+
+                  {section.kind === "branches" && (
+                    <div className="flex flex-col gap-4 py-2">
+                      {section.branches.map((branch) => (
+                        <div key={branch.label} className="flex flex-col gap-0.5">
+                          <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-white/45 mb-1 px-1">
+                            {branch.label}
+                          </p>
+                          {branch.children.map((child) => childLink(child))}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </nav>
   );
 }

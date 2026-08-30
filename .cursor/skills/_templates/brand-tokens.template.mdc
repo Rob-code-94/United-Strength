@@ -1,0 +1,46 @@
+---
+description: Enforces approved brand color and typography tokens for {client-name} frontend files
+globs: "**/*.{css,scss,tsx,jsx,html,vue,svelte}"
+alwaysApply: false
+---
+
+# {client-name} Brand Tokens
+
+Read `.cursor/skills/{client-slug}-brand/SKILL.md` for full brand context. This rule enforces tokens in code.
+
+## CSS variables (required)
+
+Define these in your global stylesheet or `:root`. Use semantic names — never hardcode hex in components.
+
+```css
+:root {
+  /* Colors — from approved palette */
+  --color-bg-primary: {hex};
+  --color-bg-secondary: {hex};
+  --color-text-primary: {hex};
+  --color-text-muted: {hex};
+  --color-accent: {hex};
+  --color-accent-secondary: {hex};
+
+  /* Typography */
+  --font-display: "{display-font}", {fallbacks};
+  --font-body: "{body-font}", {fallbacks};
+  --font-caption: "{caption-font}", {fallbacks};
+
+  /* Spacing rhythm */
+  --space-section: {e.g. 120px};
+  --space-block: {e.g. 48px};
+}
+```
+
+## Rules
+
+1. **No hardcoded hex** in component files — use `var(--color-*)` only.
+2. **No generic SaaS fonts** unless the project brand skill explicitly allows them.
+3. **CTA copy** must match the approved table in the brand skill — not "Sign Up" or "Join Now" unless approved.
+4. **Motion:** prefer CSS transitions 400–800ms ease; avoid bouncy/spring defaults on luxury/editorial projects.
+5. **Images:** full-bleed heroes use `object-fit: cover`; never stretch logos.
+
+## When tokens change
+
+Update this file and `.cursor/skills/{client-slug}-brand/SKILL.md` together via `website-brand-foundation` iteration mode.

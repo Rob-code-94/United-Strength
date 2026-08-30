@@ -1,0 +1,79 @@
+---
+description: United Strength Aesthetic — Sukha-first look, features, and brand kit reference
+alwaysApply: true
+---
+
+# United Strength Aesthetic
+
+## North star
+
+Premium boutique fitness club. **Active aesthetic: Culture Club tokens + Direction D Ritual Progression** (Odd Ritual–inspired two-act homepage, Satoshi Bold wordmark, white canvas, photography-led). Wireframe: [docs/wireframes/home-direction-d.md](../docs/wireframes/home-direction-d.md). v1/v2 frozen — see [docs/brand/versions/](../docs/brand/versions/).
+
+## Project workflow
+
+Follow [.cursor/rules/plan-mode-ticketing.mdc](plan-mode-ticketing.mdc) when planning or scoping work (audit done work, sync todos, complete all items).
+
+## AI Studio bridge (beta frontend)
+
+Culture Club UX/UI exploration runs in Google AI Studio; Cursor ports approved patterns into `src/`.
+
+- **Edit:** https://aistudio.google.com/apps/f0b0ce5b-993b-4c03-9e60-d6063c477bd2
+- **Preview:** https://ais-pre-fewk45ctma7odjkgzbjqcl-20545025737.us-east1.run.app
+- **Code (Studio only):** https://github.com/Rob-code-94/US-google-Studio
+- **Bridge doc:** [docs/toolkit/ai-studio-cursor-bridge.md](../docs/toolkit/ai-studio-cursor-bridge.md)
+- **Prompts + uploads:** [docs/client/ai-studio-brief.md](../docs/client/ai-studio-brief.md)
+
+Before implementing nav/hero/overlay changes, check the live preview and Studio GitHub repo. Port into this repo's `src/` — do not deploy from `US-google-Studio`.
+
+## High-End Website Builder Stack
+
+Generic toolkit for foundation → build on any website. Personal skills: `website-brand-foundation` and `website-frontend-build` in `~/.cursor/skills/`. Project context for this client: [.cursor/skills/united-strength-brand/SKILL.md](../.cursor/skills/united-strength-brand/SKILL.md) + [.cursor/rules/brand-tokens.mdc](brand-tokens.mdc). See [docs/toolkit/README.md](../docs/toolkit/README.md).
+
+**MCP stack:** cursor-ide-browser · plugin-browse-browser · Firecrawl CLI (`~/.npm-global/bin/firecrawl`) · Notion MCP · cursor-app-control.
+
+## Before UI or marketing copy
+
+1. Read [docs/brand/united-strength-aesthetic.md](../docs/brand/united-strength-aesthetic.md) for tokens, fonts, logos, and approved overrides.
+2. For foundation-approved direction (The Quiet Club), also read [.cursor/skills/united-strength-brand/SKILL.md](../.cursor/skills/united-strength-brand/SKILL.md).
+3. Skills (`.cursor/skills/`):
+   - **odd-ritual** — Direction E Odd Ritual editorial (chapter scroll, photo-led story; pair with `shadcn-space-catalog`)
+   - **odd-ritual-pages** — EF interior page recipes (unique Tier 2 layouts; Philosophy foundation; pair with `odd-ritual` + catalog)
+   - **united-strength-brand** — Culture Club tokens, voice, sitemap
+   - **high-end-minimalist-ui** — dark editorial vibe, spacing, geometry
+   - **light-performance-bold** — archived v2 only
+   - **high-octane-industrial-sanctuary** — archived v1 only
+   - **luxury-motion-micro-interactions** — animation and micro-interactions
+   - **production-ready-components** — TypeScript, modular components, `cn` pattern
+   - **high-performance-media** — Next.js Image, video heroes, CLS
+   - **premium-mobile-touch-ux** — touch targets, drawer nav, mobile luxury
+4. Use [docs/information-architecture.md](../docs/information-architecture.md), [docs/wireframes/](../docs/wireframes/), and [docs/reference/feature-matrix.md](../docs/reference/feature-matrix.md).
+
+## Mobile first
+
+Design and implement for **phone first**, desktop second. See [.cursor/rules/mobile-first.mdc](mobile-first.mdc).
+
+## Visual defaults
+
+- Full-bleed hero (video or still), generous whitespace, restrained type.
+- Sticky nav: Info · Offerings · Memberships · New here (reserved — no Buy/Reserve/Member on marketing). See [.cursor/rules/todd-nav-preferences.mdc](todd-nav-preferences.mdc).
+- Repeated journey CTA → `/new-here`.
+- Footer: address, segmented emails (info / membership / training), social, legal, optional newsletter.
+- `/buy`, `/schedule`, `/account`: site header/footer only; minimal chrome around gym-software embed.
+
+## Feature defaults
+
+- Marketing on Next.js + Firebase; booking/credits/account via **gym software embed** (no custom member auth or billing in v1).
+- Sukha-style membership application; **no public monthly prices** unless the brand kit marks pricing as approved.
+- No apparel shop in v1 unless brand kit changelog says otherwise.
+
+## When assets are approved
+
+Append fonts, colors, logo paths, and copy tone to [docs/brand/united-strength-aesthetic.md](../docs/brand/united-strength-aesthetic.md) with a changelog entry. Mirror values in Tailwind/theme config. Do not hardcode one-off brand values only in components.
+
+Store files under `public/brand/` when the app exists; record path and usage in the brand kit.
+
+## Anti-patterns
+
+- Busy multi-banner nav, lorem ipsum at launch.
+- Rebuilding Mariana Tek / Mindbody booking, credits, or waitlists in custom code.
+- Ethos-style public tier cards without explicit client sign-off in the brand kit.
