@@ -8,7 +8,10 @@ Low-fidelity layout specs for key pages. Use for client review before visual des
 |------|------|
 | **[home-direction-d.md](home-direction-d.md)** | **Home — Direction D Ritual Progression (locked IA / Todd Aug 2026)** |
 | **[home-direction-e.md](home-direction-e.md)** | **Home — Direction E Odd Ritual (frozen default)** |
-| **[home-direction-ef.md](home-direction-ef.md)** | **Home — Direction E+F lookbook merge (toggle)** |
+| **[home-direction-ef.md](home-direction-ef.md)** | **Home — Direction E+F lookbook merge (default · frozen)** |
+| **[home-direction-v1.md](home-direction-v1.md)** | **Home — Direction V1 Edits (parallel tab · dark carousel)** |
+| **[navigation-updates-sep-2026.md](navigation-updates-sep-2026.md)** | **Nav hierarchy — Todd Sep 2026 (Wave 1 coded · polish parked)** |
+| **[nav-sep-2026-wave2-spec.md](nav-sep-2026-wave2-spec.md)** | **Spec + status checklist — Wave 1 Done · Wave 2 tickets** |
 | **[home-direction-f.md](home-direction-f.md)** | **Home — Direction F Awake lookbook (toggle)** |
 | [about-direction-e.md](about-direction-e.md) | About interiors — E tree (frozen with E) |
 | [about-direction-ef.md](about-direction-ef.md) | About interiors — EF lookbook tree |

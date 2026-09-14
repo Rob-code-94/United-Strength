@@ -104,20 +104,24 @@ export const PRIVACY_PAGE = {
   headline: "Privacy Policy",
   lede: "How United Strength Club handles information you share with us.",
   intro: [
-    "This page outlines our approach to privacy for the United Strength Club website and related communications. Final counsel language and SMS program details will be confirmed before Mariana Tek launch.",
+    "This page outlines our approach to privacy for the United Strength Club website, membership communications, and related services. Counsel may refine language before public launch.",
   ],
   sections: [
     {
       title: "Information we collect",
-      body: "When you contact us, apply for membership, or request a visit, we may collect your name, email, phone number, and details you choose to share about your goals.",
+      body: "When you contact us, apply for membership, book or visit, or use member tools, we may collect your name, email, phone number, payment-related details processed by our gym software partner, and information you choose to share about your goals.",
     },
     {
       title: "How we use information",
-      body: "We use this information to respond to inquiries, review membership applications, schedule visits, and operate the club. We do not sell personal information.",
+      body: "We use this information to respond to inquiries, review membership applications, operate the club, and provide booking and account services through our partners. We do not sell personal information.",
     },
     {
-      title: "Mobile messaging (SMS)",
-      body: "If you opt into club text messages, message frequency varies. Message and data rates may apply. Reply STOP to opt out and HELP for help. Support phone and frequency caps will be confirmed with the team before SMS launch. See also our Terms of Use.",
+      title: "Mobile information & SMS",
+      body: "No mobile information will be shared with third parties/affiliates for marketing/promotional purposes. All other categories exclude text messaging originator opt-in data and consent; this information will not be shared with any third parties. If you opt into club text messages, see our Terms of Use for program details, opt-out (STOP), and help (HELP).",
+    },
+    {
+      title: "Partners",
+      body: "Booking, buy, and account experiences may be provided by Mariana Tek / Xplor. Their processing is governed by their policies in addition to this notice.",
     },
     {
       title: "Contact",
@@ -133,20 +137,36 @@ export const TERMS_PAGE = {
   headline: "Terms of Use",
   lede: "Guidelines for using the United Strength Club website and related services.",
   intro: [
-    "By using this site you agree to these terms. Membership, training, and facility use are governed by agreements shared during the application and onboarding process.",
+    "By using this site you agree to these terms. Membership, training, and facility use are also governed by agreements shared during application and onboarding. Booking and account tools, when linked, are provided by our gym software partner.",
   ],
   sections: [
     {
       title: "Website use",
-      body: "Content on this marketing site is for information about United Strength Club. It does not create a membership contract. Booking and account tools, when linked, are provided by our gym software partner.",
+      body: "Content on this marketing site is for information about United Strength Club. It does not by itself create a membership contract. Open checkout and class booking occur in partner embeds or by arrangement with the club — not via public Buy/Reserve chrome on marketing pages.",
     },
     {
       title: "Membership & applications",
-      body: "Membership is selective and reviewed by the team. Submitting an application does not guarantee acceptance. Pricing and plan details are confirmed directly with the club — not via open checkout on this marketing layer.",
+      body: "Membership is selective and reviewed by the team. Submitting an application does not guarantee acceptance. Plan details are confirmed directly with the club.",
     },
     {
-      title: "SMS program",
-      body: "By opting into SMS you agree to receive club-related messages (visits, membership, schedule updates as offered). Frequency varies. Carrier fees may apply. Opt out anytime by replying STOP. Help: reply HELP or email info@unitedstrengthgym.com. Exact message types and caps will be confirmed before launch.",
+      title: "SMS program — description",
+      body: "By opting in, you agree to receive recurring automated text messages from United Strength Club (\"we,\" \"us,\" \"our\") at the mobile number you provided. Messages may include appointment reminders, class updates, account alerts, promotional offers, and customer support follow-ups. Consent to receive these messages is not a condition of any purchase.",
+    },
+    {
+      title: "SMS program — message frequency",
+      body: "You may receive up to [X] messages per [week/month]. Message frequency may vary depending on your activity and interactions with us. (Exact cap to be confirmed with the club before SMS launch.)",
+    },
+    {
+      title: "SMS program — rates",
+      body: "Message and data rates may apply. Charges are billed by and payable to your mobile service provider. Please contact your wireless carrier for details about your messaging plan.",
+    },
+    {
+      title: "SMS program — opt out & help",
+      body: "Unsubscribe anytime by replying STOP to any message we send. After STOP you will receive a one-time confirmation, and no further messages will be sent. Rejoin by signing up again or replying START. For help, reply HELP or contact info@unitedstrengthgym.com or [SUPPORT PHONE]. Privacy Policy: /privacy on this site.",
+    },
+    {
+      title: "SMS program — carrier liability",
+      body: "Carriers are not liable for any delayed or undelivered messages.",
     },
     {
       title: "Privacy",

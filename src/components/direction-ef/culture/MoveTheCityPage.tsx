@@ -14,7 +14,8 @@ interface PageProps {
 }
 
 /**
- * Move the City — photo-first community recipe (gallery-01 DNA).
+ * Move the City // Run Club — photo-first community recipe (gallery-01 DNA).
+ * Training Classes leaf (Sep 2026) — was Culture. Alias: /culture/move-the-city.
  * Light opener → full-bleed photo → story → partners ruled index.
  * Live twin: unitedstrengthgym.com/our-partners · #ColumbUS
  */
@@ -32,8 +33,9 @@ export default function MoveTheCityPage({ onBack, onNav }: PageProps) {
       />
 
       <LookbookPhotoChapter
-        image={gymPhotos.experienceBroll}
-        imageAlt="United Strength — STRONGER mural and facility atmosphere"
+        image={gymPhotos.runClub}
+        imageAlt="Run club — a diverse group of runners on a city street"
+        gradientClass="from-black/55 via-black/20 to-transparent"
       >
         <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-white/70">
           {c.photo.n} // {c.photo.title}
@@ -94,12 +96,15 @@ export default function MoveTheCityPage({ onBack, onNav }: PageProps) {
                     {n}
                   </span>
                   <div className="col-span-10 sm:col-span-11 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
-                    <span
-                      className="text-[15px] font-bold tracking-tight text-[#181818]"
+                    <a
+                      href={row.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-[15px] font-bold tracking-tight text-[#181818] min-h-[44px] inline-flex items-center hover:opacity-55 transition-opacity"
                       style={{ fontFamily: "'Satoshi', sans-serif" }}
                     >
                       {row.name}
-                    </span>
+                    </a>
                     <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#5C5C5C]">
                       {row.focus}
                     </span>

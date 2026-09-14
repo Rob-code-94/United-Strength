@@ -105,7 +105,7 @@ export const pillars: PillarItem[] = [
     body: "Building stronger connections beyond the gym — a weekly run club for movement, conversation, and Columbus.",
     image: gymPhotos.equipmentClose,
     imageAlt: "Move the City — equipment",
-    href: "/culture/move-the-city",
+    href: "/training/move-the-city",
   },
 ];
 

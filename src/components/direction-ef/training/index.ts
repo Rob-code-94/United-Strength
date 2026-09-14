@@ -1,6 +1,7 @@
 export { default as BuildPage } from "./BuildPage";
 export { default as BurnPage } from "./BurnPage";
 export { default as BalancePage } from "./BalancePage";
+export { default as PersonalTrainingPage } from "./PersonalTrainingPage";
 export { default as OneOnOnePage } from "./OneOnOnePage";
 export { default as SmallGroupPage } from "./SmallGroupPage";
 export { default as PrivateGroupPage } from "./PrivateGroupPage";

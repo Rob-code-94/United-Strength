@@ -52,33 +52,57 @@ Other pages compose a **subset** of beats + unique structure. Do not paste this 
 Copy: `src/data/about-copy.ts`  
 Wireframe: [about-direction-ef.md](../../../docs/wireframes/about-direction-ef.md)
 
-### Training (`direction-ef/training/`)
+### Training (`direction-ef/training/` · Move the City page file under culture/)
 
 | Route | Recipe | Tier 2 structure | Catalog DNA | Notes |
 |-------|--------|------------------|-------------|-------|
 | `/training/classes/build` | Class leaf | Opener → photo split → body → week-strip → cue to Burn | editorial + custom | Free Trial → Experience, not Triib |
 | `/training/classes/burn` | Class leaf | Alternate canvas/photo + week-strip → Balance | editorial + custom | Mon–Thu as published |
-| `/training/classes/balance` | Sparse manifesto | Coming Soon sparse — **no** schedule | manifesto DNA | Draft |
-| `/training/personal/1-on-1` | Story-led | Story + Team cue + inquire / Start Here | `about-us-13` | |
-| `/training/personal/small-group` | Ruled format index | Ruled format index | about / index | Draft |
-| `/training/personal/private-group` | Inquiry band | Inquiry band — **no** prices | `cta-08` (no tier cards) | Draft |
+| `/training/classes/balance` | Sparse manifesto | Coming Soon sparse — **no** schedule | manifesto DNA | CS nav; full class leaf later (NAV-104) |
+| `/training/move-the-city` | Photo-first community | Opener → `LookbookPhotoChapter` → story → partners ruled index | `gallery-01` | Label **MOVE THE CITY // RUN CLUB**; component `MoveTheCityPage`; alias `/culture/move-the-city` |
+| `/training/personal` | Story-led hub | Opener → hub body → 1:1 + private group beats → coaches → inquire | `about-us-13` + `cta-08` | Sep 2026 single Coaching leaf; Wave 1 shell · polish NAV-102 |
+| `/training/personal/1-on-1` | — | — | — | **Alias →** `/training/personal` (retired nav leaf) |
+| `/training/personal/small-group` | — | — | — | **Alias →** `/training/personal` |
+| `/training/personal/private-group` | — | — | — | **Alias →** `/training/personal` |
 
-Copy: `src/data/training-copy.ts`  
-Wireframe: [training-direction-ef.md](../../../docs/wireframes/training-direction-ef.md)
+Copy: `src/data/training-copy.ts` · Move the City copy in `culture-copy.ts`  
+Wireframe: [training-direction-ef.md](../../../docs/wireframes/training-direction-ef.md) · [navigation-updates-sep-2026.md](../../../docs/wireframes/navigation-updates-sep-2026.md)
 
 ### Culture (`direction-ef/culture/`)
 
 | Route | Recipe | Tier 2 structure | Catalog DNA | Notes |
 |-------|--------|------------------|-------------|-------|
-| `/culture/move-the-city` | Photo-first community | Opener → `LookbookPhotoChapter` → story → partners ruled index | `gallery-01` | Live twin: `/our-partners` |
+| `/culture/by-design` | Sparse manifesto | Opener → manifesto → cream quote → principles index | `about-us-13` | Cultivated twin; intention ≠ The Space; Wave 1 shell · polish NAV-101 |
 | `/culture/cultivated` | Sparse manifesto | Opener → manifesto → cream quote → principles index | `about-us-13` | Todd draft — no live twin |
 | `/culture/archive` | Off Centered Stack | Cream jump → `LookbookOffCenteredStack` (scroll reveal) → authors | Act2 photo-deck DNA | Live blog; external Read links |
+| `/culture/move-the-city` | — | — | — | **Alias →** `/training/move-the-city` |
 
 Copy: `src/data/culture-copy.ts`
 
-### Future journey pages
+### Journey (`direction-ef/journey/`)
 
-Use the same 3-tier system. Pick the closest recipe (story-led, photo-first, ruled index, inquiry) before inventing a sixth clone of Philosophy. Document new recipes when they ship.
+| Route | Recipe | Tier 2 structure | Catalog DNA | Notes |
+|-------|--------|------------------|-------------|-------|
+| `/membership` | Story-led belonging | Opener → belonging / passport cue — **no** public tier cards | `about-us-13` / image statement | Full passport page polish is separate backlog |
+| `/start-here/experience` | Inquiry / Start Here | Opener → experience path → dual path CTAs | `cta-08` DNA (no Buy) | Primary join entry |
+| `/start-here/apply` | Form / apply | Opener → application · Apply `#0A3C2E` | form + `cta-08` | Selective membership |
+| `/contact` | Inquiry | Sparse contact | — | Footer / partner inquire |
+| `/privacy` · `/terms` | Legal | Minimal legal chrome | — | Embed-adjacent; not Doc nav leaves |
+
+### Coming Soon / future (`COMING_SOON_ROUTES`)
+
+| Route | Recipe (when live) | Catalog DNA | Notes |
+|-------|--------------------|-------------|-------|
+| `/foundation` | Sparse manifesto → dedicated page | `about-us-13` | Nav = CS direct today · NAV-105 |
+| `/longevity` | Sparse manifesto → dedicated page | `about-us-13` | Nav = CS direct today · NAV-106 |
+
+### Nav-only (no interior recipe)
+
+| Nav | Href | Notes |
+|-----|------|-------|
+| Shop | `https://theunitedlimited.com` | External; no US marketing page · NAV-103 label confirm |
+
+**Space rule:** Adapt DNA into Lookbook Tailwind + `motion` — **no** Space CLI / `components/ui` install in this Vite app.
 
 ---
 

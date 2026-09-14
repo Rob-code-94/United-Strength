@@ -18,6 +18,11 @@ import {
 import ConceptEView from "./components/ConceptEView";
 import ConceptEFView from "./components/ConceptEFView";
 import ConceptFView from "./components/ConceptFView";
+import ConceptV1View from "./components/ConceptV1View";
+import MarianaEmbedPage from "./components/MarianaEmbedPage";
+import MaintenancePage, {
+  isMaintenanceMode,
+} from "./components/MaintenancePage";
 import {
   FaqPage,
   FounderPage,
@@ -36,9 +41,7 @@ import {
   BalancePage,
   BuildPage,
   BurnPage,
-  OneOnOnePage,
-  PrivateGroupPage,
-  SmallGroupPage,
+  PersonalTrainingPage,
 } from "./components/direction-ef/training";
 import {
   ApplyPage,
@@ -50,13 +53,14 @@ import {
 } from "./components/direction-ef/journey";
 import {
   ArchivePage,
+  ByDesignPage,
   CultivatedPage,
   MoveTheCityPage,
 } from "./components/direction-ef/culture";
 import { gymPhotos } from "./assets/images/gym";
 import { showDevChrome } from "./lib/dev-chrome";
 
-type WorkingDirection = "E" | "EF" | "F";
+type WorkingDirection = "E" | "EF" | "F" | "V1";
 
 const ABOUT_ROUTES = new Set([
   "/about/philosophy",
@@ -70,7 +74,15 @@ const ABOUT_ROUTES = new Set([
 const TRAINING_ROUTES = new Set([
   "/training/classes/build",
   "/training/classes/burn",
+  "/training/move-the-city",
+  "/training/personal",
+]);
+
+/** Legacy PT children → `/training/personal` */
+const PERSONAL_TRAINING_ALIASES = new Set([
   "/training/personal/1-on-1",
+  "/training/personal/small-group",
+  "/training/personal/private-group",
 ]);
 
 /** Live-site parity + Culture + legal shells */
@@ -79,12 +91,15 @@ const PARITY_ROUTES = new Set([
   "/start-here/apply",
   "/membership",
   "/contact",
-  "/culture/move-the-city",
+  "/culture/by-design",
   "/culture/cultivated",
   "/culture/archive",
   "/privacy",
   "/terms",
 ]);
+
+/** Mariana Tek embeds — deep-link only; not in marketing nav */
+const EMBED_ROUTES = new Set(["/buy", "/schedule", "/account"]);
 
 /** Intentional roadmap — client-facing Coming Soon (pillars + overlay drafts) */
 const COMING_SOON_ROUTES = new Set([
@@ -94,14 +109,15 @@ const COMING_SOON_ROUTES = new Set([
   "/longevity/strength-standard",
   "/longevity/the-trials",
   "/training/classes/balance",
-  "/training/personal/small-group",
-  "/training/personal/private-group",
 ]);
 
 // ----------------------------------------------------------------------
 // BRAND CONSTANTS & LINKS
 // ----------------------------------------------------------------------
-/** Todd Aug 2026 — locked IA (Direction D) — exact hierarchy */
+/**
+ * Todd Sep 2026 navigation hierarchy (homepage V1 locked — do not edit direction-v1 home).
+ * Source: docs/client/todd-navigation-updates-sep-2026.md · Google Doc tab
+ */
 type NavLeaf = { label: string; href: string; external?: boolean; comingSoon?: boolean };
 type NavBranch = { label: string; children: NavLeaf[] };
 type NavSection =
@@ -131,22 +147,16 @@ const LOCKED_NAV: NavSection[] = [
           { label: "BUILD", href: "/training/classes/build" },
           { label: "BURN", href: "/training/classes/burn" },
           { label: "BALANCE", href: "/training/classes/balance", comingSoon: true },
+          {
+            label: "MOVE THE CITY // RUN CLUB",
+            href: "/training/move-the-city",
+          },
         ],
       },
       {
-        label: "Personal Training",
+        label: "Coaching",
         children: [
-          { label: "1-on-1 Coaching", href: "/training/personal/1-on-1" },
-          {
-            label: "Small Group Training",
-            href: "/training/personal/small-group",
-            comingSoon: true,
-          },
-          {
-            label: "Private Group Training",
-            href: "/training/personal/private-group",
-            comingSoon: true,
-          },
+          { label: "Personal Training", href: "/training/personal" },
         ],
       },
     ],
@@ -158,19 +168,14 @@ const LOCKED_NAV: NavSection[] = [
   },
   {
     title: "LONGEVITY",
-    kind: "links",
-    comingSoon: true,
-    items: [
-      { label: "Reflection", href: "/longevity/reflection", comingSoon: true },
-      { label: "The Strength Standard", href: "/longevity/strength-standard", comingSoon: true },
-      { label: "The Trials", href: "/longevity/the-trials", comingSoon: true },
-    ],
+    kind: "direct",
+    item: { label: "Longevity", href: "/longevity", comingSoon: true },
   },
   {
     title: "CULTURE",
     kind: "links",
     items: [
-      { label: "Move the City", href: "/culture/move-the-city" },
+      { label: "By Design", href: "/culture/by-design" },
       { label: "Cultivated", href: "/culture/cultivated" },
       { label: "Archive", href: "/culture/archive" },
     ],
@@ -184,10 +189,9 @@ const LOCKED_NAV: NavSection[] = [
     title: "SHOP",
     kind: "direct",
     item: {
-      label: "United Limited",
-      href: "https://unitedlimited.com",
+      label: "Shop",
+      href: "https://theunitedlimited.com",
       external: true,
-      comingSoon: true,
     },
   },
   {
@@ -258,8 +262,8 @@ export default function App() {
   /** Production / Vercel: always simulator — Archive A&C and Specs never mount */
   const studioTab = showDevChrome ? activeTab : "simulator";
   const [archiveDirection, setArchiveDirection] = useState<"A" | "C">("A");
-  /** Working homepage: E (default Odd Ritual) | F (Awake lookbook) */
-  const [workingDirection, setWorkingDirection] = useState<WorkingDirection>("EF");
+  /** Working homepage: V1 = Todd PDF delivery candidate; EF frozen fallback (DEV switcher) */
+  const [workingDirection, setWorkingDirection] = useState<WorkingDirection>("V1");
   const [activeSimRoute, setActiveSimRoute] = useState<string>("/");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -269,6 +273,19 @@ export default function App() {
   const [navigationNotification, setNavigationNotification] = useState<string | null>(null);
   /** EF lookbook zone — drop snap-mandatory for continuous stack scroll */
   const [lookbookFreeScroll, setLookbookFreeScroll] = useState(false);
+  /** V1 opening: vertical page scroll only after slide 04 */
+  const [v1VerticalUnlocked, setV1VerticalUnlocked] = useState(false);
+  /** V1 header clock — ticks every minute */
+  const [v1Clock, setV1Clock] = useState(() => new Date());
+
+  const isV1 = workingDirection === "V1";
+  const usesEfInteriors = workingDirection === "EF" || workingDirection === "V1";
+  const isEmbedRoute = EMBED_ROUTES.has(activeSimRoute);
+  /** V1 dark chrome on marketing home/interiors — never under Mariana embeds */
+  const useV1Chrome = isV1 && !isEmbedRoute;
+  /** Lock parent Y scroll while V1 home is on slides 01–03 */
+  const v1OpeningLocked =
+    isV1 && activeSimRoute === "/" && !v1VerticalUnlocked;
 
   // References for mobile frames to track manual scrolling
   const simScrollContainerRef = useRef<HTMLDivElement>(null);
@@ -289,6 +306,27 @@ export default function App() {
     return `Columbus, OH | ${dateStr}`;
   };
 
+  /** V1 PDF §02 — COLUMBUS, OH // MM.DD.YY // 12-HOUR TIME WITH AM/PM */
+  const getV1FormattedDateTime = (d: Date) => {
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    const yy = String(d.getFullYear()).slice(-2);
+    let hours = d.getHours();
+    const minutes = String(d.getMinutes()).padStart(2, "0");
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12;
+    if (hours === 0) hours = 12;
+    return `COLUMBUS, OH // ${mm}.${dd}.${yy} // ${hours}:${minutes} ${ampm}`;
+  };
+
+  useEffect(() => {
+    if (!isV1) return;
+    const tick = () => setV1Clock(new Date());
+    tick();
+    const id = window.setInterval(tick, 30_000);
+    return () => window.clearInterval(id);
+  }, [isV1]);
+
   const scrollSimToTop = () => {
     setTimeout(() => {
       if (simScrollContainerRef.current) {
@@ -302,18 +340,32 @@ export default function App() {
     setIsMenuOpen(false);
     setIsScrolled(false);
     setLookbookFreeScroll(false);
+    setV1VerticalUnlocked(false);
     scrollSimToTop();
   };
 
   // Handle fake navigation for interactive link testing
   const triggerNavigation = (href: string, label: string) => {
+    if (href.startsWith("http://") || href.startsWith("https://")) {
+      window.open(href, "_blank", "noopener,noreferrer");
+      setIsMenuOpen(false);
+      return;
+    }
+
     let normalized = href === "/team" ? "/about/team" : href;
     if (normalized === "/memberships") normalized = "/membership";
+    if (normalized === "/culture/move-the-city") {
+      normalized = "/training/move-the-city";
+    }
+    if (PERSONAL_TRAINING_ALIASES.has(normalized)) {
+      normalized = "/training/personal";
+    }
 
     if (
       ABOUT_ROUTES.has(normalized) ||
       TRAINING_ROUTES.has(normalized) ||
-      PARITY_ROUTES.has(normalized)
+      PARITY_ROUTES.has(normalized) ||
+      EMBED_ROUTES.has(normalized)
     ) {
       setActiveSimRoute(normalized);
       setIsMenuOpen(false);
@@ -416,22 +468,53 @@ export default function App() {
   /** Home at top = ALD overlay; scrolled or interior = compact crest */
   const crestCompact = isScrolled || activeSimRoute !== "/";
 
-  // Lock phone-stage scroll while overlay menu is open
+  // Lock phone-stage scroll while overlay menu is open OR V1 opening (01–03)
   useEffect(() => {
     const el = simScrollContainerRef.current;
     if (!el) return;
-    if (isMenuOpen) {
-      el.style.overflow = "hidden";
-    } else {
-      el.style.overflow = "";
+    if (v1OpeningLocked) {
+      el.scrollTop = 0;
     }
+    // Overflow is class-driven (`overflow-y-hidden` / `overflow-y-auto`);
+    // only force inline when menu is open so it wins over Tailwind.
+    if (isMenuOpen) {
+      el.style.overflowY = "hidden";
+    } else {
+      el.style.overflowY = "";
+    }
+  }, [isMenuOpen, v1OpeningLocked]);
+
+  // Clear V1 unlock when leaving V1 home
+  useEffect(() => {
+    if (!isV1 || activeSimRoute !== "/") {
+      setV1VerticalUnlocked(false);
+    }
+  }, [isV1, activeSimRoute]);
+
+  // Reset unlock when switching working direction away from / onto V1 mid-session
+  useEffect(() => {
+    if (workingDirection !== "V1") {
+      setV1VerticalUnlocked(false);
+    }
+  }, [workingDirection]);
+
+  // Escape closes nav (EF overlay or V1 drawer)
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, [isMenuOpen]);
 
   return (
     <div className="min-h-screen bg-[#111111] text-[#E5E5E5] flex flex-col font-sans overflow-x-hidden">
       
+      {isMaintenanceMode ? <MaintenancePage /> : null}
+
       {/* HEADER / CONTROL BAR — local DEV only */}
-      {showDevChrome ? (
+      {showDevChrome && !isMaintenanceMode ? (
       <header
         className={`border-b border-neutral-800 bg-[#161616] sticky top-0 z-40 overflow-hidden transition-[max-height,opacity,padding] duration-300 ease-out ${
           chromeHidden
@@ -518,9 +601,12 @@ export default function App() {
             role="tablist"
             aria-label="Working direction"
           >
-            {/* E and F hidden for now — E+F is the active working surface */}
+            {/* DEV only — V1 is production default; E+F frozen fallback */}
             {(
-              [{ id: "EF" as const, label: "E+F" }] as const
+              [
+                { id: "V1" as const, label: "V1" },
+                { id: "EF" as const, label: "E+F" },
+              ] as const
             ).map((tab) => (
               <button
                 key={tab.id}
@@ -531,7 +617,11 @@ export default function App() {
                   setWorkingDirection(tab.id);
                   goSimHome();
                 }}
-                className="px-3 py-2 min-h-[44px] min-w-[44px] text-[10px] font-mono uppercase tracking-widest transition-colors bg-[#F3EEE7] text-[#181818]"
+                className={`px-3 py-2 min-h-[44px] min-w-[44px] text-[10px] font-mono uppercase tracking-widest transition-colors ${
+                  workingDirection === tab.id
+                    ? "bg-[#F3EEE7] text-[#181818]"
+                    : "bg-[#161616]/95 text-neutral-400 hover:text-white"
+                }`}
               >
                 {tab.label}
               </button>
@@ -550,7 +640,7 @@ export default function App() {
       ) : null}
 
       {/* Route notification — Coming Soon (prod + DEV) · Mock Route (DEV only, set above) */}
-      {navigationNotification && (
+      {!isMaintenanceMode && navigationNotification && (
         <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[110] max-w-[min(92vw,24rem)] bg-[#181818] border border-white/10 text-white px-5 py-3 rounded-sm shadow-2xl flex items-center gap-3">
           <div className="w-1.5 h-1.5 rounded-full bg-[#F3EEE7] shrink-0" />
           <p className="text-[11px] font-mono uppercase tracking-[0.14em] leading-snug">
@@ -560,6 +650,7 @@ export default function App() {
       )}
 
       {/* MAIN CONTAINER AREA */}
+      {!isMaintenanceMode ? (
       <main className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-6 lg:p-8 min-w-0 overflow-x-hidden">
         
         {/* ================================================================= */}
@@ -569,11 +660,16 @@ export default function App() {
           <div className="fixed inset-0 z-20 flex flex-col bg-white min-h-[100dvh]">
             <div className="relative flex-1 min-h-0 flex flex-col">
               {/* ALD crest — fixed over the scrollport (not inside overflow content) */}
+                  {!isEmbedRoute ? (
                   <div
                     className={`absolute top-0 left-0 right-0 z-30 transition-all duration-500 pointer-events-none ${
-                      crestCompact
-                        ? "bg-white/85 backdrop-blur-md border-b border-black/[0.06]"
-                        : "bg-gradient-to-b from-black/50 via-black/20 to-transparent"
+                      useV1Chrome
+                        ? crestCompact
+                          ? "bg-[#111111]/92 backdrop-blur-md border-b border-white/[0.08]"
+                          : "bg-gradient-to-b from-black/70 via-black/30 to-transparent"
+                        : crestCompact
+                          ? "bg-white/85 backdrop-blur-md border-b border-black/[0.06]"
+                          : "bg-gradient-to-b from-black/50 via-black/20 to-transparent"
                     }`}
                   >
                     <div className="px-5 pt-3 pb-2 flex items-start justify-between min-h-[56px] relative pointer-events-auto">
@@ -582,8 +678,14 @@ export default function App() {
                         onClick={() => setIsMenuOpen(true)}
                         className={`hover:opacity-75 transition-all p-1 -ml-1 min-h-[44px] min-w-[44px] flex flex-col justify-center ${
                           isMenuOpen ? "opacity-0 pointer-events-none" : "opacity-100"
-                        } ${crestCompact ? "text-[#181818]" : "text-white"}`}
-                        title="Open Overlay Menu"
+                        } ${
+                          useV1Chrome
+                            ? "text-[#F3EEE7]"
+                            : crestCompact
+                              ? "text-[#181818]"
+                              : "text-white"
+                        }`}
+                        title={useV1Chrome ? "Open navigation" : "Open Overlay Menu"}
                       >
                         <div className="w-5 h-[1.5px] bg-current mb-1.5 transition-all" />
                         <div className="w-5 h-[1.5px] bg-current mb-1.5 transition-all" />
@@ -593,16 +695,20 @@ export default function App() {
                       <button
                         type="button"
                         onClick={() => triggerNavigation("/", "Home")}
-                        className="absolute left-1/2 top-3 -translate-x-1/2 flex flex-col items-center gap-1.5 cursor-pointer hover:opacity-80 transition-opacity w-[78%] z-10 min-h-[44px]"
+                        className="absolute left-1/2 top-3 -translate-x-1/2 flex flex-col items-center gap-1.5 cursor-pointer hover:opacity-80 transition-opacity w-[86%] z-10 min-h-[44px]"
                         title="Return to Home"
                       >
                         {/* Crossfade: wordmark at top · monogram when scrolled */}
-                        <span className="relative block h-6 w-full">
+                        <span className={`relative block w-full ${useV1Chrome ? "h-8" : "h-6"}`}>
                           <span
-                            className={`absolute inset-0 flex items-center justify-center font-bold text-[12px] font-sans uppercase leading-tight tracking-[-0.04em] transition-all duration-500 ${
+                            className={`absolute inset-0 flex items-center justify-center font-bold font-sans uppercase leading-tight tracking-[-0.04em] transition-all duration-500 ${
+                              useV1Chrome ? "text-[15px] md:text-[17px]" : "text-[12px]"
+                            } ${
                               crestCompact
                                 ? "opacity-0 scale-95 pointer-events-none"
-                                : "opacity-100 scale-100 text-white"
+                                : useV1Chrome
+                                  ? "opacity-100 scale-100 text-[#F3EEE7]"
+                                  : "opacity-100 scale-100 text-white"
                             }`}
                             style={{ fontFamily: "'Satoshi', sans-serif" }}
                             aria-hidden={crestCompact}
@@ -612,67 +718,88 @@ export default function App() {
                           <span
                             className={`absolute inset-0 flex items-center justify-center transition-all duration-500 ${
                               crestCompact
-                                ? "opacity-100 scale-100 text-[#181818]"
+                                ? useV1Chrome
+                                  ? "opacity-100 scale-100 text-[#F3EEE7]"
+                                  : "opacity-100 scale-100 text-[#181818]"
                                 : "opacity-0 scale-95 pointer-events-none text-white"
                             }`}
                             aria-hidden={!crestCompact}
                           >
-                            <USCrestSVG className="w-6 h-6" />
+                            <USCrestSVG className={useV1Chrome ? "w-7 h-7" : "w-6 h-6"} />
                           </span>
                         </span>
                         <span
-                          className={`font-mono text-[8px] uppercase tracking-[0.18em] text-center transition-opacity duration-500 ${
-                            crestCompact ? "text-[#5C5C5C] opacity-100" : "text-white/70 opacity-100"
+                          className={`font-mono uppercase text-center transition-opacity duration-500 ${
+                            useV1Chrome
+                              ? "text-[8px] md:text-[9px] tracking-[0.14em] text-[#F3EEE7]/70 opacity-100"
+                              : crestCompact
+                                ? "text-[8px] tracking-[0.18em] text-[#5C5C5C] opacity-100"
+                                : "text-[8px] tracking-[0.18em] text-white/70 opacity-100"
                           }`}
                         >
-                          {getFormattedDate()}
+                          {useV1Chrome
+                            ? getV1FormattedDateTime(v1Clock)
+                            : getFormattedDate()}
                         </span>
                       </button>
 
                       <div className="w-11 shrink-0" aria-hidden />
                     </div>
                   </div>
+                  ) : null}
 
                   <div
                     ref={simScrollContainerRef}
+                    data-sim-scroll
                     onScroll={handleSimScroll}
-                    className={`relative flex-1 min-h-0 w-full bg-white text-[#181818] overflow-y-auto scrollbar-none flex flex-col [container-type:size] ${
-                      lookbookFreeScroll ? "" : "scroll-smooth"
+                    className={`relative flex-1 min-h-0 w-full scrollbar-none flex flex-col [container-type:size] ${
+                      isMenuOpen || v1OpeningLocked
+                        ? "overflow-y-hidden"
+                        : "overflow-y-auto"
                     } ${
-                      (activeSimRoute === "/" && !lookbookFreeScroll) ||
-                      (workingDirection === "E" && activeSimRoute === "/about/philosophy")
+                      useV1Chrome
+                        ? "bg-[#111111] text-[#F3EEE7]"
+                        : "bg-white text-[#181818]"
+                    } ${
+                      lookbookFreeScroll || useV1Chrome ? "" : "scroll-smooth"
+                    } ${
+                      !useV1Chrome &&
+                      !isEmbedRoute &&
+                      ((activeSimRoute === "/" && !lookbookFreeScroll) ||
+                        (workingDirection === "E" &&
+                          activeSimRoute === "/about/philosophy"))
                         ? "snap-y snap-mandatory"
                         : ""
                     }`}
                   >
-                    {/* ACTIVE SCREEN — E / EF / F home; About: EF tree when EF, else E (F home-only) */}
+                    {/* ACTIVE SCREEN — EF default · V1 parallel · E/F hidden */}
                     <div className="flex flex-col">
                       {activeSimRoute === "/about/philosophy" ? (
-                        workingDirection === "EF" ? (
+                        usesEfInteriors ? (
                           <EfPhilosophyPage onBack={goSimHome} onNav={triggerNavigation} />
                         ) : (
                           <PhilosophyPage onBack={goSimHome} />
                         )
                       ) : activeSimRoute === "/about/founder" ? (
-                        workingDirection === "EF" ? (
+                        usesEfInteriors ? (
                           <EfFounderPage onBack={goSimHome} onNav={triggerNavigation} />
                         ) : (
                           <FounderPage onBack={goSimHome} />
                         )
                       ) : activeSimRoute === "/about/team" ? (
-                        workingDirection === "EF" ? (
+                        usesEfInteriors ? (
                           <EfTeamPage onBack={goSimHome} onNav={triggerNavigation} />
                         ) : (
                           <TeamPage onBack={goSimHome} onNav={triggerNavigation} />
                         )
                       ) : activeSimRoute === "/about/the-space" ? (
-                        workingDirection === "EF" ? (
+                        usesEfInteriors ? (
                           <EfSpacePage onBack={goSimHome} onNav={triggerNavigation} />
                         ) : (
                           <SpacePage onBack={goSimHome} />
                         )
                       ) : activeSimRoute === "/about/faq" ? (
-                        workingDirection === "EF" ? (
+                        usesEfInteriors ? (
                           <EfFaqPage onBack={goSimHome} onNav={triggerNavigation} />
                         ) : (
                           <FaqPage onBack={goSimHome} />
@@ -683,12 +810,18 @@ export default function App() {
                         <BurnPage onBack={goSimHome} onNav={triggerNavigation} />
                       ) : activeSimRoute === "/training/classes/balance" ? (
                         <BalancePage onBack={goSimHome} onNav={triggerNavigation} />
-                      ) : activeSimRoute === "/training/personal/1-on-1" ? (
-                        <OneOnOnePage onBack={goSimHome} onNav={triggerNavigation} />
-                      ) : activeSimRoute === "/training/personal/small-group" ? (
-                        <SmallGroupPage onBack={goSimHome} onNav={triggerNavigation} />
-                      ) : activeSimRoute === "/training/personal/private-group" ? (
-                        <PrivateGroupPage onBack={goSimHome} onNav={triggerNavigation} />
+                      ) : activeSimRoute === "/training/personal" ||
+                        PERSONAL_TRAINING_ALIASES.has(activeSimRoute) ? (
+                        <PersonalTrainingPage
+                          onBack={goSimHome}
+                          onNav={triggerNavigation}
+                        />
+                      ) : activeSimRoute === "/training/move-the-city" ||
+                        activeSimRoute === "/culture/move-the-city" ? (
+                        <MoveTheCityPage
+                          onBack={goSimHome}
+                          onNav={triggerNavigation}
+                        />
                       ) : activeSimRoute === "/start-here/experience" ? (
                         <ExperiencePage onBack={goSimHome} onNav={triggerNavigation} />
                       ) : activeSimRoute === "/start-here/apply" ? (
@@ -697,8 +830,8 @@ export default function App() {
                         <MembershipPage onBack={goSimHome} onNav={triggerNavigation} />
                       ) : activeSimRoute === "/contact" ? (
                         <ContactPage onBack={goSimHome} onNav={triggerNavigation} />
-                      ) : activeSimRoute === "/culture/move-the-city" ? (
-                        <MoveTheCityPage onBack={goSimHome} onNav={triggerNavigation} />
+                      ) : activeSimRoute === "/culture/by-design" ? (
+                        <ByDesignPage onBack={goSimHome} onNav={triggerNavigation} />
                       ) : activeSimRoute === "/culture/cultivated" ? (
                         <CultivatedPage onBack={goSimHome} onNav={triggerNavigation} />
                       ) : activeSimRoute === "/culture/archive" ? (
@@ -707,6 +840,17 @@ export default function App() {
                         <PrivacyPage onBack={goSimHome} onNav={triggerNavigation} />
                       ) : activeSimRoute === "/terms" ? (
                         <TermsPage onBack={goSimHome} onNav={triggerNavigation} />
+                      ) : activeSimRoute === "/buy" ? (
+                        <MarianaEmbedPage kind="buy" onBack={goSimHome} />
+                      ) : activeSimRoute === "/schedule" ? (
+                        <MarianaEmbedPage kind="schedule" onBack={goSimHome} />
+                      ) : activeSimRoute === "/account" ? (
+                        <MarianaEmbedPage kind="account" onBack={goSimHome} />
+                      ) : workingDirection === "V1" ? (
+                        <ConceptV1View
+                          onNav={triggerNavigation}
+                          onVerticalScrollUnlockChange={setV1VerticalUnlocked}
+                        />
                       ) : workingDirection === "F" ? (
                         <ConceptFView onNav={triggerNavigation} />
                       ) : workingDirection === "EF" ? (
@@ -720,7 +864,61 @@ export default function App() {
                     </div>
                   </div>
 
-                {/* FULL-SCREEN OVERLAY MENU — photo field + accordion keeps full IA */}
+                {/* NAV — V1 left drawer · EF/others fullscreen overlay · hidden on embeds */}
+                {isEmbedRoute ? null : useV1Chrome ? (
+                  <div
+                    className={`absolute inset-0 z-[60] flex transition-opacity duration-500 ease-out ${
+                      isMenuOpen
+                        ? "opacity-100 pointer-events-auto visible"
+                        : "opacity-0 pointer-events-none invisible"
+                    }`}
+                    aria-hidden={!isMenuOpen}
+                  >
+                    <div
+                      className={`relative h-full w-full md:w-[28%] min-w-0 md:min-w-[280px] max-w-full bg-[#111111] text-white flex flex-col border-r border-white/10 transition-transform duration-500 ease-[cubic-bezier(0.21,0.47,0.32,0.98)] ${
+                        isMenuOpen ? "translate-x-0" : "-translate-x-full"
+                      }`}
+                    >
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[1] overflow-hidden">
+                        <USCrestSVG className="w-[160%] max-w-none h-auto text-white/[0.05]" />
+                      </div>
+
+                      <div className="relative z-10 flex items-center justify-between px-5 pt-10 pb-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => setIsMenuOpen(false)}
+                          className="min-h-[44px] min-w-[44px] flex items-center justify-start -ml-1 text-[#F3EEE7] hover:opacity-80 transition-all"
+                          title="Close navigation"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setIsMenuOpen(false)}
+                          className="font-sans text-[11px] font-bold uppercase tracking-[0.18em] text-[#F3EEE7]/90 min-h-[44px] px-1 hover:opacity-70 transition-opacity"
+                        >
+                          Close
+                        </button>
+                      </div>
+
+                      <div className="relative z-10 flex-1 min-h-0 flex flex-col px-5 pb-6">
+                        <LockedNavOverlay
+                          variant="oddRitual"
+                          onNavigate={(href, label) => {
+                            setIsMenuOpen(false);
+                            triggerNavigation(href, label);
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      className="hidden md:block flex-1 h-full bg-black/35 cursor-default"
+                      aria-label="Close navigation"
+                      onClick={() => setIsMenuOpen(false)}
+                    />
+                  </div>
+                ) : (
                 <div
                   className={`absolute inset-0 z-[60] text-white flex flex-col transition-opacity duration-500 ease-out ${
                     isMenuOpen
@@ -800,6 +998,7 @@ export default function App() {
                     </div>
                   </div>
                 </div>
+                )}
             </div>
           </div>
         )}
@@ -1136,6 +1335,7 @@ export default function App() {
         )}
 
       </main>
+      ) : null}
 
       {/* SYSTEM WORKSPACE FOOTER — local DEV only (never on Vercel) */}
       {showDevChrome && activeTab !== "simulator" && (

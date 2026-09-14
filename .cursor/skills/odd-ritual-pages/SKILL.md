@@ -70,17 +70,33 @@ Full beat inventory: [reference.md](reference.md) § Philosophy beats.
 |------|--------|------------------|-------------|
 | Build / Burn | Class leaf | Opener → photo split → body → week-strip schedule | editorial + custom |
 | Balance | Sparse manifesto | Coming-soon sparse — **no** schedule | manifesto DNA |
-| 1-on-1 | Story-led | Story + Team cue + inquire / Start Here | `about-us-13` |
-| Small Group | Ruled format index | Ruled index (draft) | about / index |
-| Private Group | Inquiry band | Inquiry — **no** prices | `cta-08` DNA (no tiers) |
+| Move the City // Run Club | Photo-first community | Opener → full-bleed photo → story → partners ruled index | `gallery-01` |
+| Personal Training | Story-led hub | Opener → hub body → 1:1 + private group beats → coaches → inquire band | `about-us-13` + `cta-08` |
 
 ### Culture
 
 | Page | Recipe | Tier 2 structure | Catalog DNA |
 |------|--------|------------------|-------------|
-| Move the City | Photo-first community | Opener → full-bleed photo → story → partners ruled index | `gallery-01` |
+| By Design | Sparse manifesto | Opener → manifesto → cream pull-quote → principles index | `about-us-13` (Cultivated twin) |
 | Cultivated | Sparse manifesto | Opener → manifesto → cream pull-quote → principles index | `about-us-13` |
 | Archive | Off Centered Stack | Opener → cream jump → scroll-reveal Archives → authors | Act2 photo-deck DNA |
+
+### Journey
+
+| Page | Recipe | Tier 2 structure | Catalog DNA |
+|------|--------|------------------|-------------|
+| Membership | Story-led belonging | Opener → belonging statement → no tier cards | `about-us-13` / image statement |
+| Experience United | Inquiry / Start Here | Opener → experience path → CTAs | `cta-08` DNA (no Buy) |
+| Apply for Membership | Form / apply | Opener → application path · Apply `#0A3C2E` | form + `cta-08` |
+
+### Coming Soon (future recipes)
+
+| Page | Recipe (when live) | Catalog DNA |
+|------|--------------------|-------------|
+| Foundation | Sparse manifesto → dedicated page | `about-us-13` |
+| Longevity | Sparse manifesto → dedicated page | `about-us-13` |
+
+**Sep 2026:** PT children (`1-on-1` / small-group / private-group) are **aliases →** `/training/personal`. Move the City lives under Training (`/training/move-the-city`), not Culture. Shop = external only (no interior recipe). Adapt Space DNA only — **no** CLI install.
 
 ## Culture Club tokens (required)
 

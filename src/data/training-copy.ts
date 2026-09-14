@@ -96,14 +96,35 @@ export const BALANCE_CLASS = {
   ],
 } as const;
 
-/** Source: unitedstrengthgym.com/personal-training */
+/**
+ * Personal Training hub — Sep 2026 single Coaching leaf.
+ * Consolidates 1:1 + private group; no prices; no separate nav children.
+ * Source: unitedstrengthgym.com/personal-training
+ */
 export const PERSONAL_TRAINING_HUB = {
+  metadata: "( Training )",
   headline: "Personal Training",
   lede: "Customized coaching. Real results. Personal attention that changes the game.",
   body: [
     "We have elite-level coaches who are among the best in the industry. Each one brings a unique skill set, deep expertise, and a passion for helping others get stronger in and out of the gym.",
     "Whether you're new to training or ready to break through a plateau, our coaches are ready to meet you where you're at and take you where you want to go.",
   ],
+  oneOnOne: {
+    n: "01",
+    title: "1-on-1 Coaching",
+    headline: "Undivided attention — programming built around you.",
+    body: [
+      "One-on-one coaching pairs you with a United Strength coach for personalized programming, form, and accountability. Sessions meet you where you are and progress toward where you want to go.",
+    ],
+  },
+  privateGroup: {
+    n: "02",
+    title: "Private Group",
+    headline: "Your crew. Your schedule. Coach-led in the United room.",
+    body: [
+      "Private group training is for friends, teams, or circles who want a dedicated coaching block together. Inquire with the team — we'll shape the session around your goals.",
+    ],
+  },
   coachCues: [
     { name: "Todd Johnson", role: "Owner, Coach", note: "Exercise physiology · ACSM CPT · USAW" },
     { name: "Jason Katz", role: "Coach", note: "Strength and conditioning" },

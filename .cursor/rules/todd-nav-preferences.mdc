@@ -9,10 +9,11 @@ Client direction from foundation review. Full spec: [.cursor/skills/united-stren
 
 ## Required patterns
 
-- **Overlay menu:** Full-viewport dark overlay — not a right-slide drawer. Links left-aligned. Stealth US monogram watermark in background (~5–8% opacity).
+- **Overlay menu (Direction EF default):** Full-viewport dark overlay — not a right-slide drawer. Links left-aligned. Stealth US monogram watermark in background (~5–8% opacity).
+- **V1 Edits (parallel tab only):** Left-side charcoal drawer (~28% desktop / full-bleed mobile). EF overlay unchanged when `workingDirection === "EF"`. See [home-direction-v1.md](../../docs/wireframes/home-direction-v1.md).
 - **Hamburger:** Left side of header.
 - **Crest transition:** Scroll up → **UNITED STRENGTH CLUB** wordmark centered; scroll down → monogram only.
-- **Top bar:** `Columbus, OH | {weekday}, {date}` below header when scrolled (ALD `top-bar`).
+- **Top bar:** `Columbus, OH | {weekday}, {date}` below header when scrolled (ALD `top-bar`). V1 uses `COLUMBUS, OH // MM.DD.YY // h:mm AM/PM`.
 
 ## Public nav guardrails
 

@@ -28,7 +28,7 @@ const PILLARS = [
     n: "04",
     title: "Move the City",
     body: "Run club. Columbus in motion.",
-    href: "/culture/move-the-city",
+    href: "/training/move-the-city",
   },
 ];
 

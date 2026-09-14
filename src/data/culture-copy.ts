@@ -1,36 +1,61 @@
 /**
- * Culture section (05) — Move the City · Cultivated · Archive.
- * Sources: unitedstrengthgym.com/our-partners · blog · Todd IA (Cultivated).
+ * Culture section — By Design · Cultivated · Archive.
+ * Move the City // Run Club lives under Training (Sep 2026 nav).
+ * Sources: unitedstrengthgym.com/our-partners · blog · Todd IA.
  * No public prices · no Buy / Reserve / Book chrome.
  */
 
 import { archiveCovers } from "../assets/images/archive";
 
-// ── Move the City — live partners / #ColumbUS ────────────────────────────────
+// ── Move the City // Run Club — Training Classes (was Culture) ───────────────
 
 export const MOVE_THE_CITY = {
-  metadata: "( Culture )",
-  headline: "Move the City",
-  lede: "#ColumbUS — building a stronger community beyond the gym floor.",
+  metadata: "( Training )",
+  headline: "Move the City // Run Club",
+  lede: "Weekly run club — movement, conversation, and Columbus beyond the gym floor.",
   photo: {
     n: "01",
-    title: "Community",
-    caption: "Stronger together — Columbus first.",
+    title: "Run Club",
+    caption: "Weekly miles. Good people. Columbus in motion.",
   },
   story: {
     n: "02",
     title: "#ColumbUS",
     body: [
-      "We believe in building a strong community. That's why we focus on giving back to our city of Columbus by partnering with other local small businesses to help and support one another.",
+      "Our weekly run club brings the United community beyond the gym floor — movement, conversation, and the city we call home. Whether you're chasing a PR or just looking to move with good people, everyone is welcome.",
     ],
   },
+  /** Live twin: unitedstrengthgym.com/our-partners — full partner list + links */
   partners: {
     n: "03",
     title: "Local partners",
-    lede: "Artists, makers, and neighbors we stand with.",
+    lede: "As part of a greater initiative to support and connect with our Columbus community, we've partnered with local businesses, artists, and entrepreneurs.",
     rows: [
-      { name: "Dana Grubbe", focus: "Contemporary Abstracts" },
-      { name: "OREWILER", focus: "Art" },
+      {
+        name: "Fit Fresh Fast",
+        focus: "Local business",
+        href: "https://www.fitfreshfast.com",
+      },
+      {
+        name: "Rehabilitation Redefined",
+        focus: "Recovery",
+        href: "http://www.rehabilitationredefined.com",
+      },
+      {
+        name: "Dana Grubbe",
+        focus: "Contemporary Abstracts",
+        href: "https://www.instagram.com/danafrostgrubbe/?hl=en",
+      },
+      {
+        name: "OREWILER",
+        focus: "Art",
+        href: "https://www.orewiler.art",
+      },
+      {
+        name: "LRX Apparel",
+        focus: "Apparel",
+        href: "https://lrxapparel.com",
+      },
     ],
   },
   partnerCta: {
@@ -40,6 +65,54 @@ export const MOVE_THE_CITY = {
   inquire: {
     label: "Partner with us",
     href: "/contact",
+  },
+} as const;
+
+// ── By Design — Todd Sep 2026 Culture leaf (Wave 1 shell) ────────────────────
+
+export const BY_DESIGN = {
+  metadata: "( Culture )",
+  headline: "By Design",
+  lede: "The intention behind the experience — not just the room you walk into.",
+  manifesto: {
+    n: "01",
+    title: "Intention",
+    headline: "Designed on purpose.",
+    body: [
+      "By Design is how United Strength chooses space, equipment, materials, aesthetic, hospitality, and function — so the club feels deliberate before you ever pick up a weight.",
+      "Where About / The Space shows the environment, By Design explains why it feels the way it does. Wave 1 shell — fuller copy after Todd reviews the Sep 2026 nav brief.",
+    ],
+  },
+  quote: {
+    n: "02",
+    title: "Contrast",
+    text: "The Space is where you train. By Design is why it was built that way.",
+  },
+  principles: {
+    n: "03",
+    title: "Held to",
+    rows: [
+      {
+        n: "01",
+        title: "Space",
+        body: "Layout and light that support focus — never crowded for the sake of density.",
+      },
+      {
+        n: "02",
+        title: "Equipment",
+        body: "Tools chosen for craft and longevity, not trend cycles.",
+      },
+      {
+        n: "03",
+        title: "Materials",
+        body: "Surfaces and finishes that age with the club — quiet, durable, intentional.",
+      },
+      {
+        n: "04",
+        title: "Hospitality",
+        body: "How members are received — selective, calm, never sales-forward.",
+      },
+    ],
   },
 } as const;
 

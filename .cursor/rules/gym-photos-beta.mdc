@@ -16,6 +16,7 @@ This is the master library for all United Strength facility photos. Do **not** u
 | *(root)* | General facility shots not yet sorted |
 | `B Roll aesthitc ` | Aesthetic b-roll — atmosphere, architecture, cinematic crops (note trailing space in folder name) |
 | `Equipment` | Equipment close-ups and rack/detail shots |
+| `Run Club` | Move the City // Run Club — urban group run photos |
 
 **More folders will be added.** When new subfolders appear, update this table with name + intended use. Do not rename source folders unless the client asks.
 
@@ -26,6 +27,7 @@ All files prefixed `6.3.25 - United-*.jpg` (June 3, 2025 session).
 - **Root:** `6.3.25 - United-59.jpg`
 - **B Roll aesthitc :** 103, 119, 127, 129, 130, 132, 136
 - **Equipment:** 10, 96, 99, 100, 108, 109, 122, 125
+- **Run Club:** `move-the-city-run-club.jpg` (Pexels 2402777 — see `Run Club/ATTRIBUTION.txt`)
 
 ## Website wiring
 
@@ -37,8 +39,20 @@ Copied/optimized assets live in `src/assets/images/gym/` and are exported from `
 | `space-atmosphere.jpg` | B Roll · United-103 | Concept D “The Space” chapter · Direction E ch. 02 |
 | `architecture-raw.jpg` | B Roll · United-136 | Concept A hero (raw architecture) |
 | `gallery-cinematic.jpg` | B Roll · United-119 | Concept C gallery · Direction E ch. 01 |
-| `equipment-close.jpg` | Equipment · United-108 | Concept C equipment detail |
+| `equipment-close.jpg` | Equipment · United-108 | Concept C equipment detail · V1 Space plank |
 | `experience-broll.jpg` | B Roll · United-127 | Direction E ch. 04 Experience United (STRONGER mural) |
+| `floor-columbus.jpg` | Equipment · United-109 | V1 Space lead — training floor, benches, DBs |
+| `rack-weights.jpg` | Equipment · United-96 | V1 Space plank — dumbbell rack + plates |
+| `run-club.jpg` | Run Club · Pexels 2402777 (HD stock; replaces soft editorial crop) | Move the City // Run Club photo chapter |
+
+
+## Website video
+
+Local muted loops live in `src/assets/video/` (`gymVideos` export). Do **not** hotlink Squarespace HLS (signed URLs expire).
+
+| Web asset | Source | Used for |
+|-----------|--------|----------|
+| `opening-01-united-strength.mp4` | unitedstrengthgym.com hero · `United-Strength-gym-in-Columbus-OH.mp4` | V1 OpeningCarousel slide 01 (poster: `gallery-cinematic.jpg`) |
 
 ## When adding photos
 

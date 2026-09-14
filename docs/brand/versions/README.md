@@ -8,7 +8,8 @@ Numbered previews of the United Strength marketing site look. **Active** is what
 | **v2** | Light Performance Bold | Light canvas, black/white only, Barlow Condensed bold, IronX rhythm | `aesthetic-v2` (before v3 ship) | Frozen — still in `globals.css` until v3 ships |
 | **v3** | Editorial Private Club | Dark charcoal, warm off-white, cinematic heroes, Kit D, application-first | `aesthetic-v3` (not created — superseded) | Superseded |
 | **v4** | The Culture Club | ALD-primary, scroll-snap homepage, Satoshi wordmark, Sukha apply | `aesthetic-v4-culture-club` | Frozen 2026-06-24 |
-| **v5** | Culture Club Editorial | Canvas-driven pattern library, Monocle broadsheet, full route rebuild | `aesthetic-v5-culture-club` (after ship) | **Active** |
+| **v5** | Culture Club Editorial | Canvas-driven pattern library, Monocle broadsheet, full route rebuild | `aesthetic-v5-culture-club` (after ship) | **Active** (EF default) |
+| **v6** | V1 Edits homepage | Dark-first · horizontal opening carousel · left drawer · passport Membership preview | — | **Code default** `workingDirection: "V1"` — [v6-v1-edits.md](v6-v1-edits.md) |
 
 ## Naming convention
 

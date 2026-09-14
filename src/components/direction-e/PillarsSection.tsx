@@ -53,7 +53,7 @@ const PILLARS: PillarItem[] = [
     image: gymPhotos.equipmentClose,
     description:
       "Building stronger connections beyond the gym — a weekly run club for movement, conversation, and Columbus.",
-    href: "/culture/move-the-city",
+    href: "/training/move-the-city",
   },
 ];
 
