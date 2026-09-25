@@ -16,10 +16,9 @@ interface PageProps {
 }
 
 /**
- * Personal Training hub — Sep 2026 single Coaching leaf.
- * Story-led: hub lede → 1:1 + private group beats → coaches → inquire.
+ * Personal Training hub — Copywright _PERSONAL TRAINING PAGE.txt (Sep 2026).
+ * 5-section expanded: Approach → Experience → Two Ways → Programming → Find a Coach.
  * No prices · no Buy / Reserve / Book chrome.
- * Legacy aliases: /training/personal/1-on-1|small-group|private-group
  */
 export default function PersonalTrainingPage({ onBack, onNav }: PageProps) {
   const c = PERSONAL_TRAINING_HUB;
@@ -33,6 +32,7 @@ export default function PersonalTrainingPage({ onBack, onNav }: PageProps) {
         onBack={onBack}
       />
 
+      {/* 01 // OUR APPROACH */}
       <section className="box-border w-full px-5 py-14 md:px-8 md:py-24 border-b border-neutral-200/60 bg-white">
         <LookbookScrollReveal className="mx-auto max-w-6xl grid grid-cols-12 gap-y-8 md:gap-x-8">
           <div className="col-span-12 md:col-span-4 flex flex-col gap-3">
@@ -40,22 +40,55 @@ export default function PersonalTrainingPage({ onBack, onNav }: PageProps) {
               className="font-mono text-[3.5rem] sm:text-[5rem] leading-none tracking-tight text-[#181818]/15"
               aria-hidden
             >
-              01
+              {c.approach.n}
             </span>
             <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#5C5C5C]">
-              // Coaching
+              // {c.approach.title}
             </p>
           </div>
-          <div className="col-span-12 md:col-span-7 md:col-start-6 flex flex-col gap-6">
-            <LookbookStaggerBody paragraphs={c.body} />
+          <div className="col-span-12 md:col-span-7 md:col-start-6 flex flex-col gap-5">
+            <h2
+              className="text-[1.35rem] font-bold tracking-[-0.01em] text-[#181818] uppercase"
+              style={{ fontFamily: "'Satoshi', sans-serif" }}
+            >
+              {c.approach.headline}
+            </h2>
+            <LookbookStaggerBody paragraphs={c.approach.body} />
           </div>
         </LookbookScrollReveal>
       </section>
 
+      {/* 02 // EXPERIENCE MATTERS */}
       <section className="box-border w-full px-5 py-14 md:px-8 md:py-20 border-b border-neutral-200/60 bg-[#F3EEE7]">
+        <LookbookScrollReveal className="mx-auto max-w-6xl grid grid-cols-12 gap-y-8 md:gap-x-8">
+          <div className="col-span-12 md:col-span-4 flex flex-col gap-3">
+            <span
+              className="font-mono text-[3.5rem] sm:text-[5rem] leading-none tracking-tight text-[#181818]/15"
+              aria-hidden
+            >
+              {c.experience.n}
+            </span>
+            <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#5C5C5C]">
+              // {c.experience.title}
+            </p>
+          </div>
+          <div className="col-span-12 md:col-span-7 md:col-start-6 flex flex-col gap-5">
+            <h2
+              className="text-[1.35rem] font-bold tracking-[-0.01em] text-[#181818] uppercase"
+              style={{ fontFamily: "'Satoshi', sans-serif" }}
+            >
+              {c.experience.headline}
+            </h2>
+            <LookbookStaggerBody paragraphs={c.experience.body} />
+          </div>
+        </LookbookScrollReveal>
+      </section>
+
+      {/* 03 // TWO WAYS TO TRAIN */}
+      <section className="box-border w-full px-5 py-14 md:px-8 md:py-20 border-b border-neutral-200/60 bg-white">
         <LookbookScrollReveal className="mx-auto max-w-6xl flex flex-col gap-10">
           <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#5C5C5C]">
-            02 // How you train
+            03 // Two Ways to Train
           </p>
 
           <ul className="flex flex-col border-t border-neutral-200">
@@ -76,7 +109,7 @@ export default function PersonalTrainingPage({ onBack, onNav }: PageProps) {
                       {beat.title}
                     </h3>
                     <p
-                      className="text-[1.15rem] sm:text-[1.35rem] leading-snug text-[#181818]"
+                      className="text-[1.1rem] sm:text-[1.25rem] leading-snug text-[#181818]"
                       style={{ fontFamily: "'Instrument Serif', serif" }}
                     >
                       {beat.headline}
@@ -92,10 +125,40 @@ export default function PersonalTrainingPage({ onBack, onNav }: PageProps) {
         </LookbookScrollReveal>
       </section>
 
+      {/* 04 // YOUR PROGRAMMING */}
+      <section className="box-border w-full px-5 py-14 md:px-8 md:py-20 border-b border-neutral-200/60 bg-[#F3EEE7]">
+        <LookbookScrollReveal className="mx-auto max-w-6xl grid grid-cols-12 gap-y-8 md:gap-x-8">
+          <div className="col-span-12 md:col-span-4 flex flex-col gap-3">
+            <span
+              className="font-mono text-[3.5rem] sm:text-[5rem] leading-none tracking-tight text-[#181818]/15"
+              aria-hidden
+            >
+              {c.programming.n}
+            </span>
+            <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#5C5C5C]">
+              // {c.programming.title}
+            </p>
+          </div>
+          <div className="col-span-12 md:col-span-7 md:col-start-6 flex flex-col gap-5">
+            <h2
+              className="text-[1.35rem] font-bold tracking-[-0.01em] text-[#181818] uppercase"
+              style={{ fontFamily: "'Satoshi', sans-serif" }}
+            >
+              {c.programming.headline}
+            </h2>
+            <LookbookStaggerBody paragraphs={c.programming.body} />
+          </div>
+        </LookbookScrollReveal>
+      </section>
+
+      {/* 05 // FIND THE RIGHT COACH */}
       <section className="box-border w-full px-5 py-14 md:px-8 md:py-16 border-b border-neutral-200/60 bg-white">
         <LookbookScrollReveal className="mx-auto max-w-6xl flex flex-col gap-6">
           <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#5C5C5C]">
-            03 // Coaches
+            05 // Find the Right Coach
+          </p>
+          <p className="text-[14px] leading-relaxed text-[#5C5C5C] max-w-xl">
+            Finding a coach shouldn&apos;t just be about picking a name from a list. Different coaches have different personalities, experiences, strengths and ways of communicating. Tell us what you&apos;re looking for and we&apos;ll help you figure out the right next step.
           </p>
           <ul className="flex flex-col max-w-2xl">
             {c.coachCues.map((coach) => (
@@ -122,9 +185,10 @@ export default function PersonalTrainingPage({ onBack, onNav }: PageProps) {
         </LookbookScrollReveal>
       </section>
 
+      {/* CTA — READY TO FIND THE RIGHT COACH? */}
       <section
         className="relative box-border w-full min-h-[50vh] flex flex-col justify-end border-b border-neutral-200/60 overflow-hidden"
-        aria-label="Inquire"
+        aria-label={c.ctaSection.headline}
       >
         <img
           src={gymPhotos.architectureRaw}
@@ -147,14 +211,17 @@ export default function PersonalTrainingPage({ onBack, onNav }: PageProps) {
             className="text-[1.5rem] sm:text-[2rem] leading-snug text-white max-w-md"
             style={{ fontFamily: "'Instrument Serif', serif" }}
           >
-            Ready to train with a coach.
+            {c.ctaSection.headline}
+          </p>
+          <p className="text-[13px] leading-relaxed text-white/80 max-w-md">
+            {c.ctaSection.body}
           </p>
           <div className="flex flex-wrap gap-x-6 gap-y-2 pt-2">
             <a
               href={TRAINING_CTA.inquireHref}
               className="font-mono text-[10px] uppercase tracking-[0.22em] text-white min-h-[44px] inline-flex items-center hover:opacity-70 transition-opacity"
             >
-              [ {TRAINING_CTA.inquireLabel} ]
+              [ {c.ctaSection.inquireLabel} ]
             </a>
             <button
               type="button"

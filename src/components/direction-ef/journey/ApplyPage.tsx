@@ -11,9 +11,13 @@ interface PageProps {
   onNav: (href: string, label: string) => void;
 }
 
-/** Apply for Membership — live become-a-member (mailto draft; no prices). */
+/**
+ * Apply for Membership — Copywright verbatim.
+ * Begin Application → Typeform when URL set; else mailto (no dead iframe).
+ */
 export default function ApplyPage({ onBack, onNav }: PageProps) {
   const c = APPLY_MEMBERSHIP;
+  const beginHref = c.typeformUrl ?? c.mailto;
 
   return (
     <LookbookAboutPageShell onNav={onNav}>
@@ -27,14 +31,31 @@ export default function ApplyPage({ onBack, onNav }: PageProps) {
 
       <section className="box-border w-full px-5 py-14 md:px-8 md:py-20 border-b border-neutral-200/60 bg-white">
         <LookbookScrollReveal className="mx-auto max-w-xl flex flex-col gap-6">
-          <LookbookStaggerBody paragraphs={c.body} />
+          <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#5C5C5C]">
+            01 // Why an Application?
+          </p>
+          <LookbookStaggerBody paragraphs={[...c.body]} />
         </LookbookScrollReveal>
       </section>
 
-      <section className="box-border w-full px-5 py-14 md:px-8 md:py-16 border-b border-neutral-200/60 bg-[#F3EEE7]">
+      <section className="box-border w-full px-5 py-16 md:px-8 md:py-24 border-b border-neutral-200/60 bg-[#F3EEE7]">
+        <LookbookScrollReveal className="mx-auto max-w-2xl flex flex-col gap-3 text-center">
+          {c.statement.map((line) => (
+            <p
+              key={line}
+              className="text-[20px] leading-snug tracking-[-0.02em] text-[#181818] md:text-[26px] uppercase"
+              style={{ fontFamily: "'Satoshi', sans-serif", fontWeight: 700 }}
+            >
+              {line}
+            </p>
+          ))}
+        </LookbookScrollReveal>
+      </section>
+
+      <section className="box-border w-full px-5 py-14 md:px-8 md:py-16 border-b border-neutral-200/60 bg-white">
         <LookbookScrollReveal className="mx-auto max-w-6xl flex flex-col gap-2">
           <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#5C5C5C] mb-4">
-            // How it works
+            02 // What to Expect
           </p>
           <ul className="flex flex-col max-w-3xl">
             {c.steps.map((step) => (
@@ -60,21 +81,26 @@ export default function ApplyPage({ onBack, onNav }: PageProps) {
         </LookbookScrollReveal>
       </section>
 
-      <section className="box-border w-full px-5 py-12 md:px-8 md:py-14 border-b border-neutral-200/60 bg-white">
-        <LookbookScrollReveal className="mx-auto max-w-xl flex flex-col sm:flex-row flex-wrap gap-3">
-          <a
-            href={c.mailto}
-            className="min-h-[44px] inline-flex items-center justify-center px-5 font-mono text-[10px] uppercase tracking-[0.22em] text-white bg-[#0A3C2E] hover:opacity-90 transition-opacity"
-          >
-            {c.mailtoLabel}
-          </a>
-          <button
-            type="button"
-            onClick={() => onNav(c.experienceHref, "Experience United")}
-            className="min-h-[44px] inline-flex items-center justify-center px-2 font-mono text-[10px] uppercase tracking-[0.22em] text-[#181818] hover:opacity-55 transition-opacity"
-          >
-            [ Experience United first ]
-          </button>
+      <section className="box-border w-full px-5 py-12 md:px-8 md:py-14 border-b border-neutral-200/60 bg-[#F3EEE7]">
+        <LookbookScrollReveal className="mx-auto max-w-xl flex flex-col gap-6">
+          <p className="text-[14px] leading-relaxed text-[#5C5C5C]">{c.closing}</p>
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3">
+            <a
+              href={beginHref}
+              target={c.typeformUrl ? "_blank" : undefined}
+              rel={c.typeformUrl ? "noreferrer" : undefined}
+              className="min-h-[44px] inline-flex items-center justify-center px-5 font-mono text-[10px] uppercase tracking-[0.22em] text-white bg-[#0A3C2E] hover:opacity-90 transition-opacity"
+            >
+              {c.beginApplicationLabel}
+            </a>
+            <button
+              type="button"
+              onClick={() => onNav(c.experienceHref, "Experience United")}
+              className="min-h-[44px] inline-flex items-center justify-center px-2 font-mono text-[10px] uppercase tracking-[0.22em] text-[#181818] hover:opacity-55 transition-opacity"
+            >
+              [ Experience United first ]
+            </button>
+          </div>
         </LookbookScrollReveal>
       </section>
     </LookbookAboutPageShell>

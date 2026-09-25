@@ -3,61 +3,51 @@ import { gymPhotos } from "../../assets/images/gym";
 import { LOOKBOOK_EASE } from "../direction-ef/lookbook";
 
 interface Props {
+  /** Kept for ConceptV1View parity — Space is a layout break, not a gateway. */
   onNav: (href: string, label: string) => void;
 }
 
 /**
- * Cream chapter break — gallery-01 DNA as layered horizontal planks
- * (magazine offsets), not an equal mosaic grid.
+ * 05 // THE SPACE — cream layout break.
+ * Staggered pair: larger floor, smaller rack overlapping up-right.
+ * Cluster tucks slightly into People. Type sits beside the pair on desktop.
+ * No page CTA.
  */
-export default function SpaceExperience({ onNav }: Props) {
+export default function SpaceExperience({ onNav: _onNav }: Props) {
   const reduceMotion = useReducedMotion();
 
   return (
-    <section className="bg-[#F3EEE7] px-5 py-16 text-[#181818] md:px-10 md:py-24">
-      <motion.div
-        initial={reduceMotion ? false : { opacity: 0, y: 18 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.35 }}
-        transition={{ duration: 0.7, ease: LOOKBOOK_EASE }}
-        className="border-b border-[#181818]/15 pb-6"
-      >
-        <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#5C5C5C]">
-          06 // The Space / Experience
-        </p>
-        <h2
-          className="mt-3 max-w-[14ch] font-sans text-[28px] font-bold uppercase tracking-[-0.04em] md:text-[36px]"
-          style={{ fontFamily: "'Satoshi', sans-serif" }}
-        >
-          The physical club
-        </h2>
-      </motion.div>
-
-      <div className="relative mt-10 md:mt-14">
-        {/* Lead — training floor with weights */}
-        <motion.div
-          initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.7, ease: LOOKBOOK_EASE }}
-          className="relative z-10 aspect-[21/9] w-full overflow-hidden md:aspect-[2.5/1]"
-        >
-          <img
-            src={gymPhotos.floorColumbus}
-            alt="United Strength training floor — benches, dumbbells, and Columbus banner"
-            className="h-full w-full object-cover"
-            style={{ objectPosition: "center 45%" }}
-          />
-        </motion.div>
-
-        {/* Offset layered planks — equipment + rack */}
-        <div className="relative z-20 mt-[-10px] flex flex-col gap-0 md:mt-[-14px]">
+    <section
+      className="relative z-40 -mt-8 bg-[#F3EEE7] px-5 pb-16 pt-0 text-[#181818] md:-mt-14 md:px-10 md:pb-28"
+      aria-labelledby="v1-space-heading"
+    >
+      <div className="mx-auto grid max-w-5xl items-center gap-8 md:grid-cols-12 md:gap-6 lg:gap-10">
+        <div className="relative order-2 md:order-none md:col-span-7 md:-mt-10">
           <motion.div
-            initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.25 }}
-            transition={{ duration: 0.65, delay: reduceMotion ? 0 : 0.08, ease: LOOKBOOK_EASE }}
-            className="relative ml-0 w-[92%] overflow-hidden aspect-[21/9] shadow-[0_0_0_1px_rgba(24,24,24,0.06)] md:ml-[4%] md:w-[88%] md:aspect-[2.8/1]"
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.7, ease: LOOKBOOK_EASE }}
+            className="relative z-0 w-[78%] overflow-hidden aspect-[4/5] md:w-[80%]"
+          >
+            <img
+              src={gymPhotos.floorColumbus}
+              alt="United Strength training floor — benches, dumbbells, and Columbus banner"
+              className="h-full w-full object-cover"
+              style={{ objectPosition: "center 45%" }}
+            />
+          </motion.div>
+
+          <motion.div
+            initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{
+              duration: 0.7,
+              delay: reduceMotion ? 0 : 0.08,
+              ease: LOOKBOOK_EASE,
+            }}
+            className="absolute right-0 top-[14%] z-10 w-[54%] overflow-hidden aspect-[3/4] md:top-[10%] md:w-[48%]"
           >
             <img
               src={gymPhotos.equipmentClose}
@@ -66,35 +56,34 @@ export default function SpaceExperience({ onNav }: Props) {
               style={{ objectPosition: "center 40%" }}
             />
           </motion.div>
-
-          <motion.div
-            initial={reduceMotion ? false : { opacity: 0, y: 14 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.25 }}
-            transition={{ duration: 0.65, delay: reduceMotion ? 0 : 0.14, ease: LOOKBOOK_EASE }}
-            className="relative z-30 mt-[-8px] ml-auto w-[90%] overflow-hidden aspect-[21/9] shadow-[0_0_0_1px_rgba(24,24,24,0.06)] md:mt-[-12px] md:w-[86%] md:aspect-[2.8/1]"
-          >
-            <img
-              src={gymPhotos.rackWeights}
-              alt="Weight plates and dumbbell rack on the club floor"
-              className="h-full w-full object-cover"
-              style={{ objectPosition: "center 50%" }}
-            />
-          </motion.div>
         </div>
 
-        <p className="mt-6 font-mono text-[9px] uppercase tracking-[0.18em] text-[#5C5C5C]">
-          Columbus · floor, racks &amp; iron
-        </p>
+        <motion.div
+          initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{
+            duration: 0.65,
+            delay: reduceMotion ? 0 : 0.06,
+            ease: LOOKBOOK_EASE,
+          }}
+          className="order-1 flex flex-col items-center text-center md:order-none md:col-span-5 md:items-start md:self-center md:text-left"
+        >
+          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#5C5C5C]">
+            05 // The Space
+          </p>
+          <h2
+            id="v1-space-heading"
+            className="mt-3 max-w-[12ch] font-sans text-[24px] font-bold uppercase leading-[1.05] tracking-[-0.04em] md:text-[28px] lg:text-[32px]"
+            style={{ fontFamily: "'Satoshi', sans-serif" }}
+          >
+            The physical club
+          </h2>
+          <p className="mt-5 font-mono text-[9px] uppercase tracking-[0.18em] text-[#5C5C5C]">
+            Columbus · floor, racks &amp; iron
+          </p>
+        </motion.div>
       </div>
-
-      <button
-        type="button"
-        onClick={() => onNav("/about/the-space", "Explore the Space")}
-        className="mt-10 inline-flex min-h-[44px] items-center gap-2 border-b border-[#181818] pb-1 font-mono text-[11px] uppercase tracking-[0.18em] text-[#181818] transition-opacity hover:opacity-60"
-      >
-        Explore the Space →
-      </button>
     </section>
   );
 }

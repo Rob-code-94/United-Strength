@@ -8,7 +8,7 @@ import {
 import { LOOKBOOK_EASE } from "./constants";
 
 interface LookbookCountUpProps {
-  /** Display target — e.g. `5`, `14`, `$75` */
+  /** Display target — e.g. `5`, `14`, `$70` */
   value: string;
   className?: string;
   /** Stagger delay before count starts (seconds) */

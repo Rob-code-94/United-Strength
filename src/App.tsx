@@ -94,8 +94,8 @@ const PARITY_ROUTES = new Set([
   "/culture/by-design",
   "/culture/cultivated",
   "/culture/archive",
-  "/privacy",
-  "/terms",
+  "/privacy-policy",
+  "/terms-of-service",
 ]);
 
 /** Mariana Tek embeds — deep-link only; not in marketing nav */
@@ -206,8 +206,8 @@ const LOCKED_NAV: NavSection[] = [
 
 const FOOTER_LINKS = [
   { label: "FAQ", href: "/faq" },
-  { label: "Terms", href: "/terms" },
-  { label: "Privacy", href: "/privacy" },
+  { label: "Terms", href: "/terms-of-service" },
+  { label: "Privacy", href: "/privacy-policy" },
   { label: "Instagram", href: "https://www.instagram.com/united_strength/" },
   { label: "Email", href: "mailto:info@unitedstrengthgym.com" }
 ];
@@ -354,6 +354,8 @@ export default function App() {
 
     let normalized = href === "/team" ? "/about/team" : href;
     if (normalized === "/memberships") normalized = "/membership";
+    if (normalized === "/privacy") normalized = "/privacy-policy";
+    if (normalized === "/terms") normalized = "/terms-of-service";
     if (normalized === "/culture/move-the-city") {
       normalized = "/training/move-the-city";
     }
@@ -836,9 +838,9 @@ export default function App() {
                         <CultivatedPage onBack={goSimHome} onNav={triggerNavigation} />
                       ) : activeSimRoute === "/culture/archive" ? (
                         <ArchivePage onBack={goSimHome} onNav={triggerNavigation} />
-                      ) : activeSimRoute === "/privacy" ? (
+                      ) : activeSimRoute === "/privacy-policy" ? (
                         <PrivacyPage onBack={goSimHome} onNav={triggerNavigation} />
-                      ) : activeSimRoute === "/terms" ? (
+                      ) : activeSimRoute === "/terms-of-service" ? (
                         <TermsPage onBack={goSimHome} onNav={triggerNavigation} />
                       ) : activeSimRoute === "/buy" ? (
                         <MarianaEmbedPage kind="buy" onBack={goSimHome} />

@@ -15,16 +15,16 @@ interface PageProps {
 
 const SECTION_LABELS: Record<FaqItem["section"], string> = {
   general: "General",
-  offerings: "Offerings",
+  training: "Training",
   memberships: "Membership",
-  location: "Location",
+  visiting: "Visiting United",
 };
 
 const SECTION_ORDER: FaqItem["section"][] = [
   "general",
-  "offerings",
+  "training",
   "memberships",
-  "location",
+  "visiting",
 ];
 
 /**

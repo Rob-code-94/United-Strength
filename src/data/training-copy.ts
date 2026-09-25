@@ -1,9 +1,9 @@
 /**
  * Training section copy — Direction EF menu pages (overlay 02).
- * Sources: unitedstrengthgym.com/classes/build · /classes/burn · /personal-training
- * Balance / Small Group / Private Group: Coming Soon in overlay — no dedicated live pages yet.
+ * Sources: tmp-copywright/ · unitedstrengthgym.com/classes/build · /classes/burn · /personal-training
+ * Copywright Part D update Sep 2026: BUILD, PERSONAL_TRAINING_HUB, TRAINING_CTA.
  *
- * Strip from live: Sign up / Free Trial / Book chrome → Start Here / mailto only.
+ * Strip from live: Sign up / Free Trial / Book chrome → Experience United / mailto only.
  */
 
 export interface ScheduleRow {
@@ -33,19 +33,23 @@ export const FACILITY_HOURS = [
 
 export const FACILITY_ADDRESS = "237 Cleveland Ave, Columbus, Ohio 43215";
 
-/** Source: unitedstrengthgym.com/classes/build */
+/** Source: BUILD PAGE.txt */
 export const BUILD_CLASS: TrainingClassCopy = {
   n: "01",
   title: "Build",
   metadata: "( Classes )",
   headline: "BUILD",
-  lede: "Strength first — with conditioning that finishes the work.",
+  lede: "Strength for life.",
   body: [
-    "Build is a class that focuses on strength but also incorporates conditioning and weight circuits. Build begins with a strength component dedicated to either the upper body or the lower body.",
-    "The next portion incorporates super-sets and circuits of accessory movements that complement the major lift in the beginning. Build will finish with some form of HIIT training to increase your metabolic conditioning and cardiovascular capacity.",
+    "BUILD is our approach to functional strength training.",
+    "The goal isn't to make every workout as hard as possible. The goal is to get stronger, build and maintain muscle, move well, and continue developing a body that allows you to do more throughout your life.",
+    "Every BUILD class is intentionally programmed around strength. We focus on the movements that matter, teach you how to perform them well, and give you the opportunity to progress them over time.",
+    "Conditioning still has a place, but it supports the strength work rather than replacing it.",
+    "You don't need to be an experienced lifter to start. You just need to be willing to learn, challenge yourself, and keep showing up.",
+    "The work changes as you do.",
   ],
   communityNote:
-    "Regardless of where you're starting from, the United Strength community is here to help educate and motivate you to reach your goals. We highly recommend you try out our classes — we offer a free trial class to those who are interested.",
+    "The best way to understand BUILD is to experience it. Experience United gives you the opportunity to train with us, meet our coaches, understand how our classes work, and decide if United is the right place for you.",
   schedule: [
     { day: "Monday", times: "6 am · 9 am · 6 pm" },
     { day: "Tuesday", times: "7 pm" },
@@ -73,7 +77,7 @@ export const BURN_CLASS: TrainingClassCopy = {
     "Burn will help build your cardiovascular and muscular endurance.",
   ],
   communityNote:
-    "Regardless of where you're starting from, the United Strength community is here to help educate and motivate you to reach your goals. We highly recommend you try out our classes — we offer a free trial class to those who are interested.",
+    "The best way to understand BURN is to experience it. Experience United gives you the opportunity to train with us, meet our coaches, understand how our classes work, and decide if United is the right place for you.",
   schedule: [
     { day: "Monday", times: "7 pm" },
     { day: "Tuesday", times: "6 am · 9 am · 6 pm" },
@@ -97,40 +101,96 @@ export const BALANCE_CLASS = {
 } as const;
 
 /**
- * Personal Training hub — Sep 2026 single Coaching leaf.
- * Consolidates 1:1 + private group; no prices; no separate nav children.
- * Source: unitedstrengthgym.com/personal-training
+ * Personal Training hub — Copywright _PERSONAL TRAINING PAGE.txt (Sep 2026).
+ * Expanded verbatim. No prices · no Buy / Reserve / Book.
  */
 export const PERSONAL_TRAINING_HUB = {
   metadata: "( Training )",
   headline: "Personal Training",
-  lede: "Customized coaching. Real results. Personal attention that changes the game.",
-  body: [
-    "We have elite-level coaches who are among the best in the industry. Each one brings a unique skill set, deep expertise, and a passion for helping others get stronger in and out of the gym.",
-    "Whether you're new to training or ready to break through a plateau, our coaches are ready to meet you where you're at and take you where you want to go.",
-  ],
+  lede: "Personal training should be personal.",
+
+  /** 01 // OUR APPROACH */
+  approach: {
+    n: "01",
+    title: "Our Approach",
+    headline: "WE START WITH THE PERSON.",
+    body: [
+      "We don't start with a program and try to fit you into it.",
+      "We start by understanding you.",
+      "What are you trying to accomplish? What have you done before? What do you enjoy? Where do you struggle? What does your body need? And just as importantly, what can realistically fit into your life?",
+      "From there, we build.",
+      "Good coaching is more than writing workouts. It's knowing how to teach, when to push, when to adjust, and how to build something that someone can actually continue doing.",
+      "The goal isn't to make you dependent on a coach forever.",
+      "It's to help you become stronger, more capable, and more confident in understanding how to take care of yourself.",
+    ],
+  },
+
+  /** 02 // EXPERIENCE MATTERS */
+  experience: {
+    n: "02",
+    title: "Experience Matters",
+    headline: "EXPERIENCE CHANGES HOW YOU COACH.",
+    body: [
+      "A certification can teach you a lot.",
+      "Experience teaches you how to work with people.",
+      "Our coaches have spent years working with different bodies, different goals, different ages, different personalities, and people at completely different places in their lives.",
+      "Over time, you learn that there isn't one perfect program or one way to coach everyone.",
+      "You learn how to listen. How to adjust. How to communicate. And how to recognize what the person standing in front of you actually needs.",
+      "That experience matters.",
+      "We also expect our coaches to continue learning and investing in themselves. Coaching is a craft, and getting better at it doesn't stop when you earn a certification.",
+    ],
+    stats: [
+      { label: "20+ YEARS COACHING", value: "20+" },
+    ],
+  },
+
+  /** 03 // TWO WAYS TO TRAIN */
   oneOnOne: {
     n: "01",
-    title: "1-on-1 Coaching",
-    headline: "Undivided attention — programming built around you.",
+    title: "1:1 Coaching",
+    headline: "The most individualized way to train at United.",
     body: [
-      "One-on-one coaching pairs you with a United Strength coach for personalized programming, form, and accountability. Sessions meet you where you are and progress toward where you want to go.",
+      "You'll work directly with a coach who builds your training around your goals, your body, your experience, and your life.",
+      "Your coach is there to teach, guide, adjust, challenge you, and help you understand the work you're doing instead of simply taking you through workouts.",
     ],
   },
   privateGroup: {
     n: "02",
-    title: "Private Group",
-    headline: "Your crew. Your schedule. Coach-led in the United room.",
+    title: "Private Group Training",
+    headline: "Personal training doesn't always have to mean training alone.",
     body: [
-      "Private group training is for friends, teams, or circles who want a dedicated coaching block together. Inquire with the team — we'll shape the session around your goals.",
+      "Private Group Training allows you to train with a small group of people you choose while still receiving dedicated coaching and intentional programming.",
+      "It's a way to share the experience while still having a coach who understands the group, knows what everyone is working toward, and can adjust the training when needed.",
     ],
   },
+
+  /** 04 // YOUR PROGRAMMING */
+  programming: {
+    n: "04",
+    title: "Your Programming",
+    headline: "THE WORK HAS A PLAN.",
+    body: [
+      "Personal Training extends beyond the time you spend standing next to your coach.",
+      "Your programming is built around you and can live inside Trainerize, giving you access to your workouts, exercises, sets, reps, training history and progress.",
+      "Depending on how you're training with us, your coach can also give you work to complete outside of your sessions so everything continues to work together.",
+      "The goal is for you to know what you're doing, understand why you're doing it, and be able to see how you're progressing over time.",
+    ],
+  },
+
+  /** 05 // FIND THE RIGHT COACH */
   coachCues: [
     { name: "Todd Johnson", role: "Owner, Coach", note: "Exercise physiology · ACSM CPT · USAW" },
     { name: "Jason Katz", role: "Coach", note: "Strength and conditioning" },
     { name: "Jenna Farkas", role: "Coach", note: "Body recomposition · competition prep" },
     { name: "Kara Shaffer", role: "Coach", note: "Kettlebell, barbell & bodyweight · all levels" },
   ],
+
+  /** CTA — bottom inquire band */
+  ctaSection: {
+    headline: "READY TO FIND THE RIGHT COACH?",
+    body: "You don't need to know exactly what you need before reaching out. Tell us where you are, what you're looking for, and we'll help you figure out the best place to start.",
+    inquireLabel: "Inquire about training",
+  },
 } as const;
 
 /** 1-on-1 — adapted from PT hub. */
@@ -183,11 +243,11 @@ export const PRIVATE_GROUP = {
 
 /**
  * Class / PT CTAs — match live functions without Triib Book chrome.
- * Live “Free Trial Class” → Start Here / Experience United.
+ * "Free Trial Class" → "Experience United" per BUILD PAGE.txt direction.
  */
 export const TRAINING_CTA = {
-  /** Live-site equivalent: Free Trial Class */
-  freeTrialLabel: "Free Trial Class",
+  /** Previously "Free Trial Class" — updated to Experience United per Part D copywright */
+  freeTrialLabel: "Experience United",
   freeTrialHref: "/start-here/experience",
   experienceLabel: "Experience United",
   experienceHref: "/start-here/experience",

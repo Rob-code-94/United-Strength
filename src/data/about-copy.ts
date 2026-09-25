@@ -104,7 +104,7 @@ export const PHILOSOPHY_HEALTH_AREAS = [
   },
 ] as const;
 
-// ── Founder — unitedstrengthgym.com/johnson + Archive IMG_6405 ───────────────
+// ── Founder — Copywright FOUNDER STORY PAGE.txt ──────────────────────────────
 
 export interface FounderChapter {
   n: string;
@@ -117,40 +117,46 @@ export interface FounderChapter {
   quoteAttribution?: string;
 }
 
-/** Source: US EDITORIAL Post/IMG_6405.jpeg, unitedstrengthgym.com/johnson */
+/** Source: FOUNDER STORY PAGE.txt */
 export const FOUNDER_CHAPTERS = {
   origin: {
     n: "01",
     title: "Origin",
     metadata: "( Founder )",
     headline: "Todd Johnson",
-    lede: "Owner and coach — building a community that truly cares about one another.",
+    lede: "Founder, United Strength",
   },
   story: {
     n: "01",
     title: "Story",
     metadata: "( Journey )",
-    headline: "Built downtown. For people who take the practice seriously.",
+    headline: "",
     body: [
-      "My love of sports and fitness started in high school — track and soccer, the camaraderie of being part of a team. Once we started hitting the weight room, I was addicted. That led me to double major in exercise physiology and sports management at MVNU.",
-      "Upon graduation, I gained experience at Dunlap Community Hospital in Orville, working with physical and occupational therapists along with athletic trainers. Wanting to focus more on helping people with their fitness goals, I moved to Columbus to become a personal trainer with aspirations of opening my own gym.",
-      "I opened my first gym in 2014 and transitioned to opening United Strength in 2021. My passion lies within building a community that truly cares about one another and working to help people reach their fitness goals.",
+      "Before anything else, I'm a father and a husband.",
+      "Showing up for my daughter and building a legacy she can be proud of is what drives me.",
+      "Everything I build is rooted in leaving this world better than I found it.",
+      "That's what shapes how I show up in my work, in my leadership, and in the spaces I build.",
+      "I've spent over 20 years working in fitness, in hospitals, athletic performance settings, and alongside everyday people who just want to feel better in their own bodies and in their lives. I've seen people at their lowest and their strongest. What changes people is not hype or shortcuts, it is consistency, support, and knowing someone actually cares. The relationships I built during that time, many of which have lasted 15 years and counting, showed me what real trust looks like and why community matters.",
+      "I've owned and operated gyms for over a decade, building through seasons most people never see and learning what it actually takes to create something that lasts. Along the way, I've helped build brands, design training spaces, and shape the culture of fitness communities, work that's grown into consulting with other founders who want to build with intention.",
+      "Earlier in my career, I went through a long and difficult season in business that tested me mentally, financially, and personally. Walking away would have been easier. I chose not to. That season sharpened my standards. It clarified what I stand for, principle, integrity, and intention, and taught me to build with transparency, structure, and people who share those values.",
+      "What carried me through that season was people.",
+      "Clients and members who believed in me, showed up for me, and chose to keep moving forward together. Their support gave United Strength its deeper meaning. This gym exists because of that shared commitment to keep going, not just for ourselves, but for each other.",
+      "United Strength was also built in response to something I see happening in our world. We are more disconnected than ever. Screens, noise, and division have made it harder to find real connection. People need community. They need accountability. They need spaces where they can show up as they are and grow alongside others who are doing the same.",
+      "I also wanted to approach fitness differently.",
+      "The industry is saturated with misinformation, shortcuts, and trends that promise quick results without teaching people how to build lasting health. Dependency has become the norm, on programs, personalities, and external answers, instead of helping people develop the understanding and confidence to take ownership of their health long term.",
+      "United Strength exists to cut through that noise.",
+      "Our approach is rooted in education, intention, and longevity. We aim to give people the tools to understand their bodies, take care of their health, physically and mentally, and build strength that carries into every part of their life.",
     ],
   },
   community: {
     n: "02",
-    title: "Community",
-    metadata: "( Belonging )",
+    title: "What I Believe",
+    metadata: "( Belief )",
+    quote: "AT ITS CORE, UNITED STRENGTH IS ABOUT CHOOSING PEOPLE.",
     body: [
-      "We're not changing who we are. We're becoming more intentional about how we deliver it. This isn't about becoming exclusive. It's about creating a place where people can pursue their potential alongside others who challenge them to grow.",
+      "Choosing to grow.",
+      "Choosing to build something honest, supportive, and meaningful, without an agenda other than helping each other become better every day.",
     ],
-    quote: "Don't limit your challenges, challenge your limits.",
-    quoteAttribution: "Jerry Dunn",
-    advice:
-      "Don't be intimidated or discouraged by weight-training — everyone has to start someplace. Take the time to learn proper movements and techniques. Above all, don't compare yourself to other people. Everyone has their own fitness journey.",
-    memberNote:
-      "This newly opened gym is designed thoughtfully and beautifully by the experienced owner, Todd Johnson.",
-    memberAttribution: "Liz Pione",
   },
   credentials: {
     n: "03",
@@ -159,7 +165,7 @@ export const FOUNDER_CHAPTERS = {
   },
 } as const;
 
-/** Ruled credential index — about-us-13 DNA (no image split). Source: /johnson */
+/** Ruled credential index — kept in data but removed from editorial sections per Todd Sep 2026. */
 export const FOUNDER_CREDENTIAL_ROWS = [
   {
     label: "Education",
@@ -169,34 +175,24 @@ export const FOUNDER_CREDENTIAL_ROWS = [
   {
     label: "Experience",
     value:
-      "12+ years in fitness and wellness — hospital rehab to strength and conditioning. Owner/operator of two gyms for eight years.",
+      "20+ years in fitness and wellness — hospital rehab to strength and conditioning. Owner/operator of gyms for over a decade.",
   },
-  {
-    label: "Style",
-    value: "Strength & HIIT circuit training · Bodybuilding",
-  },
-  { label: "Favorites", value: "Back squat · Bench press" },
 ] as const;
 
-/** Story-led sequence — no image chapters (opener + text + pull-quote + ruled index). */
+/** Story-led sequence — credentials removed per FOUNDER STORY PAGE.txt direction. */
 export const FOUNDER_EDITORIAL_SECTIONS = [
   {
     key: "story" as const,
     tone: "white" as const,
-    next: "02 // Community",
+    next: "02 // What I Believe",
   },
   {
     key: "community" as const,
     tone: "alabaster" as const,
-    next: "03 // Credentials",
-  },
-  {
-    key: "credentials" as const,
-    tone: "white" as const,
   },
 ];
 
-// ── Team — unitedstrengthgym.com/our-team + coach slug pages ────────────────
+// ── Team — Copywright MEET THE TEAM PAGE.txt ─────────────────────────────────
 
 export interface TeamMember {
   id: string;
@@ -211,10 +207,10 @@ export interface TeamMember {
   source: string;
 }
 
-/** Source: unitedstrengthgym.com/our-team */
+/** Source: MEET THE TEAM PAGE.txt */
 export const TEAM_INTRO = {
   lede: "Starting your fitness journey can be difficult, but our team is here to encourage and challenge you to become the best version of yourself.",
-  headline: "Practitioners of the discipline — guiding the collective pursuit of strength in Columbus.",
+  headline: "Meet the Team",
 } as const;
 
 /** Source: unitedstrengthgym.com/johnson, /farkas, /katz, /shaffer */
@@ -224,8 +220,8 @@ export const TEAM_MEMBERS: TeamMember[] = [
     name: "Todd Johnson",
     role: "Owner, Coach",
     specialty: "Strength & HIIT circuit training",
-    lede: "Building a community that truly cares — 12+ years in fitness, owner since 2014.",
-    bio: "Education: Bachelor of Science in Exercise Physiology & Sports Management. Certifications: ACSM CPT; USAW. I have been working in the fitness and wellness industry for over 12 years, starting in a hospital setting with physical therapy and rehab, then shifting to strength and conditioning and personal training. I opened my first gym in 2014 and transitioned to opening United Strength in 2021. My passion lies within building a community that truly cares about one another and working to help people reach their fitness goals. Style of training: Strength & HIIT circuit training; Bodybuilding. Favorite exercises: Back squat & Bench press.",
+    lede: "Building a community that truly cares — 20+ years in fitness, owner since 2014.",
+    bio: "Education: Bachelor of Science in Exercise Physiology & Sports Management. Certifications: ACSM CPT; USAW. I have been working in the fitness and wellness industry for over 20 years, starting in a hospital setting with physical therapy and rehab, then shifting to strength and conditioning and personal training. I opened my first gym in 2014 and transitioned to opening United Strength in 2021. My passion lies within building a community that truly cares about one another and working to help people reach their fitness goals. Style of training: Strength & HIIT circuit training; Bodybuilding. Favorite exercises: Back squat & Bench press.",
     source: "https://www.unitedstrengthgym.com/johnson",
   },
   {
@@ -257,7 +253,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
   },
 ];
 
-// ── Space — unitedstrengthgym.com homepage + testimonials ───────────────────
+// ── Space — Copywright THE SPACE PAGE.txt ────────────────────────────────────
 
 export interface SpaceChapter {
   n: string;
@@ -269,7 +265,7 @@ export interface SpaceChapter {
   memberAttribution?: string;
 }
 
-/** Source: unitedstrengthgym.com homepage — photo-first (gallery dominates). */
+/** Source: THE SPACE PAGE.txt + unitedstrengthgym.com homepage testimonials. */
 export const SPACE_CHAPTERS = {
   hero: {
     n: "01",
@@ -293,9 +289,9 @@ export const SPACE_CHAPTERS = {
   },
   visit: {
     n: "02",
-    title: "Visit",
-    metadata: "( Schedule a visit )",
-    lede: "Take a free tour of our facility to help you decide if United Strength is the right gym for you. You'll have the opportunity to try equipment, observe classes, and get answers to all of your questions.",
+    title: "Experience United",
+    metadata: "( Start Here )",
+    lede: "Experience United is how you get to know us — and how we get to know you. The best way to understand what United is about is to be here.",
     address: "237 Cleveland Ave, Columbus, Ohio 43215",
     parking: "Parking behind the building · near Columbus State",
   },
@@ -305,7 +301,7 @@ export const SPACE_EDITORIAL_SECTIONS = [
   {
     key: "mosaic" as const,
     tone: "white" as const,
-    next: "02 // Visit",
+    next: "02 // Experience United",
   },
   {
     key: "visit" as const,
@@ -313,74 +309,123 @@ export const SPACE_EDITORIAL_SECTIONS = [
   },
 ];
 
-// ── FAQ — docs/wireframes/faq.md + site facts ────────────────────────────────
+// ── FAQ — Copywright FAQ PAGE.txt ─────────────────────────────────────────────
 
 export interface FaqItem {
   q: string;
   a: string;
-  /** Wireframe section anchor */
-  section: "general" | "offerings" | "memberships" | "location";
+  /** Section anchor */
+  section: "general" | "training" | "memberships" | "visiting";
 }
 
 /**
- * Source: docs/wireframes/faq.md + unitedstrengthgym.com + brand skill.
- * Todd may refine answers after V1 review — no client-visible draft chrome.
+ * Source: FAQ PAGE.txt — 20 questions, 4 sections.
+ * Answers: placeholder "Details coming." where doc deferred; kept existing if stronger.
  */
 export const FAQ_ITEMS: FaqItem[] = [
+  // ── GENERAL ──────────────────────────────────────────────────────────────
   {
     section: "general",
-    q: "What should I expect on my first visit?",
-    a: "Schedule a free tour — try equipment, observe classes, and get answers to your questions. Experience United is the recommended first step so you can feel the practice before you apply.",
-  },
-  {
-    section: "general",
-    q: "What classes do you offer?",
-    a: "We offer two results-driven classes led by certified coaches: Build and Burn. Each is designed to build a stronger and healthier you from the inside out.",
+    q: "What is United Strength?",
+    a: "United Strength is a private fitness club in downtown Columbus, Ohio. We offer intentional coaching, structured classes, personal training, and a community built around a shared commitment to health and strength.",
   },
   {
     section: "general",
-    q: "How do I get in touch?",
-    a: "Email info@unitedstrengthgym.com for general questions, membership@unitedstrengthgym.com for membership, or training@unitedstrengthgym.com for coaching. Or apply through Start Here when you are ready to join.",
+    q: "Is United Strength a private club?",
+    a: "Yes. Membership is selective and reviewed by the team. We're not a traditional open-enrollment gym.",
   },
   {
-    section: "offerings",
-    q: "What is Build?",
-    a: "Build is our strength-focused class — foundational movements, technique, and progressive loading designed to make you stronger over time.",
+    section: "general",
+    q: "Do I need to be experienced to train at United?",
+    a: "No. You need to be willing to learn, challenge yourself, and keep showing up. Our coaches meet you where you are.",
   },
   {
-    section: "offerings",
-    q: "What is Burn?",
-    a: "Burn is our conditioning class — energy systems work and HIIT circuits designed to improve capacity and complement your strength training.",
+    section: "general",
+    q: "What makes United different from a traditional gym?",
+    a: "Intentional coaching, a selective membership community, structured programming, and a space built to make the practice feel deliberate — not just another place to work out.",
+  },
+  // ── TRAINING ─────────────────────────────────────────────────────────────
+  {
+    section: "training",
+    q: "What types of training do you offer?",
+    a: "We offer BUILD, BURN, and BALANCE signature classes, personal training (1:1 and private group), and Move the City // Run Club.",
   },
   {
-    section: "offerings",
-    q: "Do you offer personal training and open gym?",
-    a: "Yes. Coaches offer personal training alongside group classes, and open gym memberships are part of how the club operates. Details are confirmed during your visit or application.",
+    section: "training",
+    q: "What are BUILD, BURN and BALANCE?",
+    a: "BUILD is our functional strength training class. BURN is our conditioning and HIIT class. BALANCE is coming soon — recovery, mobility, and the quieter side of the practice.",
   },
+  {
+    section: "training",
+    q: "Do you offer personal training?",
+    a: "Yes. Our coaches offer 1:1 coaching and private group training, each built around your goals, your body, and your life. Inquire at training@unitedstrengthgym.com.",
+  },
+  {
+    section: "training",
+    q: "Can I train on my own?",
+    a: "Details coming.",
+  },
+  {
+    section: "training",
+    q: "What is Move the City // Run Club?",
+    a: "Move the City is our free run club — open to everyone. No membership required. We get outside, move our bodies, and spend time with people.",
+  },
+  {
+    section: "training",
+    q: "Do I need to be a member to work with a coach?",
+    a: "Details coming.",
+  },
+  // ── MEMBERSHIP ───────────────────────────────────────────────────────────
   {
     section: "memberships",
     q: "How does membership work?",
-    a: "Membership is selective and reviewed by the team. There is no open checkout on the marketing site. Apply when you are ready; we will follow up.",
+    a: "Membership is selective and reviewed by the team. There is no open checkout on this site. Apply when you're ready; we will follow up.",
   },
   {
     section: "memberships",
-    q: "Why an application?",
+    q: "Why do I need to apply for membership?",
     a: "United Strength is a community first. The application helps us understand your goals and whether the club is the right fit — belonging over volume.",
   },
   {
     section: "memberships",
-    q: "Do you publish monthly prices here?",
-    a: "No. Public monthly pricing is not shown on this marketing layer. Pricing is discussed in the application process.",
+    q: "Can I try United before becoming a member?",
+    a: "Yes. Experience United is how you get to know us — and how we get to know you.",
   },
   {
-    section: "location",
+    section: "memberships",
+    q: "What is Experience United?",
+    a: "Details coming.",
+  },
+  {
+    section: "memberships",
+    q: "What membership options are available?",
+    a: "Membership options are discussed during the application process. We do not publish pricing on this site.",
+  },
+  {
+    section: "memberships",
+    q: "Can I cancel my membership?",
+    a: "Details coming.",
+  },
+  // ── VISITING UNITED ───────────────────────────────────────────────────────
+  {
+    section: "visiting",
     q: "Where are you located?",
-    a: "237 Cleveland Ave, Columbus, Ohio 43215 — downtown near Columbus State, with parking behind the building.",
+    a: "237 Cleveland Ave, Columbus, Ohio 43215 — downtown near Columbus State.",
   },
   {
-    section: "location",
+    section: "visiting",
     q: "Is parking available?",
-    a: "Yes — parking is behind the building. Members often note the downtown location near CState as convenient.",
+    a: "Yes — parking is available behind the building.",
+  },
+  {
+    section: "visiting",
+    q: "When can members access the gym?",
+    a: "Details coming.",
+  },
+  {
+    section: "visiting",
+    q: "What should I expect the first time I come in?",
+    a: "Experience United is the recommended first step — you'll train with us, meet our coaches, understand how our classes work, and decide if United is the right place for you.",
   },
 ];
 
