@@ -1,11 +1,10 @@
 /**
  * About section copy — Direction EF lookbook pages.
- * Sources: unitedstrengthgym.com · Archive Issue 001 (US EDITORIAL Post/) · docs/wireframes/faq.md
+ * Sources: tmp-copywright/ · unitedstrengthgym.com · Archive Issue 001
+ * Copywright Part D update Sep 2026: Philosophy, Founder, Team, Space, FAQ.
  */
 
-import { gymPhotos } from "../assets/images/gym";
-
-// ── Philosophy — Archive Issue 001 (IMG_6408, IMG_6409) ─────────────────────
+// ── Philosophy — Todd PHILOSOPHY PAGE ────────────────────────────────────────
 
 export interface PhilosophyChapter {
   n: string;
@@ -13,154 +12,97 @@ export interface PhilosophyChapter {
   metadata?: string;
   lede?: string;
   quote?: string;
-  body?: string[];
+  body?: readonly string[];
   /** Serif pull headline */
   headline?: string;
 }
 
-/** Source: US EDITORIAL Post/IMG_6408.jpeg, IMG_6409.jpeg */
+/** Source: Todd's Philosophy page brief. */
 export const PHILOSOPHY_CHAPTERS = {
-  /** ch.01 — Cutting Through the Noise */
+  /** Full-screen hero. Headline only. */
   hero: {
-    n: "01",
-    title: "What We Hold",
-    metadata: "( Philosophy )",
-    lede: "Every week, we explore one topic to help you make better decisions about your health — without the hype, confusion, or endless opinions.",
     headline: "Cutting Through the Noise",
   },
-  /** ch.02 — Manifesto opener */
+  /** After the hero. 01 // Philosophy · // What We Believe */
+  place: {
+    n: "01",
+    title: "Philosophy",
+    kicker: "What We Believe",
+    headline: "You are capable of more.",
+    body: [
+      "There is more information than ever about how to be healthy, yet taking care of ourselves has somehow become more complicated.",
+      "We believe it can be simpler.",
+      "Train with intention. Understand your body. Take care of your health. Stay connected to people. Build a life that allows you to keep doing the things you love for as long as possible.",
+      "United exists to help people make sense of what matters, put it into practice, and keep moving forward.",
+    ],
+  },
+  /** Horizontal manifesto break. */
   manifesto: {
-    n: "02",
     title: "Manifesto",
     headline: "What does it really mean to be healthy?",
     body: [
-      "Ask ten people what it means to be healthy, and you'll probably get ten different answers. Some will say losing weight. Others will say running a marathon. Some will say having visible abs. But none of those things, on their own, define health.",
-      "Somewhere along the way, we started confusing looking healthy with actually being healthy. The reality is, health is much bigger than any single metric.",
+      "We don't believe health is defined by how much you lift, how you look, or how often you make it to the gym.",
+      "It is the ability to live your life well.",
+      "To move. To think. To connect. To adapt. To remain capable. To keep doing the things you love with the people you love.",
+      "Training is part of that.",
+      "But it is only part of it.",
     ],
   },
-  /** ch.03 — Place / life you're building */
-  place: {
-    n: "03",
-    title: "Place",
-    metadata: "( Columbus )",
-    quote:
-      "People don't stay because of equipment. They stay because of how a place makes them feel.",
-    body: [
-      "At United, we believe real health is having the strength to carry your kids and eventually your grandkids. It's having the energy to enjoy your life instead of constantly feeling exhausted. It's being able to move well, recover from setbacks, manage stress, build meaningful relationships, and understand what's actually happening inside your body.",
-      "It's not just about how you look today. It's about the life you're building for the years to come — the strength to carry kids and grandkids, the energy to enjoy life, moving well, managing stress, and understanding your own biology.",
-      "That's why strength matters. Why movement matters. Why your habits and behaviors matter. Why the people you surround yourself with matter. And why understanding things like your bloodwork, body composition, and cardiovascular health becomes increasingly important as you age.",
-      "The problem is that we tend to look at each of these things separately, when real health is built by paying attention to all of them. You can be strong and still neglect your health. You can be thin and still lack muscle, energy, or cardiovascular fitness.",
+  /** Sparse close. No repeat of belief 05. */
+  close: {
+    lines: [
+      "You have to do the work.",
+      "But you shouldn't have to do it alone.",
+      "Stronger United.",
     ],
-  },
-  /** ch.04 — The Practice (photo chapter) */
-  practice: {
-    n: "04",
-    title: "The Practice",
-    lede: "For United, real health is built on four key areas.",
-  },
-  /** ch.05 — Four Key Areas index */
-  fourAreas: {
-    n: "05",
-    title: "Four Key Areas",
-    metadata: "( Index )",
-  },
-  /** ch.06 — Continue / closing */
-  continue: {
-    n: "06",
-    title: "Continue",
-    body: [
-      "There is no single workout, diet, supplement, medication, or health trend that solves everything.",
-      "The goal isn't simply to live longer. It's to live better for longer. To stay capable. To stay independent. To keep doing the things you love with the people you care about.",
-    ],
-    headline: "Health isn't something you achieve. It's something you continue to build.",
   },
 } as const;
 
-/** Source: US EDITORIAL Post/IMG_6409.jpeg */
+/** Five Core Beliefs — one full screen at a time. */
 export const PHILOSOPHY_HEALTH_AREAS = [
   {
     n: "01",
-    title: "Strength",
-    body: "Building a body that is strong and capable through all phases of life.",
+    title: "Cut Through the Noise",
+    body: [
+      "There is more information than ever about how to be healthy. More trends. More shortcuts. More people telling you what you should be doing.",
+      "We believe in making it simpler. Understand what matters, understand why it matters, and build the confidence to take ownership of your health.",
+    ],
   },
   {
     n: "02",
-    title: "Self-awareness",
-    body: "Understanding yourself, and creating lasting change.",
+    title: "Build Strength for Life",
+    body: [
+      "Strength is more than what you can lift.",
+      "It's building and maintaining a body that allows you to remain capable throughout your life.",
+      "It's challenging yourself, doing difficult things, and continuing to raise the standard of what you believe you're capable of.",
+    ],
   },
   {
     n: "03",
-    title: "Connection",
-    body: "Surrounding yourself with people who challenge you, support you, and make life better.",
+    title: "People Need People",
+    body: [
+      "At a time when we are more connected than ever, we have somehow become more disconnected.",
+      "We believe community matters. Having people who know you, challenge you, support you, and notice when you're not there matters.",
+    ],
   },
   {
     n: "04",
-    title: "Longevity",
-    body: "Using meaningful information to understand where you are today and improve for tomorrow.",
+    title: "Take Care of the Whole Person",
+    body: [
+      "Health is physical, but it isn't only physical.",
+      "How you move, how you think, how you recover, how you connect with people, and how you take care of yourself outside the gym all play a role in how well you live.",
+    ],
+  },
+  {
+    n: "05",
+    title: "Do the Work",
+    body: [
+      "There are no shortcuts to lasting change.",
+      "Show up. Be consistent. Challenge yourself. Keep learning. Keep growing.",
+      "You have to do the work. But you shouldn't have to do it alone.",
+    ],
   },
 ] as const;
-
-/** Layout map for EF Philosophy — off-center editorial + hairline sections. */
-export type PhilosophyEditorialKey =
-  | "hero"
-  | "manifesto"
-  | "place"
-  | "practice"
-  | "fourAreas"
-  | "continue";
-
-export interface PhilosophyEditorialLayout {
-  key: PhilosophyEditorialKey;
-  align?: "media-left" | "media-right";
-  image?: string;
-  imageAlt?: string;
-  tone?: "white" | "alabaster";
-  next?: string;
-}
-
-export const PHILOSOPHY_EDITORIAL_SECTIONS: PhilosophyEditorialLayout[] = [
-  {
-    key: "hero",
-    align: "media-left",
-    image: gymPhotos.galleryCinematic,
-    imageAlt: "United Strength — quiet moment in the practice",
-    tone: "white",
-    next: "02 // Manifesto",
-  },
-  {
-    key: "manifesto",
-    tone: "alabaster",
-    next: "03 // Place",
-  },
-  {
-    key: "place",
-    align: "media-right",
-    image: gymPhotos.spaceAtmosphere,
-    imageAlt: "United Strength — atmosphere in the club",
-    tone: "white",
-    next: "04 // The Practice",
-  },
-  {
-    key: "practice",
-    align: "media-left",
-    image: gymPhotos.experienceBroll,
-    imageAlt: "United Strength — the practice",
-    tone: "alabaster",
-    next: "05 // Four Key Areas",
-  },
-  {
-    key: "fourAreas",
-    tone: "white",
-    next: "06 // Continue",
-  },
-  {
-    key: "continue",
-    align: "media-right",
-    image: gymPhotos.architectureRaw,
-    imageAlt: "United Strength — downtown club",
-    tone: "alabaster",
-  },
-];
 
 // ── Founder — unitedstrengthgym.com/johnson + Archive IMG_6405 ───────────────
 

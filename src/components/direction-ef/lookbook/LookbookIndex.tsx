@@ -20,13 +20,15 @@ export default function LookbookIndex({
 }: LookbookIndexProps) {
   return (
     <div className={`flex flex-col gap-3 max-w-sm ${className}`}>
-      <span
-        className={`font-mono text-[48px] leading-none tracking-tight ${
-          onDark ? "text-white/90" : "text-[#181818]/90"
-        }`}
-      >
-        {n}
-      </span>
+      {n ? (
+        <span
+          className={`font-mono text-[48px] leading-none tracking-tight ${
+            onDark ? "text-white/90" : "text-[#181818]/90"
+          }`}
+        >
+          {n}
+        </span>
+      ) : null}
       <h2
         className={`font-mono text-[11px] uppercase tracking-[0.28em] ${
           onDark ? "text-white/85" : "text-[#5C5C5C]"

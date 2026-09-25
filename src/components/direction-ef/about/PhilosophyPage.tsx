@@ -1,185 +1,137 @@
-import { motion, useReducedMotion } from "motion/react";
+import { ChevronLeft } from "lucide-react";
+import { gymPhotos } from "../../../assets/images/gym";
+import { PHILOSOPHY_CHAPTERS } from "../../../data/about-copy";
+import V1SiteIndexFooter from "../../direction-v1/V1SiteIndexFooter";
 import {
-  PHILOSOPHY_CHAPTERS,
-  PHILOSOPHY_EDITORIAL_SECTIONS,
-  PHILOSOPHY_HEALTH_AREAS,
-} from "../../../data/about-copy";
-import {
-  LOOKBOOK_EASE,
   LookbookAboutPageShell,
-  LookbookEditorialChapter,
-  LookbookManifestoSection,
-  LookbookNextCue,
-  LookbookPageOpener,
-  LookbookScrollReveal,
+  LookbookManifestoSplit,
+  LookbookStaggerBody,
 } from "../lookbook";
+import PhilosophyBeliefStrip from "./PhilosophyBeliefStrip";
 
 interface PageProps {
   onBack: () => void;
   onNav: (href: string, label: string) => void;
 }
 
-/** Philosophy — EF editorial foundation (F off-center + Odd Ritual hairlines). */
+/** Philosophy — Todd's sequence on the dark canvas, with the V1 home footer. */
 export default function PhilosophyPage({ onBack, onNav }: PageProps) {
-  const reduceMotion = useReducedMotion();
-  const { hero, manifesto, place, practice, fourAreas, continue: closing } =
-    PHILOSOPHY_CHAPTERS;
+  const { hero, place, manifesto, close } = PHILOSOPHY_CHAPTERS;
 
   return (
-    <LookbookAboutPageShell onNav={onNav}>
-      <LookbookPageOpener
-        title={hero.headline ?? hero.title}
-        lede={hero.lede ?? ""}
-        metadata={hero.metadata ?? "( Philosophy )"}
-        onBack={onBack}
-      />
+    <LookbookAboutPageShell
+      onNav={onNav}
+      className="bg-[#111111] text-[#F3EEE7] selection:bg-white/15 selection:text-[#F3EEE7]"
+      footer={<V1SiteIndexFooter onNav={onNav} />}
+    >
+      <section className="relative h-[100cqh] min-h-[520px] w-full overflow-hidden bg-[#111111]">
+        <img
+          src={gymPhotos.heroFullBleed}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ objectPosition: "center 40%" }}
+        />
+        <div className="absolute inset-0 bg-[#111111]/45" />
+        <button
+          type="button"
+          onClick={onBack}
+          className="absolute left-4 top-4 z-10 flex min-h-[44px] min-w-[44px] items-center gap-1 text-[#F3EEE7] transition-opacity hover:opacity-70 md:left-8 md:top-6"
+          aria-label="Back to home"
+        >
+          <ChevronLeft className="h-5 w-5 shrink-0" />
+          <span className="font-mono text-[9px] uppercase tracking-[0.22em] text-[#F3EEE7]/70">
+            Back
+          </span>
+        </button>
+        <h1
+          className="absolute bottom-16 left-5 right-5 z-10 max-w-[12ch] font-sans text-[40px] font-bold uppercase leading-[0.95] tracking-[-0.04em] text-[#F3EEE7] md:bottom-20 md:left-10 md:text-[64px]"
+          style={{ fontFamily: "'Satoshi', sans-serif" }}
+        >
+          {hero.headline}
+        </h1>
+      </section>
 
-      {PHILOSOPHY_EDITORIAL_SECTIONS.map((section) => {
-        if (section.key === "manifesto") {
-          return (
-            <LookbookManifestoSection
-              key={section.key}
-              n={manifesto.n}
-              title={manifesto.title}
-              headline={manifesto.headline}
-              body={manifesto.body}
-              tone={section.tone}
-              next={section.next}
-            />
-          );
-        }
-
-        if (section.key === "fourAreas") {
-          return (
-            <section
-              key={section.key}
-              className="box-border w-full px-5 py-14 md:px-8 md:py-20 border-b border-neutral-200/60 bg-[#F3EEE7]"
-              aria-label={`${fourAreas.n} ${fourAreas.title}`}
+      <section
+        className="border-b border-white/10 bg-[#111111] px-5 py-16 md:px-10 md:py-24"
+        aria-labelledby="philosophy-believe-heading"
+      >
+        <div className="mx-auto grid max-w-6xl items-center gap-10 md:grid-cols-12 md:gap-12">
+          <div className="md:col-span-5">
+            <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#F3EEE7]/60">
+              {place.n} // {place.title}
+            </p>
+            <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.28em] text-[#F3EEE7]/60">
+              // {place.kicker}
+            </p>
+            <h2
+              id="philosophy-believe-heading"
+              className="mt-6 font-sans text-[28px] font-bold uppercase leading-[1.05] tracking-[-0.04em] md:text-[36px]"
+              style={{ fontFamily: "'Satoshi', sans-serif" }}
             >
-              <LookbookScrollReveal className="mx-auto max-w-6xl flex flex-col gap-8">
-                <div className="flex flex-col gap-2">
-                  <span
-                    className="font-mono text-[3.5rem] sm:text-[4.5rem] leading-none tracking-tight text-[#181818]/15"
-                    aria-hidden
-                  >
-                    {fourAreas.n}
-                  </span>
-                  {fourAreas.metadata ? (
-                    <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#5C5C5C]">
-                      {fourAreas.metadata}
-                    </p>
-                  ) : null}
-                  <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#5C5C5C]">
-                    // {fourAreas.title}
-                  </p>
-                </div>
-                <ul className="flex flex-col">
-                  {PHILOSOPHY_HEALTH_AREAS.map((area, i) => (
-                    <motion.li
-                      key={area.n}
-                      initial={reduceMotion ? false : { opacity: 0, y: 10 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, amount: 0.5 }}
-                      transition={{
-                        duration: 0.55,
-                        delay: reduceMotion ? 0 : i * 0.05,
-                        ease: LOOKBOOK_EASE,
-                      }}
-                      className="py-5 border-t border-neutral-200 last:border-b flex gap-4"
-                    >
-                      <span className="font-mono text-[22px] leading-none tracking-tight text-[#181818]/35 shrink-0 w-10">
-                        {area.n}
-                      </span>
-                      <div className="flex flex-col gap-1.5 min-w-0 pt-0.5">
-                        <span
-                          className="text-[14px] font-bold uppercase tracking-[0.08em] text-[#181818]"
-                          style={{ fontFamily: "'Satoshi', sans-serif" }}
-                        >
-                          {area.title}
-                        </span>
-                        <span className="text-sm text-[#5C5C5C] leading-relaxed">{area.body}</span>
-                      </div>
-                    </motion.li>
-                  ))}
-                </ul>
-              </LookbookScrollReveal>
-              {section.next ? (
-                <div className="mx-auto max-w-6xl mt-10">
-                  <LookbookNextCue next={section.next} />
-                </div>
-              ) : null}
-            </section>
-          );
-        }
-
-        if (section.key === "hero") {
-          return (
-            <LookbookEditorialChapter
-              key={section.key}
-              n={hero.n}
-              title={hero.title}
-              metadata={hero.metadata}
-              image={section.image}
-              imageAlt={section.imageAlt}
-              align={section.align}
-              tone={section.tone}
-              next={section.next}
+              {place.headline}
+            </h2>
+            <LookbookStaggerBody
+              paragraphs={place.body}
+              onDark
+              className="mt-6 max-w-md"
             />
-          );
-        }
+          </div>
+          <div className="md:col-span-7">
+            <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#181818] md:aspect-[5/4]">
+              <img
+                src={gymPhotos.spaceAtmosphere}
+                alt="United Strength — atmosphere in the club"
+                className="absolute inset-0 h-full w-full object-cover"
+                style={{ objectPosition: "center 40%" }}
+              />
+            </div>
+          </div>
+        </div>
+      </section>
 
-        if (section.key === "place") {
-          return (
-            <LookbookEditorialChapter
-              key={section.key}
-              n={place.n}
-              title={place.title}
-              metadata={place.metadata}
-              body={place.body}
-              quote={place.quote}
-              image={section.image}
-              imageAlt={section.imageAlt}
-              align={section.align}
-              tone={section.tone}
-              next={section.next}
-            />
-          );
-        }
+      <section
+        className="border-b border-white/10 bg-[#181818] px-5 py-16 md:px-10 md:py-24"
+        aria-label="Manifesto"
+      >
+        <div className="mx-auto max-w-6xl">
+          <LookbookManifestoSplit
+            n=""
+            title={manifesto.title}
+            headline={manifesto.headline}
+            body={manifesto.body}
+            onDark
+          />
+        </div>
+      </section>
 
-        if (section.key === "practice") {
-          return (
-            <LookbookEditorialChapter
-              key={section.key}
-              n={practice.n}
-              title={practice.title}
-              body={practice.lede}
-              image={section.image}
-              imageAlt={section.imageAlt}
-              align={section.align}
-              tone={section.tone}
-              next={section.next}
-            />
-          );
-        }
+      <PhilosophyBeliefStrip />
 
-        if (section.key === "continue") {
-          return (
-            <LookbookEditorialChapter
-              key={section.key}
-              n={closing.n}
-              title={closing.title}
-              body={closing.body}
-              headline={closing.headline}
-              image={section.image}
-              imageAlt={section.imageAlt}
-              align={section.align}
-              tone={section.tone}
-            />
-          );
-        }
-
-        return null;
-      })}
+      <section
+        className="bg-[#111111] px-5 py-32 md:px-10 md:py-48"
+        aria-labelledby="philosophy-close-heading"
+      >
+        <div className="mx-auto flex max-w-6xl flex-col gap-4">
+          <h2
+            id="philosophy-close-heading"
+            className="max-w-[16ch] font-sans text-[32px] font-bold uppercase leading-[1.05] tracking-[-0.04em] md:text-[48px]"
+            style={{ fontFamily: "'Satoshi', sans-serif" }}
+          >
+            {close.lines[0]}
+          </h2>
+          <p
+            className="max-w-[18ch] font-sans text-[32px] font-bold uppercase leading-[1.05] tracking-[-0.04em] text-[#F3EEE7] md:text-[48px]"
+            style={{ fontFamily: "'Satoshi', sans-serif" }}
+          >
+            {close.lines[1]}
+          </p>
+          <p
+            className="mt-16 font-sans text-[13px] font-bold uppercase tracking-[0.22em] text-[#F3EEE7]/80 md:mt-24 md:text-[15px]"
+            style={{ fontFamily: "'Satoshi', sans-serif" }}
+          >
+            {close.lines[2]}
+          </p>
+        </div>
+      </section>
     </LookbookAboutPageShell>
   );
 }

@@ -15,13 +15,15 @@
 
 | Route | Page | Layout recipe |
 |---|---|---|
-| `/about/philosophy` | Philosophy | **Canonical reference** — opener + off-center editorial chapters + manifesto + four-areas index |
+| `/about/philosophy` | Philosophy | Dark sequence — full-screen “Cutting Through the Noise” hero → 01 Philosophy / What We Believe → manifesto → five full-screen beliefs (vertical scroll moves sideways, one at a time) → sparse close. Footer is the V1 homepage footer (`V1SiteIndexFooter`). |
 | `/about/founder` | Founder Story | **Story-led** — opener + text columns + pull-quote band + ruled credentials index (no image splits) |
 | `/about/the-space` | The Space | **Photo-first** — light opener → gallery dominates → short visit band |
 | `/about/team` | Meet the Team | **Alternating portraits** — flip left/right rows; bio expand; no Apply CTA |
 | `/about/faq` | FAQ | **Full-width index** — cream section jump band + numbered accordion (faq-02 feel) |
 
 Shared: `LookbookAboutPageShell` + `LookbookPageOpener` + `SiteIndexFooter`. **No** `DirectionEPageShell`. Pages must feel related, not identical.
+
+Philosophy is the exception: dark canvas, no typographic opener, and the V1 homepage footer. Other interiors keep the cream `SiteIndexFooter`.
 
 ---
 
