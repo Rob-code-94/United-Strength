@@ -8,9 +8,11 @@ import {
   V1Hero,
   V1InteriorShell,
   V1Kicker,
+  V1MediaImg,
   V1NavButton,
   V1Section,
 } from "./V1Interior";
+import type { MediaSlot } from "@/hub/brand-kit";
 
 interface PageProps {
   onBack: () => void;
@@ -26,13 +28,27 @@ const TILE_IMAGES = [
   gymPhotos.architectureRaw,
 ] as const;
 
+const TILE_SLOTS = [
+  "spaceTile1",
+  "spaceTile2",
+  "spaceTile3",
+  "spaceTile4",
+  "spaceTile5",
+  "spaceTile6",
+] as const satisfies readonly MediaSlot[];
+
 export default function V1SpacePage({ onBack, onNav }: PageProps) {
   const [open, setOpen] = useState<string | null>(null);
   const quotes = SPACE_CHAPTERS.mosaic;
 
   return (
     <V1InteriorShell onNav={onNav}>
-      <V1Hero image={gymPhotos.heroFullBleed} imageAlt="The United Strength floor" onBack={onBack}>
+      <V1Hero
+        image={gymPhotos.heroFullBleed}
+        imageAlt="The United Strength floor"
+        onBack={onBack}
+        mediaSlot="spaceHero"
+      >
         <V1Display className="max-w-[12ch]">{SPACE_CHAPTERS.hero.headline}</V1Display>
       </V1Hero>
 
@@ -52,7 +68,8 @@ export default function V1SpacePage({ onBack, onNav }: PageProps) {
                 onClick={() => setOpen(active ? null : tile.n)}
                 className="group relative h-[68vh] min-h-[280px] w-[78%] max-w-[420px] shrink-0 snap-start overflow-hidden text-left md:h-[72vh] md:w-[34%] md:max-w-none"
               >
-                <img
+                <V1MediaImg
+                  slot={TILE_SLOTS[index]}
                   src={TILE_IMAGES[index]}
                   alt=""
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"

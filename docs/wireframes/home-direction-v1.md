@@ -33,7 +33,7 @@ Free vertical scroll (no snap). Adjacent chapters **overlap** via z-index ladder
 | 04 | People | `PeopleChapter` | Cream | “People need people.” + circular U; `MEET THE TEAM →` |
 | 05 | The Space | `SpaceExperience` | Cream | Staggered pair (floor larger, rack overlaps up-right); tucks slightly into People; type beside the pair; no page CTA |
 | 06 | Membership | `MembershipPassport` | Charcoal | Cream ticket stub, 12px, seam ~70% with dotted tear and mask notches · hub fields · serial and chapter loop · **no home prices**; `EXPLORE MEMBERSHIP →` |
-| 07 | Start Here | `StartHere` | Dark | cta-15 equality: two equal frames side by side from `md` · stacked on phone · type off the photos |
+| 07 | Start Here | `StartHere` | Dark | Apple card strip (`carousel-08`): two tall rounded photo cards, type on the image, scroll-snap. Desktop cards share the row, capped at 640px and centered. Phone stays 280px with a peek. Experience circle white · Apply circle forest |
 
 Then **V1SiteIndexFooter** — editorial 5-zone mock (Part G).
 
@@ -48,7 +48,7 @@ Treat post–04 as a **lookbook issue after the opening filmstrip**: oversized m
 | People | about-us-09 + U watermark | `MEET THE TEAM →` |
 | Space | gallery-01 → staggered overlapping pair | No CTA; slight tuck into People |
 | Membership | cream ticket stub · notches · looping serial and chapter | `EXPLORE MEMBERSHIP →` · no prices |
-| Start Here | cta-15 → equal two-up frames | Experience + Apply |
+| Start Here | carousel-08 Apple cards | Experience + Apply · no extra cards |
 
 ## Anti-patterns
 
@@ -59,4 +59,26 @@ Treat post–04 as a **lookbook issue after the opening filmstrip**: oversized m
 - CLI-installing Space into `components/ui` (adapt DNA only)  
 - ChatGPT left sticky 02–07 section rail (conflicts with V1 drawer)  
 - Scroll-snap / scroll-jack between vertical chapters  
-- Footer as dense sitemap / brand billboard  
+- Footer as dense sitemap / brand billboard
+
+## Interior pages (Todd, Sep 2026)
+
+V1 interiors live in `src/components/direction-v1/pages/`. `App.tsx` mounts them only when `workingDirection === "V1"`. The EF lookbook files stay frozen. Canvas is `#111111` / `#181818`, type is cream, and every page closes on `V1SiteIndexFooter`. Homepage prices stay on the ticketless spine. Public prices are only on `/membership`.
+
+| Route | Component | Order |
+|-------|-----------|--------|
+| `/training/move-the-city` | `V1MoveTheCityPage` | Hero MOVE THE CITY // RUN CLUB → 01 Move Together → The pace is conversation → 02 The Runs → 03 The Route → 04 People → Run with us |
+| `/about/founder` | `V1FounderPage` | Collage stand-in → Todd Johnson // Founder → 01 Story → mid photo → 02 What I Believe. No credentials. |
+| `/start-here/apply` | `V1ApplyPage` | Apply hero → why → statement → four steps → Begin Application. Typeform URL empty, button does not leave the page. Forest only on that control. |
+| `/membership` | `V1MembershipPage` | Four tiers with public prices → value → ecosystem → compare → how to join shows Experience United at **$75** → personal training link |
+| `/training/classes/build` | `V1BuildPage` | BUILD / Strength for life → 01 → programming → Strength Standard → Experience Build → static week strip |
+| `/about/the-space` | `V1SpacePage` | Existing hero line → six categories with yellow hover/tap note → quotes → Experience United |
+| `/about/team` | `V1TeamPage` | Meet the Team hero only → portrait, role, intro, expandable bio. No Apply. |
+| `/start-here/experience` | `V1ExperiencePage` | Hero → 5 / 14 / **$70** count-up → statement → four beats → expect → who → first visit → close |
+| `/about/faq` | `V1FactsPage` | Questions, answered without the noise → four groups, 20 questions → one photo between Training and Membership |
+| `/training/personal` | `V1PersonalTrainingPage` | Personal should be personal → approach → experience stats → two ways → programming → coach index → inquire mailto |
+| `/culture/archive` | `V1ArchivePage` | Archive + lede → Archives / Authors → featured → issues 001–002 without PDFs → articles → subscribe with no success state |
+| `/culture/cultivated` | `V1CultivatedPage` | Cultivated / Growth happens in the right room → 01 → 001 including seeds → system → 002 Join Us held |
+| `/culture/by-design` | `V1ByDesignPage` | By Design / Nothing here is accidental → mixed stills → Built with intention. // By Design |
+
+Burn, Balance, Philosophy, Privacy, and Terms are unchanged. Stand-in gym stills remain until Todd sends final media.

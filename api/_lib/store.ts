@@ -8,8 +8,20 @@ import {
 } from "../../src/hub/brand-kit";
 
 const FILE = path.join(process.cwd(), ".data", "brand-kit.json");
+const AUTH_FILE = path.join(process.cwd(), ".data", "hub-auth.json");
 const MEDIA_DIR = path.join(process.cwd(), ".data", "media");
 const BLOB_PATH = "hub/brand-kit.json";
+const AUTH_BLOB_PATH = "hub/auth.json";
+
+export interface HubAuthRecord {
+  passwordDigest: string | null;
+  reset: { digest: string; exp: number } | null;
+  resetRequestedAt: number | null;
+}
+
+function emptyAuth(): HubAuthRecord {
+  return { passwordDigest: null, reset: null, resetRequestedAt: null };
+}
 
 function blobToken(): string | null {
   const token = process.env.BLOB_READ_WRITE_TOKEN;
@@ -59,6 +71,46 @@ export async function loadStore(): Promise<BrandKitStore> {
   if (token) await writeBlobStore(token, seeded);
   else if (!process.env.VERCEL) await writeFileStore(seeded);
   return seeded;
+}
+
+export async function loadHubAuth(): Promise<HubAuthRecord> {
+  const token = blobToken();
+  try {
+    if (token) {
+      const listed = await list({ prefix: AUTH_BLOB_PATH, token, limit: 10 });
+      const found = listed.blobs.find((blob) => blob.pathname === AUTH_BLOB_PATH);
+      if (!found) return emptyAuth();
+      const response = await fetch(found.url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) return emptyAuth();
+      return { ...emptyAuth(), ...(await response.json()) } as HubAuthRecord;
+    }
+    const raw = await readFile(AUTH_FILE, "utf8");
+    return { ...emptyAuth(), ...(JSON.parse(raw) as HubAuthRecord) };
+  } catch {
+    return emptyAuth();
+  }
+}
+
+export async function saveHubAuth(record: HubAuthRecord): Promise<void> {
+  const token = blobToken();
+  const body = JSON.stringify(record);
+  if (token) {
+    await put(AUTH_BLOB_PATH, body, {
+      access: "private",
+      addRandomSuffix: false,
+      allowOverwrite: true,
+      contentType: "application/json",
+      token,
+    });
+    return;
+  }
+  if (process.env.VERCEL) {
+    throw new Error("Blob storage is not configured.");
+  }
+  await mkdir(path.dirname(AUTH_FILE), { recursive: true });
+  await writeFile(AUTH_FILE, body, "utf8");
 }
 
 export async function saveStore(store: BrandKitStore): Promise<void> {

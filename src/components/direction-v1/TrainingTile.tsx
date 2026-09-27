@@ -43,7 +43,7 @@ export default function TrainingTile({
         ease: LOOKBOOK_EASE,
       }}
       onClick={() => onNav(pathway.href, pathway.label)}
-      className={`group relative min-h-[44px] overflow-hidden rounded-none bg-[#181818] text-left ${className}`}
+      className={`group @container relative min-h-[44px] overflow-hidden rounded-none bg-[#181818] text-left ${className}`}
       aria-label={`${pathway.label}: ${pathway.title}`}
     >
       <img
@@ -58,12 +58,12 @@ export default function TrainingTile({
         className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent"
         aria-hidden
       />
-      <div className="absolute inset-x-0 bottom-0 z-10 p-4 transition-transform duration-500 ease-[cubic-bezier(0.21,0.47,0.32,0.98)] group-hover:-translate-y-1 group-active:-translate-y-1 md:p-5">
-        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#F3EEE7]/65">
+      <div className="absolute inset-x-0 bottom-0 z-10 p-3 transition-transform duration-500 ease-[cubic-bezier(0.21,0.47,0.32,0.98)] group-hover:-translate-y-1 group-active:-translate-y-1 @min-[200px]:p-4 md:p-5">
+        <p className="font-mono text-[8px] uppercase leading-tight tracking-[0.12em] text-[#F3EEE7]/65 @min-[200px]:text-[10px] @min-[200px]:tracking-[0.2em]">
           {pathway.n} // {pathway.label}
         </p>
         <p
-          className="mt-1.5 max-w-[14ch] font-sans text-[22px] font-black uppercase leading-[1.05] tracking-[-0.04em] text-[#F3EEE7] md:text-[26px] lg:text-[28px]"
+          className="mt-1 max-w-[16ch] font-sans text-[16px] font-black uppercase leading-[1.05] tracking-[-0.04em] text-[#F3EEE7] @min-[200px]:mt-1.5 @min-[200px]:text-[22px] md:text-[26px] lg:text-[28px]"
           style={{ fontFamily: "'Satoshi', sans-serif" }}
         >
           {pathway.title}

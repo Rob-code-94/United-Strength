@@ -1,6 +1,7 @@
 import { motion, useReducedMotion } from "motion/react";
 import { gymPhotos } from "../../assets/images/gym";
 import { LOOKBOOK_EASE } from "../direction-ef/lookbook";
+import { useSlot } from "./V1Kit";
 
 interface Props {
   /** Kept for ConceptV1View parity — Space is a layout break, not a gateway. */
@@ -15,6 +16,8 @@ interface Props {
  */
 export default function SpaceExperience({ onNav: _onNav }: Props) {
   const reduceMotion = useReducedMotion();
+  const lead = useSlot("spaceLead", gymPhotos.floorColumbus);
+  const detail = useSlot("spaceDetail", gymPhotos.equipmentClose);
 
   return (
     <section
@@ -31,7 +34,7 @@ export default function SpaceExperience({ onNav: _onNav }: Props) {
             className="relative z-0 w-[78%] overflow-hidden aspect-[4/5] md:w-[80%]"
           >
             <img
-              src={gymPhotos.floorColumbus}
+              src={lead}
               alt="United Strength training floor — benches, dumbbells, and Columbus banner"
               className="h-full w-full object-cover"
               style={{ objectPosition: "center 45%" }}
@@ -50,7 +53,7 @@ export default function SpaceExperience({ onNav: _onNav }: Props) {
             className="absolute right-0 top-[14%] z-10 w-[54%] overflow-hidden aspect-[3/4] md:top-[10%] md:w-[48%]"
           >
             <img
-              src={gymPhotos.equipmentClose}
+              src={detail}
               alt="Dumbbell rack at United Strength"
               className="h-full w-full object-cover"
               style={{ objectPosition: "center 40%" }}

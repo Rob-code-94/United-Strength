@@ -5,15 +5,18 @@ import {
   type BrandKitStore,
   type MediaSlot,
 } from "../../src/hub/brand-kit";
+import { randomBytes } from "node:crypto";
 import {
   clearSessionCookie,
+  digestsMatch,
   hubPassword,
+  passwordDigest,
   passwordsMatch,
   readSession,
   sessionCookie,
 } from "./session";
-import { sendApplication } from "./apply-mail";
-import { loadStore, localMediaPath, saveMedia, saveStore } from "./store";
+import { sendApplication, sendHubReset } from "./apply-mail";
+import { loadHubAuth, loadStore, localMediaPath, saveHubAuth, saveMedia, saveStore } from "./store";
 
 export interface HubResult {
   status: number;
@@ -57,11 +60,25 @@ function isSlot(value: string): value is MediaSlot {
   return MEDIA_SLOTS.some((slot) => slot.key === value);
 }
 
+const RESET_WINDOW_MS = 30 * 60 * 1000;
+const RESET_COOLDOWN_MS = 60 * 1000;
+
+async function passwordAccepted(given: string): Promise<"ok" | "bad" | "unconfigured"> {
+  const auth = await loadHubAuth();
+  if (auth.passwordDigest) {
+    return digestsMatch(passwordDigest(given), auth.passwordDigest) ? "ok" : "bad";
+  }
+  const password = hubPassword();
+  if (!password) return "unconfigured";
+  return given && passwordsMatch(given, password) ? "ok" : "bad";
+}
+
 export async function dispatchHub(input: {
   method: string;
   url: string;
   cookie: string | undefined;
   bodyText: string | null;
+  origin?: string;
 }): Promise<HubResult> {
   const method = input.method.toUpperCase();
   const pathname = pathnameOf(input.url);
@@ -114,8 +131,6 @@ export async function dispatchHub(input: {
       return json(200, { ok: true }, { "set-cookie": clearSessionCookie() });
     }
     if (method !== "POST") return json(405, { error: "Method not allowed." });
-    const password = hubPassword();
-    if (!password) return json(503, { error: "Hub password is not configured." });
     let payload: { password?: string; remember?: boolean } = {};
     try {
       payload = input.bodyText ? (JSON.parse(input.bodyText) as { password?: string; remember?: boolean }) : {};
@@ -123,12 +138,75 @@ export async function dispatchHub(input: {
       return json(400, { error: "Password is required." });
     }
     const given = typeof payload.password === "string" ? payload.password : "";
-    if (!given || !passwordsMatch(given, password)) {
-      return json(401, { error: "That password is not correct." });
-    }
+    const accepted = await passwordAccepted(given);
+    if (accepted === "unconfigured") return json(503, { error: "Hub password is not configured." });
+    if (accepted === "bad") return json(401, { error: "That password is not correct." });
     const cookie = sessionCookie(Boolean(payload.remember));
     if (!cookie) return json(503, { error: "Hub session is not configured." });
     return json(200, { ok: true }, { "set-cookie": cookie });
+  }
+
+  if (pathname === "/api/hub-reset") {
+    if (method !== "POST") return json(405, { error: "Method not allowed." });
+    let payload: { action?: string; token?: string; password?: string } = {};
+    try {
+      payload = input.bodyText ? (JSON.parse(input.bodyText) as typeof payload) : {};
+    } catch {
+      return json(400, { error: "Reset could not be read." });
+    }
+
+    if (payload.action === "complete") {
+      const token = typeof payload.token === "string" ? payload.token : "";
+      const nextPassword = typeof payload.password === "string" ? payload.password : "";
+      if (nextPassword.length < 10 || nextPassword.length > 200) {
+        return json(400, { error: "Use at least 10 characters." });
+      }
+      const auth = await loadHubAuth();
+      const reset = auth.reset;
+      if (!token || !reset || reset.exp < Date.now() || !digestsMatch(passwordDigest(token), reset.digest)) {
+        return json(400, { error: "This reset link is invalid or expired." });
+      }
+      try {
+        await saveHubAuth({
+          passwordDigest: passwordDigest(nextPassword),
+          reset: null,
+          resetRequestedAt: auth.resetRequestedAt,
+        });
+      } catch {
+        return json(503, { error: "The new password could not be saved." });
+      }
+      const cookie = sessionCookie(true);
+      if (!cookie) return json(503, { error: "Hub session is not configured." });
+      return json(200, { ok: true }, { "set-cookie": cookie });
+    }
+
+    const auth = await loadHubAuth();
+    if (auth.resetRequestedAt && Date.now() - auth.resetRequestedAt < RESET_COOLDOWN_MS) {
+      return json(200, { ok: true });
+    }
+    const token = randomBytes(32).toString("base64url");
+    const origin = (input.origin ?? "http://localhost:5173").replace(/\/$/, "");
+    const mailed = await sendHubReset({
+      resetUrl: `${origin}/hub?reset=${encodeURIComponent(token)}`,
+    });
+    if (mailed.ok === false) {
+      return json(mailed.status, {
+        error:
+          mailed.status === 503
+            ? "Password reset email is not connected yet."
+            : "The reset email could not be sent.",
+      });
+    }
+    try {
+      await saveHubAuth({
+        ...auth,
+        reset: { digest: passwordDigest(token), exp: Date.now() + RESET_WINDOW_MS },
+        resetRequestedAt: Date.now(),
+      });
+    } catch {
+      return json(503, { error: "The reset link could not be saved." });
+    }
+    return json(200, { ok: true });
   }
 
   if (pathname === "/api/brand-kit" && method === "GET") {

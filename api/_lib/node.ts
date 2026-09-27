@@ -18,17 +18,18 @@ export async function runNodeHub(
 ): Promise<void> {
   const host = req.headers.host ?? "localhost";
   const url = urlOverride ?? req.url ?? "/";
+  const proto = process.env.VERCEL ? "https" : "http";
   const result = await dispatchHub({
     method: req.method ?? "GET",
     url: url.startsWith("http") ? new URL(url).pathname + new URL(url).search : url,
     cookie: req.headers.cookie,
     bodyText: await readBody(req),
+    origin: `${proto}://${host}`,
   });
   res.statusCode = result.status;
   for (const [key, value] of Object.entries(result.headers)) {
     res.setHeader(key, value);
   }
-  void host;
   if (typeof result.body === "string") res.end(result.body);
   else res.end(result.body);
 }

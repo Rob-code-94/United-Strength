@@ -26,6 +26,16 @@ export function passwordsMatch(given: string, expected: string): boolean {
   return timingSafeEqual(digest(given), digest(expected));
 }
 
+export function passwordDigest(value: string): string {
+  return createHash("sha256").update(value).digest("base64url");
+}
+
+export function digestsMatch(givenDigest: string, expectedDigest: string): boolean {
+  const given = Buffer.from(givenDigest);
+  const expected = Buffer.from(expectedDigest);
+  return given.length === expected.length && timingSafeEqual(given, expected);
+}
+
 export function readSession(cookieHeader: string | undefined): boolean {
   const secret = sessionSecret();
   if (!secret || !cookieHeader) return false;

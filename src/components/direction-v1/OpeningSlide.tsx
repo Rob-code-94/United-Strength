@@ -60,7 +60,7 @@ export default function OpeningSlide({
 
   return (
     <article
-      className="relative shrink-0 w-full min-w-full h-[100cqh] min-h-[100cqh] snap-start snap-always overflow-hidden bg-[#111111]"
+      className="relative shrink-0 w-full min-w-full h-[100cqh] min-h-[100cqh] snap-start snap-always overflow-hidden bg-[#111111] md:[--v1-mono-size:64px] md:[--v1-display-size:40px] md:[--v1-body-size:18px]"
       aria-label={`${n} ${title}`}
     >
       <div className="absolute inset-0 overflow-hidden">
@@ -117,18 +117,36 @@ export default function OpeningSlide({
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 0.7, ease: LOOKBOOK_EASE }}
         >
-          <p className="font-mono text-[42px] leading-none tracking-[-0.04em] text-[#F3EEE7] md:text-[64px]">
+          <p
+            className="font-mono leading-none tracking-[-0.04em]"
+            style={{
+              fontFamily: "var(--v1-mono-family)",
+              fontSize: "var(--v1-mono-size)",
+              color: "var(--v1-mono-color, var(--v1-cream))",
+            }}
+          >
             {n}
           </p>
           <h2
-            className="mt-3 max-w-[18ch] font-sans text-[28px] font-bold uppercase leading-[1.05] tracking-[-0.04em] text-[#F3EEE7] md:text-[40px]"
-            style={{ fontFamily: "'Satoshi', sans-serif" }}
+            className="mt-3 max-w-[18ch] font-sans font-bold uppercase leading-[1.05] tracking-[-0.04em]"
+            style={{
+              fontFamily: "var(--v1-display-family)",
+              fontSize: "var(--v1-display-size)",
+              color: "var(--v1-display-color, var(--v1-cream))",
+            }}
           >
-            <span className="text-[#F3EEE7]/55">// </span>
+            <span className="opacity-55">// </span>
             {title}
           </h2>
           {lede ? (
-            <p className="mt-5 max-w-[34ch] text-[15px] leading-relaxed tracking-[-0.01em] text-[#F3EEE7]/90 md:text-[17px]">
+            <p
+              className="mt-5 max-w-[34ch] leading-relaxed tracking-[-0.01em]"
+              style={{
+                fontFamily: "var(--v1-body-family)",
+                fontSize: "var(--v1-body-size)",
+                color: "var(--v1-body-color, var(--v1-cream))",
+              }}
+            >
               {lede}
             </p>
           ) : null}

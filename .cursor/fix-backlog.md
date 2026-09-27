@@ -403,4 +403,38 @@ Not in this handoff: Stripe, Supabase, Firebase, MongoDB, Formspree, or Web3Form
   - Notes: Sections: repo URL, their Vercel project URL, hub login note (password lives in Vercel env, not in the doc), Mariana sandbox vs Oct 1 production swap (`docs/integrations/oct-1-cutover-runbook.md`). How to change an env key: Vercel → Settings → Environment Variables → redeploy. Push to `main` deploys. Roll back from Vercel Deployments. Costs to name: Vercel plan, Vercel Blob, domain renewal, Mariana/Xplor. Developer contact for later work. 30-minute call: open Vercel, trigger one deploy, open the live domain. Client adds a card if they leave the free tier.
 - [ ] **Ops** — Revoke developer access after the walkthrough · 09/26/2026
   - Notes: Remove developer access from the GitHub repo, the Vercel project, and the domain registrar. Keep write access only if Todd confirms a maintenance retainer before the call. Do not remove the developer from Mariana until Nick's Oct 1 cutover is done, if that login is still required that day.
+- [ ] **Ops** — Apply mail cannot be delivered yet · 09/26/2026
+  - Notes: Moved from QA pre-delivery. Message Todd before handoff. Form checks work (empty name, `not-an-email`, empty phone). `POST /api/apply` returns 503 while `RESEND_API_KEY` is unset. Default From `onboarding@resend.dev` does not deliver to `membership@unitedstrengthgym.com` until a sending domain is verified. He picks the inbox and the email service (Resend or otherwise). Do not paste API keys into this file.
+- [ ] **Ops** — Hub password reset waits on the club email · 09/27/2026
+  - Notes: The hub sign-in has Reset password. It emails a 30-minute link only after the same email setup as Apply (`RESEND_API_KEY` and a verified From). Set `HUB_RESET_EMAIL` to the inbox Todd wants. If that is empty, the link uses `APPLY_TO_EMAIL`, then `membership@unitedstrengthgym.com`. Saving the new password uses the same private storage as the brand kit (Vercel Blob). Until Resend is connected, the button says the email is not connected. Do not paste API keys or the password into this file.
+- [ ] **UI** — Archive subscribe shows no confirmation after a valid email · 09/26/2026
+  - Notes: Moved from QA pre-delivery. `/culture/archive`, “Get the next archive.” A bad email shows “Enter a valid email.” A valid address clears the error and the page stays silent. Submit does not email anyone (`V1ArchivePage` `onSubmit`). Same Todd email setup as Apply, then show a confirmation after a real send.
+
+---
+
+## QA — hub pencils 09/27/2026
+
+Source: full QA of `http://localhost:5173`. Report: `qa-report/2026-09-27T10-50-50/CLIENT_QA_REPORT.md`. Do not commit `qa-report/` unless asked.
+
+- [ ] **UI** — Hub preview menu ignores Escape · 09/27/2026
+  - Notes: `/hub`, preview Menu. Escape left the menu open. A pencil click does close it and opens settings. Match the public V1 menu: Escape closes it, and the preview should not scroll while it is open. `HubPreview.tsx`.
+
+## QA — pre-delivery 09/26/2026
+
+Source: deep QA of `http://localhost:5174` (local working tree). Report: `qa-report/2026-09-26T21-05-21/CLIENT_QA_REPORT.md`. Do not commit `qa-report/` unless asked.
+
+- [x] **Bug** — Direct links, refresh, and browser Back stay on the homepage · 09/26/2026
+  - Notes: The address bar now follows the sitemap path. A pasted `/membership` stays on Membership after refresh. Menu Philosophy sets `/about/philosophy`, in-page Back sets `/`, and browser Back returns. `/team` becomes `/about/team`. `/foundation` stays and toasts. `/schedule` shows the embed. Unknown paths become `/`. Checked 09/27/2026.
+- [x] **UI** — Archive subscribe shows no confirmation after a valid email · 09/26/2026
+  - Notes: Moved to Ownership handoff. `/culture/archive`. Bad email shows “Enter a valid email.” A valid address clears the error and the page stays silent. Submit does not email anyone. Checked 09/27/2026.
+- [x] **UI** — Page still scrolls while the menu is open · 09/26/2026
+  - Notes: Menu open marks the page `inert`, hides overflow, and pins `scrollTop`. Wheel and a forced scroll do not move it. Escape still closes the menu and leaves the page where it was. Checked 09/27/2026.
+- [x] **UI** — Closed menu sections stay reachable to assistive tech · 09/26/2026
+  - Notes: Collapsed panels are `inert` and `aria-hidden`. An open section can be focused; a closed one cannot. Checked 09/27/2026.
+- [x] **UI** — Shop leaves the site in the same tab · 09/26/2026
+  - Notes: Shop is `target="_blank"` `rel="noopener noreferrer"`. Click opened theunitedlimited.com in a new tab and left the club page in place. Checked 09/27/2026.
+- [x] **Ops** — Apply mail cannot be delivered yet · 09/26/2026
+  - Notes: Moved to Ownership handoff. Form checks work. `POST /api/apply` returns 503 while `RESEND_API_KEY` is unset. Default From `onboarding@resend.dev` does not deliver to `membership@unitedstrengthgym.com` until a sending domain is verified. Checked 09/27/2026.
+- [ ] **Ops** — GitHub main still renders the old Apply page · 09/26/2026
+  - Notes: This QA ran on the local working tree (`V1ApplyPage` on port 5174). `HEAD` `src/App.tsx` still mounts EF `ApplyPage` (~line 830). The form commit did not include the route switch.
 

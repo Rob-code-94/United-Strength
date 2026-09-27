@@ -16,6 +16,7 @@ import {
   Mail
 } from "lucide-react";
 import ConceptEView from "./components/ConceptEView";
+import { LockedNavOverlay } from "./components/direction-v1/LockedNavOverlay";
 import ConceptEFView from "./components/ConceptEFView";
 import ConceptFView from "./components/ConceptFView";
 import ConceptV1View from "./components/ConceptV1View";
@@ -57,6 +58,21 @@ import {
   CultivatedPage,
   MoveTheCityPage,
 } from "./components/direction-ef/culture";
+import {
+  V1ApplyPage,
+  V1ArchivePage,
+  V1BuildPage,
+  V1ByDesignPage,
+  V1CultivatedPage,
+  V1ExperiencePage,
+  V1FactsPage,
+  V1FounderPage,
+  V1MembershipPage,
+  V1MoveTheCityPage,
+  V1PersonalTrainingPage,
+  V1SpacePage,
+  V1TeamPage,
+} from "./components/direction-v1/pages";
 import { gymPhotos } from "./assets/images/gym";
 import { showDevChrome } from "./lib/dev-chrome";
 
@@ -111,98 +127,72 @@ const COMING_SOON_ROUTES = new Set([
   "/training/classes/balance",
 ]);
 
-// ----------------------------------------------------------------------
-// BRAND CONSTANTS & LINKS
-// ----------------------------------------------------------------------
-/**
- * Todd Sep 2026 navigation hierarchy (homepage V1 locked — do not edit direction-v1 home).
- * Source: docs/client/todd-navigation-updates-sep-2026.md · Google Doc tab
- */
-type NavLeaf = { label: string; href: string; external?: boolean; comingSoon?: boolean };
-type NavBranch = { label: string; children: NavLeaf[] };
-type NavSection =
-  | { title: string; kind: "links"; items: NavLeaf[]; comingSoon?: boolean }
-  | { title: string; kind: "branches"; branches: NavBranch[]; comingSoon?: boolean }
-  | { title: string; kind: "direct"; item: NavLeaf };
+const COMING_SOON_LABELS: Record<string, string> = {
+  "/foundation": "Foundation",
+  "/longevity": "Longevity",
+  "/longevity/reflection": "Reflection",
+  "/longevity/strength-standard": "Strength Standard",
+  "/longevity/the-trials": "The Trials",
+  "/training/classes/balance": "BALANCE",
+};
 
-const LOCKED_NAV: NavSection[] = [
-  {
-    title: "ABOUT",
-    kind: "links",
-    items: [
-      { label: "Philosophy", href: "/about/philosophy" },
-      { label: "Founder Story", href: "/about/founder" },
-      { label: "Meet the Team", href: "/about/team" },
-      { label: "The Space", href: "/about/the-space" },
-      { label: "FAQ", href: "/about/faq" },
-    ],
-  },
-  {
-    title: "TRAINING",
-    kind: "branches",
-    branches: [
-      {
-        label: "Classes",
-        children: [
-          { label: "BUILD", href: "/training/classes/build" },
-          { label: "BURN", href: "/training/classes/burn" },
-          { label: "BALANCE", href: "/training/classes/balance", comingSoon: true },
-          {
-            label: "MOVE THE CITY // RUN CLUB",
-            href: "/training/move-the-city",
-          },
-        ],
-      },
-      {
-        label: "Coaching",
-        children: [
-          { label: "Personal Training", href: "/training/personal" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "FOUNDATION",
-    kind: "direct",
-    item: { label: "Foundation", href: "/foundation", comingSoon: true },
-  },
-  {
-    title: "LONGEVITY",
-    kind: "direct",
-    item: { label: "Longevity", href: "/longevity", comingSoon: true },
-  },
-  {
-    title: "CULTURE",
-    kind: "links",
-    items: [
-      { label: "By Design", href: "/culture/by-design" },
-      { label: "Cultivated", href: "/culture/cultivated" },
-      { label: "Archive", href: "/culture/archive" },
-    ],
-  },
-  {
-    title: "MEMBERSHIP",
-    kind: "direct",
-    item: { label: "Membership", href: "/membership" },
-  },
-  {
-    title: "SHOP",
-    kind: "direct",
-    item: {
-      label: "Shop",
-      href: "https://theunitedlimited.com",
-      external: true,
-    },
-  },
-  {
-    title: "START HERE",
-    kind: "links",
-    items: [
-      { label: "Experience United", href: "/start-here/experience" },
-      { label: "Apply for Membership", href: "/start-here/apply" },
-    ],
-  },
-];
+type ResolvedRoute =
+  | { kind: "page"; path: string; aliased: boolean }
+  | { kind: "home"; aliased: boolean }
+  | { kind: "comingSoon"; path: string; label: string }
+  | { kind: "unknown" };
+
+function stripPath(href: string): string {
+  const bare = href.split("?")[0]?.split("#")[0] ?? "/";
+  const withSlash = bare.startsWith("/") ? bare : `/${bare}`;
+  if (withSlash.length > 1 && withSlash.endsWith("/")) {
+    return withSlash.slice(0, -1);
+  }
+  return withSlash || "/";
+}
+
+/** Aliases and `/home` collapse to the sitemap path. Coming Soon stays itself. */
+function resolveRoute(href: string): ResolvedRoute {
+  const raw = stripPath(href);
+  if (COMING_SOON_ROUTES.has(raw)) {
+    return {
+      kind: "comingSoon",
+      path: raw,
+      label: COMING_SOON_LABELS[raw] ?? "Coming Soon",
+    };
+  }
+
+  let path = raw;
+  if (path === "/team") path = "/about/team";
+  else if (path === "/memberships") path = "/membership";
+  else if (path === "/privacy") path = "/privacy-policy";
+  else if (path === "/terms") path = "/terms-of-service";
+  else if (path === "/culture/move-the-city") path = "/training/move-the-city";
+  else if (PERSONAL_TRAINING_ALIASES.has(path)) path = "/training/personal";
+  else if (path === "/home") path = "/";
+
+  const aliased = path !== raw;
+  if (path === "/") return { kind: "home", aliased };
+  if (
+    ABOUT_ROUTES.has(path) ||
+    TRAINING_ROUTES.has(path) ||
+    PARITY_ROUTES.has(path) ||
+    EMBED_ROUTES.has(path)
+  ) {
+    return { kind: "page", path, aliased };
+  }
+  return { kind: "unknown" };
+}
+
+function viewPathFor(resolved: ResolvedRoute): string {
+  if (resolved.kind === "page") return resolved.path;
+  return "/";
+}
+
+function locationUrl(path: string): string {
+  return `${path}${window.location.search}${window.location.hash}`;
+}
+
 
 const FOOTER_LINKS = [
   { label: "FAQ", href: "/faq" },
@@ -263,10 +253,14 @@ export default function App() {
   const studioTab = showDevChrome ? activeTab : "simulator";
   const [archiveDirection, setArchiveDirection] = useState<"A" | "C">("A");
   /** Working homepage: V1 = Todd PDF delivery candidate; EF frozen fallback (DEV switcher) */
-  const [workingDirection, setWorkingDirection] = useState<WorkingDirection>("V1");
-  const [activeSimRoute, setActiveSimRoute] = useState<string>("/");
+  const [workingDirection] = useState<WorkingDirection>("V1");
+  const [activeSimRoute, setActiveSimRoute] = useState(() =>
+    viewPathFor(resolveRoute(window.location.pathname)),
+  );
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(
+    () => viewPathFor(resolveRoute(window.location.pathname)) !== "/",
+  );
   /** Hide sticky beta chrome while scrolling so Direction preview is full-bleed on phone */
   const [chromeHidden, setChromeHidden] = useState(false);
   const [copiedColor, setCopiedColor] = useState<string | null>(null);
@@ -292,6 +286,8 @@ export default function App() {
   const archiveScrollContainerRef = useRef<HTMLDivElement>(null);
   const lastWindowScrollY = useRef(0);
   const lastSimScrollY = useRef(0);
+  /** Null until the first effect pass; later resets only when the key changes. */
+  const studioRouteKey = useRef<string | null>(null);
 
   // Format today's date exactly as requested: "Columbus, OH | Weekday, Month Day, Year"
   const getFormattedDate = () => {
@@ -335,6 +331,13 @@ export default function App() {
     }, 50);
   };
 
+  const writeAddress = (path: string, mode: "push" | "replace") => {
+    if (stripPath(window.location.pathname) === path) return;
+    const url = locationUrl(path);
+    if (mode === "push") window.history.pushState(null, "", url);
+    else window.history.replaceState(null, "", url);
+  };
+
   const goSimHome = () => {
     setActiveSimRoute("/");
     setIsMenuOpen(false);
@@ -342,52 +345,51 @@ export default function App() {
     setLookbookFreeScroll(false);
     setV1VerticalUnlocked(false);
     scrollSimToTop();
+    const resolved = resolveRoute(window.location.pathname);
+    if (resolved.kind === "home" && resolved.aliased) writeAddress("/", "replace");
+    else writeAddress("/", "push");
   };
 
-  // Handle fake navigation for interactive link testing
+  const showComingSoon = (label: string) => {
+    setNavigationNotification(`Coming Soon — ${label}`);
+    window.setTimeout(() => {
+      setNavigationNotification(null);
+    }, 3200);
+  };
+
+  const showResolvedPage = (path: string) => {
+    setActiveSimRoute(path);
+    setIsMenuOpen(false);
+    setIsScrolled(false);
+    scrollSimToTop();
+  };
+
+  // Handle navigation and keep the address bar on the same path
   const triggerNavigation = (href: string, label: string) => {
     if (href.startsWith("http://") || href.startsWith("https://")) {
-      window.open(href, "_blank", "noopener,noreferrer");
       setIsMenuOpen(false);
       return;
     }
+    if (href.startsWith("mailto:") || href.startsWith("tel:")) return;
 
-    let normalized = href === "/team" ? "/about/team" : href;
-    if (normalized === "/memberships") normalized = "/membership";
-    if (normalized === "/privacy") normalized = "/privacy-policy";
-    if (normalized === "/terms") normalized = "/terms-of-service";
-    if (normalized === "/culture/move-the-city") {
-      normalized = "/training/move-the-city";
-    }
-    if (PERSONAL_TRAINING_ALIASES.has(normalized)) {
-      normalized = "/training/personal";
-    }
-
-    if (
-      ABOUT_ROUTES.has(normalized) ||
-      TRAINING_ROUTES.has(normalized) ||
-      PARITY_ROUTES.has(normalized) ||
-      EMBED_ROUTES.has(normalized)
-    ) {
-      setActiveSimRoute(normalized);
-      setIsMenuOpen(false);
-      setIsScrolled(false);
-      scrollSimToTop();
-      return;
-    }
-
-    if (href === "/" || href === "/home") {
-      goSimHome();
-      return;
-    }
-
-    // Intentional roadmap — works on Vercel (not silent no-op; not Mock Route)
-    if (COMING_SOON_ROUTES.has(normalized)) {
-      setNavigationNotification(`Coming Soon — ${label}`);
-      setTimeout(() => {
-        setNavigationNotification(null);
-      }, 3200);
-      return;
+    const resolved = resolveRoute(href);
+    switch (resolved.kind) {
+      case "page":
+        showResolvedPage(resolved.path);
+        writeAddress(resolved.path, "push");
+        return;
+      case "home":
+        goSimHome();
+        return;
+      case "comingSoon":
+        showComingSoon(label || resolved.label);
+        return;
+      case "unknown":
+        break;
+      default: {
+        const _exhaustive: never = resolved;
+        return _exhaustive;
+      }
     }
 
     // Studio-only mock toast — never on Vercel / production builds
@@ -406,13 +408,27 @@ export default function App() {
     setTimeout(() => setCopiedColor(null), 1500);
   };
 
-  // Reset menu and scroll when returning home / switching archive direction
+  // Reset menu and scroll when switching studio tab or archive direction.
+  // The first pass — including Strict Mode's second run of the same key —
+  // must not wipe a path read from the address bar.
   useEffect(() => {
+    const key = `${activeTab}:${archiveDirection}`;
+    if (studioRouteKey.current === null || studioRouteKey.current === key) {
+      studioRouteKey.current = key;
+      setIsMenuOpen(false);
+      setChromeHidden(activeTab === "simulator");
+      lastSimScrollY.current = 0;
+      return;
+    }
+    studioRouteKey.current = key;
     setIsMenuOpen(false);
     setIsScrolled(false);
     setChromeHidden(activeTab === "simulator");
     lastSimScrollY.current = 0;
     setActiveSimRoute("/");
+    if (stripPath(window.location.pathname) !== "/") {
+      window.history.replaceState(null, "", locationUrl("/"));
+    }
     if (simScrollContainerRef.current) {
       simScrollContainerRef.current.scrollTop = 0;
     }
@@ -420,6 +436,61 @@ export default function App() {
       archiveScrollContainerRef.current.scrollTop = 0;
     }
   }, [activeTab, archiveDirection]);
+
+  // Deep links, aliases, Coming Soon, and browser Back/Forward.
+  useEffect(() => {
+    let toastTimer = 0;
+
+    const applyFromAddress = (source: "hydrate" | "pop") => {
+      const resolved = resolveRoute(window.location.pathname);
+      switch (resolved.kind) {
+        case "page":
+          setActiveSimRoute(resolved.path);
+          setIsMenuOpen(false);
+          if (resolved.aliased) {
+            window.history.replaceState(null, "", locationUrl(resolved.path));
+          }
+          if (source === "pop") scrollSimToTop();
+          return;
+        case "home":
+          setActiveSimRoute("/");
+          setIsMenuOpen(false);
+          setLookbookFreeScroll(false);
+          setV1VerticalUnlocked(false);
+          if (resolved.aliased) {
+            window.history.replaceState(null, "", locationUrl("/"));
+          }
+          if (source === "pop") scrollSimToTop();
+          return;
+        case "comingSoon":
+          setActiveSimRoute("/");
+          setIsMenuOpen(false);
+          setNavigationNotification(`Coming Soon — ${resolved.label}`);
+          window.clearTimeout(toastTimer);
+          toastTimer = window.setTimeout(() => {
+            setNavigationNotification(null);
+          }, 3200);
+          return;
+        case "unknown":
+          setActiveSimRoute("/");
+          setIsMenuOpen(false);
+          window.history.replaceState(null, "", locationUrl("/"));
+          return;
+        default: {
+          const _exhaustive: never = resolved;
+          return _exhaustive;
+        }
+      }
+    };
+
+    applyFromAddress("hydrate");
+    const onPop = () => applyFromAddress("pop");
+    window.addEventListener("popstate", onPop);
+    return () => {
+      window.clearTimeout(toastTimer);
+      window.removeEventListener("popstate", onPop);
+    };
+  }, []);
 
   // Hide beta chrome on scroll — stays collapsed until the BETA pill is tapped
   useEffect(() => {
@@ -474,16 +545,30 @@ export default function App() {
   useEffect(() => {
     const el = simScrollContainerRef.current;
     if (!el) return;
-    if (v1OpeningLocked) {
-      el.scrollTop = 0;
-    }
-    // Overflow is class-driven (`overflow-y-hidden` / `overflow-y-auto`);
-    // only force inline when menu is open so it wins over Tailwind.
-    if (isMenuOpen) {
-      el.style.overflowY = "hidden";
-    } else {
+    if (!isMenuOpen) {
       el.style.overflowY = "";
+      if (v1OpeningLocked) el.scrollTop = 0;
+      return;
     }
+    const lockedTop = el.scrollTop;
+    el.style.overflowY = "hidden";
+    const pin = () => {
+      if (el.scrollTop !== lockedTop) el.scrollTop = lockedTop;
+    };
+    const block = (event: Event) => {
+      event.preventDefault();
+    };
+    const timer = window.setInterval(pin, 50);
+    el.addEventListener("scroll", pin);
+    el.addEventListener("wheel", block, { capture: true, passive: false });
+    el.addEventListener("touchmove", block, { capture: true, passive: false });
+    return () => {
+      window.clearInterval(timer);
+      el.removeEventListener("scroll", pin);
+      el.removeEventListener("wheel", block, { capture: true });
+      el.removeEventListener("touchmove", block, { capture: true });
+      el.style.overflowY = "";
+    };
   }, [isMenuOpen, v1OpeningLocked]);
 
   // Clear V1 unlock when leaving V1 home
@@ -585,62 +670,6 @@ export default function App() {
       </header>
       ) : null}
 
-      {/* Simulator dev controls + reveal beta chrome — local DEV only */}
-      {showDevChrome && activeTab === "simulator" ? (
-        <div className="fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] right-[max(0.75rem,env(safe-area-inset-right))] z-[100] flex items-center gap-2 flex-wrap justify-end max-w-[calc(100%-1.5rem)]">
-          {chromeHidden && (
-            <button
-              type="button"
-              onClick={() => setChromeHidden(false)}
-              className="min-h-[44px] min-w-[44px] px-3 rounded-full bg-[#0A3C2E] text-emerald-400 text-[10px] font-mono font-semibold uppercase tracking-wider shadow-lg border border-emerald-900/60"
-              title="Show beta controls"
-            >
-              BETA
-            </button>
-          )}
-          <div
-            className="flex rounded-lg border border-neutral-700/80 overflow-hidden shadow-lg bg-[#161616]/95 backdrop-blur-sm"
-            role="tablist"
-            aria-label="Working direction"
-          >
-            {/* DEV only — V1 is production default; E+F frozen fallback */}
-            {(
-              [
-                { id: "V1" as const, label: "V1" },
-                { id: "EF" as const, label: "E+F" },
-              ] as const
-            ).map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                role="tab"
-                aria-selected={workingDirection === tab.id}
-                onClick={() => {
-                  setWorkingDirection(tab.id);
-                  goSimHome();
-                }}
-                className={`px-3 py-2 min-h-[44px] min-w-[44px] text-[10px] font-mono uppercase tracking-widest transition-colors ${
-                  workingDirection === tab.id
-                    ? "bg-[#F3EEE7] text-[#181818]"
-                    : "bg-[#161616]/95 text-neutral-400 hover:text-white"
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      ) : showDevChrome && chromeHidden ? (
-          <button
-            type="button"
-            onClick={() => setChromeHidden(false)}
-            className="fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] right-[max(0.75rem,env(safe-area-inset-right))] z-50 min-h-[44px] min-w-[44px] px-3 rounded-full bg-[#0A3C2E] text-emerald-400 text-[10px] font-mono font-semibold uppercase tracking-wider shadow-lg border border-emerald-900/60"
-            title="Show beta controls"
-          >
-            BETA
-          </button>
-      ) : null}
-
       {/* Route notification — Coming Soon (prod + DEV) · Mock Route (DEV only, set above) */}
       {!isMaintenanceMode && navigationNotification && (
         <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[110] max-w-[min(92vw,24rem)] bg-[#181818] border border-white/10 text-white px-5 py-3 rounded-sm shadow-2xl flex items-center gap-3">
@@ -704,7 +733,7 @@ export default function App() {
                         <span className={`relative block w-full ${useV1Chrome ? "h-8" : "h-6"}`}>
                           <span
                             className={`absolute inset-0 flex items-center justify-center font-bold font-sans uppercase leading-tight tracking-[-0.04em] transition-all duration-500 ${
-                              useV1Chrome ? "text-[15px] md:text-[17px]" : "text-[12px]"
+                              useV1Chrome ? "text-[15px] md:text-[22px]" : "text-[12px]"
                             } ${
                               crestCompact
                                 ? "opacity-0 scale-95 pointer-events-none"
@@ -733,7 +762,7 @@ export default function App() {
                         <span
                           className={`font-mono uppercase text-center transition-opacity duration-500 ${
                             useV1Chrome
-                              ? "text-[8px] md:text-[9px] tracking-[0.14em] text-[#F3EEE7]/70 opacity-100"
+                              ? "text-[8px] md:text-[10px] tracking-[0.14em] text-[#F3EEE7]/70 opacity-100"
                               : crestCompact
                                 ? "text-[8px] tracking-[0.18em] text-[#5C5C5C] opacity-100"
                                 : "text-[8px] tracking-[0.18em] text-white/70 opacity-100"
@@ -753,6 +782,7 @@ export default function App() {
                   <div
                     ref={simScrollContainerRef}
                     data-sim-scroll
+                    inert={isMenuOpen ? true : undefined}
                     onScroll={handleSimScroll}
                     className={`relative flex-1 min-h-0 w-full scrollbar-none flex flex-col [container-type:size] ${
                       isMenuOpen || v1OpeningLocked
@@ -783,61 +813,105 @@ export default function App() {
                           <PhilosophyPage onBack={goSimHome} />
                         )
                       ) : activeSimRoute === "/about/founder" ? (
-                        usesEfInteriors ? (
+                        isV1 ? (
+                          <V1FounderPage onBack={goSimHome} onNav={triggerNavigation} />
+                        ) : usesEfInteriors ? (
                           <EfFounderPage onBack={goSimHome} onNav={triggerNavigation} />
                         ) : (
                           <FounderPage onBack={goSimHome} />
                         )
                       ) : activeSimRoute === "/about/team" ? (
-                        usesEfInteriors ? (
+                        isV1 ? (
+                          <V1TeamPage onBack={goSimHome} onNav={triggerNavigation} />
+                        ) : usesEfInteriors ? (
                           <EfTeamPage onBack={goSimHome} onNav={triggerNavigation} />
                         ) : (
                           <TeamPage onBack={goSimHome} onNav={triggerNavigation} />
                         )
                       ) : activeSimRoute === "/about/the-space" ? (
-                        usesEfInteriors ? (
+                        isV1 ? (
+                          <V1SpacePage onBack={goSimHome} onNav={triggerNavigation} />
+                        ) : usesEfInteriors ? (
                           <EfSpacePage onBack={goSimHome} onNav={triggerNavigation} />
                         ) : (
                           <SpacePage onBack={goSimHome} />
                         )
                       ) : activeSimRoute === "/about/faq" ? (
-                        usesEfInteriors ? (
+                        isV1 ? (
+                          <V1FactsPage onBack={goSimHome} onNav={triggerNavigation} />
+                        ) : usesEfInteriors ? (
                           <EfFaqPage onBack={goSimHome} onNav={triggerNavigation} />
                         ) : (
                           <FaqPage onBack={goSimHome} />
                         )
                       ) : activeSimRoute === "/training/classes/build" ? (
-                        <BuildPage onBack={goSimHome} onNav={triggerNavigation} />
+                        isV1 ? (
+                          <V1BuildPage onBack={goSimHome} onNav={triggerNavigation} />
+                        ) : (
+                          <BuildPage onBack={goSimHome} onNav={triggerNavigation} />
+                        )
                       ) : activeSimRoute === "/training/classes/burn" ? (
                         <BurnPage onBack={goSimHome} onNav={triggerNavigation} />
                       ) : activeSimRoute === "/training/classes/balance" ? (
                         <BalancePage onBack={goSimHome} onNav={triggerNavigation} />
                       ) : activeSimRoute === "/training/personal" ||
                         PERSONAL_TRAINING_ALIASES.has(activeSimRoute) ? (
-                        <PersonalTrainingPage
-                          onBack={goSimHome}
-                          onNav={triggerNavigation}
-                        />
+                        isV1 ? (
+                          <V1PersonalTrainingPage onBack={goSimHome} onNav={triggerNavigation} />
+                        ) : (
+                          <PersonalTrainingPage
+                            onBack={goSimHome}
+                            onNav={triggerNavigation}
+                          />
+                        )
                       ) : activeSimRoute === "/training/move-the-city" ||
                         activeSimRoute === "/culture/move-the-city" ? (
-                        <MoveTheCityPage
-                          onBack={goSimHome}
-                          onNav={triggerNavigation}
-                        />
+                        isV1 ? (
+                          <V1MoveTheCityPage onBack={goSimHome} onNav={triggerNavigation} />
+                        ) : (
+                          <MoveTheCityPage
+                            onBack={goSimHome}
+                            onNav={triggerNavigation}
+                          />
+                        )
                       ) : activeSimRoute === "/start-here/experience" ? (
-                        <ExperiencePage onBack={goSimHome} onNav={triggerNavigation} />
+                        isV1 ? (
+                          <V1ExperiencePage onBack={goSimHome} onNav={triggerNavigation} />
+                        ) : (
+                          <ExperiencePage onBack={goSimHome} onNav={triggerNavigation} />
+                        )
                       ) : activeSimRoute === "/start-here/apply" ? (
-                        <ApplyPage onBack={goSimHome} onNav={triggerNavigation} />
+                        isV1 ? (
+                          <V1ApplyPage onBack={goSimHome} onNav={triggerNavigation} />
+                        ) : (
+                          <ApplyPage onBack={goSimHome} onNav={triggerNavigation} />
+                        )
                       ) : activeSimRoute === "/membership" ? (
-                        <MembershipPage onBack={goSimHome} onNav={triggerNavigation} />
+                        isV1 ? (
+                          <V1MembershipPage onBack={goSimHome} onNav={triggerNavigation} />
+                        ) : (
+                          <MembershipPage onBack={goSimHome} onNav={triggerNavigation} />
+                        )
                       ) : activeSimRoute === "/contact" ? (
                         <ContactPage onBack={goSimHome} onNav={triggerNavigation} />
                       ) : activeSimRoute === "/culture/by-design" ? (
-                        <ByDesignPage onBack={goSimHome} onNav={triggerNavigation} />
+                        isV1 ? (
+                          <V1ByDesignPage onBack={goSimHome} onNav={triggerNavigation} />
+                        ) : (
+                          <ByDesignPage onBack={goSimHome} onNav={triggerNavigation} />
+                        )
                       ) : activeSimRoute === "/culture/cultivated" ? (
-                        <CultivatedPage onBack={goSimHome} onNav={triggerNavigation} />
+                        isV1 ? (
+                          <V1CultivatedPage onBack={goSimHome} onNav={triggerNavigation} />
+                        ) : (
+                          <CultivatedPage onBack={goSimHome} onNav={triggerNavigation} />
+                        )
                       ) : activeSimRoute === "/culture/archive" ? (
-                        <ArchivePage onBack={goSimHome} onNav={triggerNavigation} />
+                        isV1 ? (
+                          <V1ArchivePage onBack={goSimHome} onNav={triggerNavigation} />
+                        ) : (
+                          <ArchivePage onBack={goSimHome} onNav={triggerNavigation} />
+                        )
                       ) : activeSimRoute === "/privacy-policy" ? (
                         <PrivacyPage onBack={goSimHome} onNav={triggerNavigation} />
                       ) : activeSimRoute === "/terms-of-service" ? (
@@ -1357,313 +1431,6 @@ export default function App() {
   );
 }
 
-// ----------------------------------------------------------------------
-// DIRECTION D — LOCKED HIERARCHICAL OVERLAY NAV
-// Direction E — Odd Ritual variant: numbered sections, larger type, accordion
-// ----------------------------------------------------------------------
-function LockedNavOverlay({
-  onNavigate,
-  variant = "default",
-}: {
-  onNavigate: (href: string, label: string) => void;
-  variant?: "default" | "oddRitual";
-}) {
-  if (variant === "oddRitual") {
-    return <OddRitualNavOverlay onNavigate={onNavigate} />;
-  }
-
-  const linkRow = (item: NavLeaf, indent = false) => {
-    const label = item.comingSoon ? `${item.label} (Coming Soon)` : item.label;
-    if (item.comingSoon) {
-      return (
-        <span
-          key={item.href + item.label}
-          aria-disabled="true"
-          className={`flex items-baseline gap-2 opacity-60 cursor-default ${
-            indent ? "pl-3" : ""
-          }`}
-        >
-          <span className="font-sans font-semibold tracking-widest text-[12px] text-white uppercase">
-            {label}
-          </span>
-          <span className="h-[1px] flex-1 bg-white/10" />
-        </span>
-      );
-    }
-    return (
-      <a
-        key={item.href + item.label}
-        href={item.href}
-        onClick={(e) => {
-          e.preventDefault();
-          onNavigate(item.href, label);
-        }}
-        className={`group flex items-baseline gap-2 transition-transform duration-200 hover:translate-x-1 ${
-          indent ? "pl-3" : ""
-        }`}
-      >
-        <span className="font-sans font-semibold tracking-widest text-[12px] text-white uppercase">
-          {label}
-        </span>
-        <span className="h-[1px] flex-1 bg-white/10 group-hover:bg-white/30 transition-colors" />
-        {item.external ? (
-          <ExternalLink className="w-3 h-3 text-neutral-500 group-hover:text-neutral-300 shrink-0" />
-        ) : (
-          <ChevronRight className="w-3.5 h-3.5 text-neutral-600 group-hover:text-neutral-400 shrink-0" />
-        )}
-      </a>
-    );
-  };
-
-  return (
-    <nav className="flex-1 min-h-0 overflow-y-auto scrollbar-none pr-1 flex flex-col gap-5 text-left pb-2">
-      {LOCKED_NAV.map((section) => (
-        <div key={section.title} className="space-y-2 shrink-0">
-          <p
-            className={`font-mono text-[9px] uppercase tracking-[0.22em] ${
-              section.kind !== "direct" && section.comingSoon
-                ? "text-neutral-600"
-                : "text-neutral-500"
-            }`}
-          >
-            {section.title}
-            {section.kind !== "direct" && section.comingSoon ? " (Coming Soon)" : ""}
-          </p>
-
-          {section.kind === "links" && !section.comingSoon && (
-            <div className="flex flex-col gap-2.5">{section.items.map((item) => linkRow(item))}</div>
-          )}
-
-          {section.kind === "links" && section.comingSoon && (
-            <p className="font-sans text-[11px] text-white/40 uppercase tracking-wider opacity-55">
-              Details forthcoming
-            </p>
-          )}
-
-          {section.kind === "direct" && (
-            <div className="flex flex-col gap-2.5">{linkRow(section.item)}</div>
-          )}
-
-          {section.kind === "branches" && (
-            <div className="flex flex-col gap-3">
-              {section.branches.map((branch) => (
-                <div key={branch.label} className="space-y-2">
-                  <p className="font-sans text-[11px] font-bold uppercase tracking-[0.14em] text-white/85 pl-0">
-                    {branch.label}
-                  </p>
-                  <div className="flex flex-col gap-2 border-l border-white/15 ml-0.5">
-                    {branch.children.map((child) => linkRow(child, true))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      ))}
-    </nav>
-  );
-}
-
-/**
- * Photo-menu overlay: collapsed = sparse OR-scale titles;
- * one accordion open at a time = full IA without dumping the sitemap.
- */
-function OddRitualNavOverlay({
-  onNavigate,
-}: {
-  onNavigate: (href: string, label: string) => void;
-}) {
-  const [openId, setOpenId] = useState<string | null>(null);
-  const ease = "cubic-bezier(0.21, 0.47, 0.32, 0.98)";
-
-  const toggle = (id: string) => {
-    setOpenId((prev) => (prev === id ? null : id));
-  };
-
-  const childLink = (item: NavLeaf) => {
-    const label = item.comingSoon ? `${item.label} (Coming Soon)` : item.label;
-    if (item.comingSoon) {
-      return (
-        <span
-          key={item.href + item.label}
-          aria-disabled="true"
-          className="flex items-center justify-between gap-3 min-h-[44px] py-2.5 px-1 border-b border-white/15 last:border-b-0 opacity-55 cursor-default"
-        >
-          <span className="font-sans text-[14px] font-medium tracking-[0.1em] uppercase text-white/85">
-            {label}
-          </span>
-        </span>
-      );
-    }
-    return (
-      <a
-        key={item.href + item.label}
-        href={item.href}
-        onClick={(e) => {
-          e.preventDefault();
-          onNavigate(item.href, label);
-        }}
-        className="flex items-center justify-between gap-3 min-h-[44px] py-2.5 px-1 border-b border-white/15 last:border-b-0 group"
-      >
-        <span className="font-sans text-[14px] font-medium tracking-[0.1em] uppercase text-white/85 group-hover:text-white transition-colors">
-          {label}
-        </span>
-        {item.external ? (
-          <ExternalLink className="w-3.5 h-3.5 text-white/45 shrink-0" />
-        ) : (
-          <ChevronRight className="w-4 h-4 text-white/40 group-hover:text-white/75 shrink-0" />
-        )}
-      </a>
-    );
-  };
-
-  return (
-    <nav
-      className="flex-1 min-h-0 overflow-y-auto scrollbar-none pr-0.5 flex flex-col gap-0 text-left pb-2"
-      aria-label="Site navigation"
-    >
-      {LOCKED_NAV.map((section, index) => {
-        const n = String(index + 1).padStart(2, "0");
-        const id = section.title;
-        const isOpen = openId === id;
-        const sectionComingSoon =
-          section.kind === "direct"
-            ? Boolean(section.item.comingSoon)
-            : Boolean(section.comingSoon);
-
-        if (section.kind === "direct") {
-          const item = section.item;
-          const label = item.comingSoon
-            ? `${section.title} (Coming Soon)`
-            : section.title;
-
-          if (item.comingSoon) {
-            return (
-              <div
-                key={id}
-                aria-disabled="true"
-                className="flex items-baseline gap-3 min-h-[52px] py-3.5 border-b border-white/20 opacity-55 cursor-default"
-              >
-                <span className="font-mono text-[10px] tracking-[0.22em] text-white/45 shrink-0 pt-1.5">
-                  {n}
-                </span>
-                <span
-                  className="font-sans text-[22px] font-bold tracking-[-0.03em] uppercase text-white flex-1 drop-shadow-[0_1px_8px_rgba(0,0,0,0.45)]"
-                  style={{ fontFamily: "'Satoshi', sans-serif" }}
-                >
-                  {label}
-                </span>
-              </div>
-            );
-          }
-
-          return (
-            <a
-              key={id}
-              href={item.href}
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate(item.href, label);
-              }}
-              className="group flex items-baseline gap-3 min-h-[52px] py-3.5 border-b border-white/20"
-            >
-              <span className="font-mono text-[10px] tracking-[0.22em] text-white/45 shrink-0 pt-1.5">
-                {n}
-              </span>
-              <span
-                className="font-sans text-[22px] font-bold tracking-[-0.03em] uppercase text-white flex-1 group-hover:opacity-80 transition-opacity drop-shadow-[0_1px_8px_rgba(0,0,0,0.45)]"
-                style={{ fontFamily: "'Satoshi', sans-serif" }}
-              >
-                {section.title}
-              </span>
-              {item.external ? (
-                <ExternalLink className="w-4 h-4 text-white/45 shrink-0" />
-              ) : (
-                <ChevronRight className="w-5 h-5 text-white/40 group-hover:text-white/75 shrink-0" />
-              )}
-            </a>
-          );
-        }
-
-        // Whole section locked (e.g. Longevity) — gray header, no accordion
-        if (sectionComingSoon) {
-          return (
-            <div
-              key={id}
-              aria-disabled="true"
-              className="flex items-baseline gap-3 min-h-[52px] py-3.5 border-b border-white/20 opacity-55 cursor-default"
-            >
-              <span className="font-mono text-[10px] tracking-[0.22em] text-white/45 shrink-0 pt-1.5">
-                {n}
-              </span>
-              <span
-                className="font-sans text-[22px] font-bold tracking-[-0.03em] uppercase text-white flex-1 drop-shadow-[0_1px_8px_rgba(0,0,0,0.45)]"
-                style={{ fontFamily: "'Satoshi', sans-serif" }}
-              >
-                {section.title} (Coming Soon)
-              </span>
-            </div>
-          );
-        }
-
-        return (
-          <div key={id} className="border-b border-white/20 shrink-0">
-            <button
-              type="button"
-              onClick={() => toggle(id)}
-              aria-expanded={isOpen}
-              className="w-full flex items-baseline gap-3 min-h-[52px] py-3.5 text-left group"
-            >
-              <span className="font-mono text-[10px] tracking-[0.22em] text-white/45 shrink-0 pt-1.5">
-                {n}
-              </span>
-              <span
-                className="font-sans text-[22px] font-bold tracking-[-0.03em] uppercase text-white flex-1 drop-shadow-[0_1px_8px_rgba(0,0,0,0.45)]"
-                style={{ fontFamily: "'Satoshi', sans-serif" }}
-              >
-                {section.title}
-              </span>
-              <ChevronRight
-                className={`w-5 h-5 text-white/40 shrink-0 transition-transform duration-500 ${
-                  isOpen ? "rotate-90 text-white/80" : ""
-                }`}
-                style={{ transitionTimingFunction: ease }}
-              />
-            </button>
-
-            <div
-              className={`grid transition-[grid-template-rows,opacity] duration-500 ${
-                isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-              }`}
-              style={{ transitionTimingFunction: ease }}
-            >
-              <div className="overflow-hidden min-h-0">
-                <div className="mb-4 ml-7 mr-0 rounded-sm bg-black/40 backdrop-blur-md border border-white/10 px-3 py-1 shadow-[0_8px_32px_rgba(0,0,0,0.35)]">
-                  {section.kind === "links" && (
-                    <div className="flex flex-col">{section.items.map((item) => childLink(item))}</div>
-                  )}
-
-                  {section.kind === "branches" && (
-                    <div className="flex flex-col gap-4 py-2">
-                      {section.branches.map((branch) => (
-                        <div key={branch.label} className="flex flex-col gap-0.5">
-                          <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-white/45 mb-1 px-1">
-                            {branch.label}
-                          </p>
-                          {branch.children.map((child) => childLink(child))}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      })}
-    </nav>
-  );
-}
 
 // ----------------------------------------------------------------------
 // SUB-VIEWS FOR CONCEPT HOMEPAGES

@@ -4,6 +4,7 @@ import {
 } from "motion/react";
 import { gymPhotos } from "../../assets/images/gym";
 import { LOOKBOOK_EASE } from "../direction-ef/lookbook";
+import { useSlot } from "./V1Kit";
 
 const PILLARS = [
   {
@@ -35,18 +36,30 @@ const PILLARS = [
  */
 export default function PillarsQuad() {
   const reduceMotion = useReducedMotion();
+  const images = [
+    useSlot("pillar1", gymPhotos.architectureRaw),
+    useSlot("pillar2", gymPhotos.galleryCinematic),
+    useSlot("pillar3", gymPhotos.spaceAtmosphere),
+    useSlot("pillar4", gymPhotos.equipmentClose),
+  ];
+  const pillars = PILLARS.map((pillar, index) => ({
+    ...pillar,
+    image: images[index] ?? pillar.image,
+  }));
 
   return (
     <article
       className="relative shrink-0 w-full min-w-full h-[100cqh] min-h-[100cqh] snap-start snap-always overflow-hidden bg-[#111111]"
       aria-label="03 The Four Pillars"
     >
-      <div className="absolute inset-0 flex flex-row">
-        {PILLARS.map((pillar, i) => (
+      <div className="absolute inset-0 grid h-full grid-cols-2 grid-rows-2 md:flex md:flex-row">
+        {pillars.map((pillar, i) => (
           <motion.div
             key={pillar.n}
-            className={`relative flex-1 min-w-0 h-full border-white/20 ${
-              i > 0 ? "border-l" : ""
+            className={`relative h-full min-h-0 min-w-0 border-white/20 md:h-full md:flex-1 ${
+              i % 2 === 0 ? "border-r md:border-r-0" : ""
+            } ${i < 2 ? "border-b md:border-b-0" : ""} ${
+              i > 0 ? "md:border-l" : ""
             }`}
             style={{ zIndex: i + 1 }}
             initial={
@@ -75,7 +88,7 @@ export default function PillarsQuad() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/25" />
 
             {/* Mid labels — higher than chapter chrome so overlap stays soft */}
-            <div className="absolute inset-x-0 bottom-[52%] z-10 flex flex-col items-center px-1.5 sm:px-2 md:bottom-[48%]">
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-1.5 sm:px-2 md:inset-x-0 md:inset-auto md:bottom-[48%]">
               <span
                 className="mb-1.5 flex h-7 w-7 items-center justify-center rounded-full border border-[#F3EEE7]/35 text-[9px] font-mono tracking-[0.14em] text-[#F3EEE7]/90 md:mb-2 md:h-8 md:w-8 md:text-[10px]"
                 aria-hidden
@@ -98,14 +111,14 @@ export default function PillarsQuad() {
 
       {/* Same type + padding as OpeningSlide so 03 matches 01 / 02 / 04 */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black/70 via-black/20 to-transparent">
-        <div className="relative z-10 flex flex-col justify-end px-5 pb-24 pt-20 md:px-10 md:pb-28">
+        <div className="relative z-10 flex flex-col justify-end px-5 pb-16 pt-8 md:px-10 md:pb-28 md:pt-20">
           <motion.div
             initial={reduceMotion ? false : { opacity: 0, y: 16 }}
             whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 0.7, delay: 0.35, ease: LOOKBOOK_EASE }}
           >
-            <p className="font-mono text-[42px] leading-none tracking-[-0.04em] text-[#F3EEE7] md:text-[64px]">
+            <p className="font-mono text-[28px] leading-none tracking-[-0.04em] text-[#F3EEE7] md:text-[64px]">
               03
             </p>
             <h2

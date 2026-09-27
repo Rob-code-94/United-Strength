@@ -5,7 +5,9 @@ import PeopleChapter from "./direction-v1/PeopleChapter";
 import SpaceExperience from "./direction-v1/SpaceExperience";
 import StartHere from "./direction-v1/StartHere";
 import V1SiteIndexFooter from "./direction-v1/V1SiteIndexFooter";
+import { useV1Kit, V1KitProvider } from "./direction-v1/V1Kit";
 import WhatWeOffer from "./direction-v1/WhatWeOffer";
+import { kitStyle } from "../hub/brand-kit";
 
 interface SubViewProps {
   onNav: (href: string, label: string) => void;
@@ -18,12 +20,24 @@ interface SubViewProps {
  * Vertical spine 02–07 after opening carousel · continuous overlap.
  * Spec: docs/wireframes/home-direction-v1.md
  */
-export default function ConceptV1View({
+export default function ConceptV1View(props: SubViewProps) {
+  return (
+    <V1KitProvider>
+      <V1Home {...props} />
+    </V1KitProvider>
+  );
+}
+
+function V1Home({
   onNav,
   onVerticalScrollUnlockChange,
 }: SubViewProps) {
+  const kit = useV1Kit();
   return (
-    <div className="flex flex-col overflow-x-hidden bg-[#111111] font-sans text-[#F3EEE7] animate-fade-in-opacity selection:bg-[#F3EEE7]/20 selection:text-[#F3EEE7]">
+    <div
+      className="flex flex-col overflow-x-hidden font-sans animate-fade-in-opacity selection:bg-[#F3EEE7]/20 selection:text-[#F3EEE7]"
+      style={kitStyle(kit)}
+    >
       <OpeningCarousel
         onVerticalScrollUnlockChange={onVerticalScrollUnlockChange}
       />

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { gymPhotos } from "../../assets/images/gym";
 import { gymVideos } from "../../assets/video";
+import { useSlot } from "./V1Kit";
 import OpeningSlide from "./OpeningSlide";
 import PillarsQuad from "./PillarsQuad";
 
@@ -28,6 +29,9 @@ export default function OpeningCarousel({
   const touchOrigin = useRef<{ x: number; y: number } | null>(null);
   const [active, setActive] = useState(0);
   const verticalLocked = active < VERTICAL_UNLOCK_INDEX;
+  const poster = useSlot("openingClubPoster", gymPhotos.galleryCinematic);
+  const believe = useSlot("openingBelieve", gymPhotos.spaceAtmosphere);
+  const experience = useSlot("openingExperience", gymPhotos.experienceBroll);
 
   const syncActive = useCallback(() => {
     const el = scrollerRef.current;
@@ -165,7 +169,7 @@ export default function OpeningCarousel({
           media={{
             kind: "video",
             src: gymVideos.opening01,
-            poster: gymPhotos.galleryCinematic,
+            poster,
             alt: "United Strength Club — facility",
             objectPosition: "center 40%",
           }}
@@ -176,7 +180,7 @@ export default function OpeningCarousel({
           lede="People don't stay because of equipment. They stay because of how a place makes them feel."
           media={{
             kind: "image",
-            src: gymPhotos.spaceAtmosphere,
+            src: believe,
             alt: "What We Believe — atmosphere",
             objectPosition: "center center",
           }}
@@ -191,7 +195,7 @@ export default function OpeningCarousel({
           cinematic
           media={{
             kind: "image",
-            src: gymPhotos.experienceBroll,
+            src: experience,
             alt: "Experience United — STRONGER mural",
             objectPosition: "18% center",
           }}
@@ -232,17 +236,22 @@ export default function OpeningCarousel({
             );
           })}
         </div>
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#F3EEE7]/45">
-          {active === VERTICAL_UNLOCK_INDEX ? (
-            <>
-              Scroll <span aria-hidden>↓</span>
-            </>
-          ) : (
-            <>
-              Swipe · {String(active + 1).padStart(2, "0")} / 04
-            </>
-          )}
-        </p>
+        {active === VERTICAL_UNLOCK_INDEX ? (
+          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#F3EEE7]/45">
+            Scroll <span aria-hidden>↓</span>
+          </p>
+        ) : (
+          <button
+            type="button"
+            onClick={() => goTo(active + 1)}
+            aria-label={`Swipe to chapter ${String(active + 2).padStart(2, "0")}`}
+            className="pointer-events-auto inline-flex min-h-11 min-w-11 items-center justify-end gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-[#F3EEE7]/80"
+          >
+            <span aria-hidden className="h-px w-8 bg-[#F3EEE7]/70" />
+            Swipe
+            <span aria-hidden>→</span>
+          </button>
+        )}
       </div>
     </section>
   );

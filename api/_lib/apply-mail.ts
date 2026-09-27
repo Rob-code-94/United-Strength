@@ -62,3 +62,44 @@ export async function sendApplication(
     return { ok: false, status: 502 };
   }
 }
+
+/** Same Resend account as membership applications. */
+export async function sendHubReset(input: {
+  resetUrl: string;
+}): Promise<{ ok: true } | { ok: false; status: number }> {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return { ok: false, status: 503 };
+
+  const to = (
+    process.env.HUB_RESET_EMAIL ||
+    process.env.APPLY_TO_EMAIL ||
+    TO_DEFAULT
+  ).trim();
+  const from = (process.env.APPLY_FROM_EMAIL || FROM_DEFAULT).trim();
+  if (!to || !EMAIL.test(to)) return { ok: false, status: 503 };
+
+  try {
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from,
+        to: [to],
+        subject: "Reset the United Strength hub password",
+        text: [
+          "Someone asked to reset the brand hub password.",
+          "Open this link within 30 minutes to set a new one:",
+          input.resetUrl,
+          "If you did not ask for this, ignore this email.",
+        ].join("\n"),
+      }),
+    });
+    if (!response.ok) return { ok: false, status: 502 };
+    return { ok: true };
+  } catch {
+    return { ok: false, status: 502 };
+  }
+}

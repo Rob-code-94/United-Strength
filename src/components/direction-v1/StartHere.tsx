@@ -1,42 +1,43 @@
+import { ArrowUpRight } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { gymPhotos } from "../../assets/images/gym";
 import { LOOKBOOK_EASE } from "../direction-ef/lookbook";
+import NumberTicker from "./NumberTicker";
 
 interface Props {
   onNav: (href: string, label: string) => void;
 }
 
+const ledeClass =
+  "flex flex-col gap-3 text-[26px] font-bold leading-none tracking-[-0.04em] text-[#F3EEE7] sm:gap-4 sm:text-[32px] lg:gap-5 lg:text-[44px]";
+
+const pathways = [
+  {
+    title: "Experience United",
+    lede: "5 classes · 14 days · try the practice.",
+    href: "/start-here/experience",
+    label: "Experience United",
+    image: gymPhotos.experienceBroll,
+    objectPosition: "center 40%",
+    circleClass: "bg-white text-[#111111]",
+  },
+  {
+    title: "Apply for Membership",
+    lede: "Selective membership — reviewed by the team.",
+    href: "/start-here/apply",
+    label: "Apply for Membership",
+    image: gymPhotos.runClub,
+    objectPosition: "center 35%",
+    circleClass: "bg-[#0A3C2E] text-[#F3EEE7]",
+  },
+] as const;
+
 /**
- * 07 // START HERE — cta-15 equality adapted.
- * Centered chapter line, then two equal frames. Type stays off the photos.
+ * 07 // START HERE — Apple card strip adapted from Space carousel-08.
+ * Two pathways only. Native scroll-snap; no Embla install.
  */
 export default function StartHere({ onNav }: Props) {
   const reduceMotion = useReducedMotion();
-
-  const pathways = [
-    {
-      title: "Experience United",
-      lede: "5 classes · 14 days · try the practice.",
-      href: "/start-here/experience",
-      label: "Experience United",
-      cta: "Start Experience →",
-      image: gymPhotos.experienceBroll,
-      objectPosition: "center 40%",
-      frame: "h-[280px] w-full md:h-[min(36vw,420px)]",
-      linkClass: "text-[#F3EEE7]",
-    },
-    {
-      title: "Apply for Membership",
-      lede: "Selective membership — reviewed by the team.",
-      href: "/start-here/apply",
-      label: "Apply for Membership",
-      cta: "Apply →",
-      image: gymPhotos.runClub,
-      objectPosition: "center 35%",
-      frame: "h-[280px] w-full md:h-[min(36vw,420px)]",
-      linkClass: "bg-[#0A3C2E] px-3 py-1.5 text-[#F3EEE7]",
-    },
-  ] as const;
 
   return (
     <section
@@ -60,58 +61,74 @@ export default function StartHere({ onNav }: Props) {
         >
           Two ways to begin.
         </h2>
-        <div className="mt-8 flex w-full flex-col items-center gap-5 sm:flex-row sm:justify-center sm:gap-12">
-          {pathways.map((path) => (
-            <button
-              key={path.href}
-              type="button"
-              onClick={() => onNav(path.href, path.label)}
-              className="min-h-[44px] max-w-[28ch] text-center"
-            >
-              <span
-                className="block font-sans text-[16px] font-bold uppercase tracking-[-0.03em]"
-                style={{ fontFamily: "'Satoshi', sans-serif" }}
-              >
-                {path.title}
-              </span>
-              <span className="mt-1 block text-[13px] leading-relaxed text-[#F3EEE7]/70">
-                {path.lede}
-              </span>
-              <span
-                className={`mt-2 inline-flex items-center font-mono text-[11px] uppercase tracking-[0.18em] ${path.linkClass}`}
-              >
-                {path.cta}
-              </span>
-            </button>
-          ))}
-        </div>
       </motion.div>
 
-      <div className="mx-auto mt-10 grid w-full max-w-6xl grid-cols-1 gap-2 md:mt-16 md:grid-cols-2 md:gap-3">
-        {pathways.map((path, i) => (
-          <motion.button
+      <div className="mx-auto mt-10 flex w-full snap-x snap-mandatory gap-6 overflow-x-auto pb-2 scrollbar-none lg:justify-center">
+        {pathways.map((path) => (
+          <button
             key={path.href}
             type="button"
-            initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{
-              duration: 0.65,
-              delay: reduceMotion ? 0 : i * 0.08,
-              ease: LOOKBOOK_EASE,
-            }}
+            data-start-card
             onClick={() => onNav(path.href, path.label)}
-            aria-label={`${path.title}. ${path.cta.replace(" →", "")}`}
-            className={`group relative min-h-[44px] overflow-hidden ${path.frame}`}
+            aria-label={`${path.title}. ${path.lede}`}
+            className="group relative h-[460px] w-[280px] shrink-0 snap-start overflow-hidden rounded-2xl text-left sm:h-[520px] sm:w-[320px] lg:h-[600px] lg:w-[calc((100%-1.5rem)/2)] lg:max-w-[640px] motion-safe:transition-transform motion-safe:duration-300 motion-safe:hover:scale-[1.02]"
           >
             <img
               src={path.image}
               alt=""
               aria-hidden
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.21,0.47,0.32,0.98)] group-hover:scale-[1.03] group-active:scale-[1.02]"
+              className="absolute inset-0 h-full w-full object-cover"
               style={{ objectPosition: path.objectPosition }}
             />
-          </motion.button>
+            <span className="absolute inset-0 bg-gradient-to-b from-[#111111]/75 via-[#111111]/20 to-[#111111]/55" />
+            <span className="relative z-10 flex h-full flex-col justify-between p-6 sm:p-8">
+              <span className="flex flex-col gap-3">
+                <span className="text-[15px] font-medium text-[#F3EEE7]">{path.title}</span>
+                {path.href === "/start-here/experience" ? (
+                  <span className={ledeClass} style={{ fontFamily: "'Satoshi', sans-serif" }}>
+                    <span>
+                      <NumberTicker
+                        end={5}
+                        loop
+                        pauseMs={12000}
+                        duration={1.2}
+                        className="tabular-nums"
+                      />
+                      {" classes"}
+                    </span>
+                    <span>
+                      <NumberTicker
+                        end={14}
+                        loop
+                        pauseMs={12000}
+                        duration={1.4}
+                        className="tabular-nums"
+                      />
+                      {" days"}
+                    </span>
+                    <span>try the practice.</span>
+                  </span>
+                ) : (
+                  <span className={ledeClass} style={{ fontFamily: "'Satoshi', sans-serif" }}>
+                    <span>Selective</span>
+                    <span>membership —</span>
+                    <span>reviewed by</span>
+                    <span>the team.</span>
+                  </span>
+                )}
+              </span>
+              <span className="flex justify-end">
+                <span
+                  className={`inline-flex h-11 w-11 items-center justify-center rounded-full ${path.circleClass}`}
+                >
+                  <ArrowUpRight
+                    className="h-4 w-4 motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover:rotate-45"
+                    aria-hidden
+                  />
+                </span>
+              </span>
+            </span>
+          </button>
         ))}
       </div>
     </section>

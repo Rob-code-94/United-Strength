@@ -1,6 +1,24 @@
-import type { ReactNode } from "react";
+import { createContext, useContext, type ImgHTMLAttributes, type ReactNode } from "react";
 import { ChevronLeft } from "lucide-react";
+import { useV1Kit } from "../V1Kit";
+import type { MediaSlot } from "@/hub/brand-kit";
 import V1SiteIndexFooter from "../V1SiteIndexFooter";
+
+const HubMarkContext = createContext(false);
+
+/** Hub preview only. Public pages leave this off, so they get no pencils. */
+export function HubMarkProvider({ children }: { children: ReactNode }) {
+  return <HubMarkContext.Provider value={true}>{children}</HubMarkContext.Provider>;
+}
+
+function pencilAttr(id: string): { "data-hub-pencil": string } | Record<string, never> {
+  return { "data-hub-pencil": id };
+}
+
+export function useHubPencil(id: string): { "data-hub-pencil": string } | Record<string, never> {
+  const marks = useContext(HubMarkContext);
+  return marks ? pencilAttr(id) : {};
+}
 
 interface ShellProps {
   onNav: (href: string, label: string) => void;
@@ -35,26 +53,49 @@ export function V1BackButton({ onBack }: { onBack: () => void }) {
   );
 }
 
+export function V1MediaImg({
+  slot,
+  pencil = true,
+  ...props
+}: ImgHTMLAttributes<HTMLImageElement> & { slot: MediaSlot; pencil?: boolean }) {
+  const marks = useContext(HubMarkContext);
+  const kit = useV1Kit();
+  const uploaded = kit.media[slot];
+  return (
+    <img
+      {...props}
+      src={uploaded || props.src}
+      {...(marks && pencil ? pencilAttr(`media-${slot}`) : {})}
+    />
+  );
+}
+
 export function V1Hero({
   image,
   imageAlt,
   onBack,
   children,
   position = "center 40%",
+  mediaSlot,
 }: {
   image: string;
   imageAlt: string;
   onBack: () => void;
   children: ReactNode;
   position?: string;
+  mediaSlot?: MediaSlot;
 }) {
+  const marks = useContext(HubMarkContext);
+  const kit = useV1Kit();
+  const uploaded = mediaSlot ? kit.media[mediaSlot] : "";
   return (
-    <section className="relative h-[100cqh] min-h-[520px] w-full overflow-hidden bg-[#111111]">
+    <section className="v1-hero relative h-[100cqh] min-h-[520px] w-full overflow-hidden bg-[#111111]">
       <img
-        src={image}
+        src={uploaded || image}
         alt={imageAlt}
         className="absolute inset-0 h-full w-full object-cover"
         style={{ objectPosition: position }}
+        {...(marks && mediaSlot ? pencilAttr(`media-${mediaSlot}`) : {})}
       />
       <div className="absolute inset-0 bg-[#111111]/50" />
       <V1BackButton onBack={onBack} />
@@ -74,9 +115,11 @@ export function V1Display({
   className?: string;
   id?: string;
 }) {
+  const marks = useContext(HubMarkContext);
   return (
     <h1
       id={id}
+      {...(marks ? pencilAttr("type-display") : {})}
       className={`font-sans text-[40px] font-bold uppercase leading-[0.95] tracking-[-0.04em] text-[#F3EEE7] md:text-[64px] ${className}`}
       style={SATOSHI}
     >
@@ -94,8 +137,10 @@ export function V1Heading({
   className?: string;
   as?: "h2" | "h3";
 }) {
+  const marks = useContext(HubMarkContext);
   return (
     <Tag
+      {...(marks ? pencilAttr("type-display") : {})}
       className={`font-sans text-[28px] font-bold uppercase leading-[1.05] tracking-[-0.04em] text-[#F3EEE7] md:text-[40px] ${className}`}
       style={SATOSHI}
     >
@@ -105,16 +150,21 @@ export function V1Heading({
 }
 
 export function V1Kicker({ children }: { children: ReactNode }) {
+  const marks = useContext(HubMarkContext);
   return (
-    <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#F3EEE7]/60">
+    <p
+      {...(marks ? pencilAttr("type-mono") : {})}
+      className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#F3EEE7]/60"
+    >
       {children}
     </p>
   );
 }
 
 export function V1Prose({ paragraphs }: { paragraphs: readonly string[] }) {
+  const marks = useContext(HubMarkContext);
   return (
-    <div className="mt-6 flex max-w-xl flex-col gap-4">
+    <div {...(marks ? pencilAttr("type-body") : {})} className="mt-6 flex max-w-xl flex-col gap-4">
       {paragraphs.map((paragraph) => (
         <p key={paragraph} className="text-[16px] leading-relaxed text-[#F3EEE7]/85">
           {paragraph}

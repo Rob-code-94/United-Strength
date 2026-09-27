@@ -3,11 +3,14 @@ import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/com
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import type { MediaSlot } from "@/hub/brand-kit";
+import { V1MediaImg } from "@/components/direction-v1/pages/V1Interior";
 
 export type PortfolioSlide = {
   image: string;
   title: string;
   description: string;
+  slot?: MediaSlot;
 };
 
 /** Portfolio 04 showcase: the active frame opens wide; neighbors stay a sliver. */
@@ -98,14 +101,27 @@ export default function Portfolio({ slides }: { slides: readonly PortfolioSlide[
                     )}
                   >
                     <div className="relative overflow-hidden">
-                      <img
-                        src={item.image}
-                        alt=""
-                        className={cn(
-                          "h-[52vh] w-full object-cover transition-all duration-700 motion-reduce:transition-none md:h-[70vh]",
-                          !isActive && "brightness-75"
-                        )}
-                      />
+                      {item.slot ? (
+                        <V1MediaImg
+                          slot={item.slot}
+                          pencil={index < slides.length}
+                          src={item.image}
+                          alt=""
+                          className={cn(
+                            "h-[52vh] w-full object-cover transition-all duration-700 motion-reduce:transition-none md:h-[70vh]",
+                            !isActive && "brightness-75"
+                          )}
+                        />
+                      ) : (
+                        <img
+                          src={item.image}
+                          alt=""
+                          className={cn(
+                            "h-[52vh] w-full object-cover transition-all duration-700 motion-reduce:transition-none md:h-[70vh]",
+                            !isActive && "brightness-75"
+                          )}
+                        />
+                      )}
                     </div>
                   </CarouselItem>
                 );

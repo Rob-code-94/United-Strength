@@ -1,4 +1,5 @@
 import strongerUnitedMark from "../../../assets/images/brand/stronger-united.png";
+import { useSlot } from "../V1Kit";
 
 interface StrongerUnitedMarkProps {
   className?: string;
@@ -11,9 +12,10 @@ interface StrongerUnitedMarkProps {
 export default function StrongerUnitedMark({
   className = "h-12 w-auto",
 }: StrongerUnitedMarkProps) {
+  const src = useSlot("strongerUnited", strongerUnitedMark);
   return (
     <img
-      src={strongerUnitedMark}
+      src={src}
       alt="Stronger United"
       className={className}
       draggable={false}

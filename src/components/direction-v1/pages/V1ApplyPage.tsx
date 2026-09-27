@@ -21,7 +21,7 @@ export default function V1ApplyPage({ onBack, onNav }: PageProps) {
 
   return (
     <V1InteriorShell onNav={onNav}>
-      <V1Hero image={gymPhotos.spaceAtmosphere} imageAlt="" onBack={onBack}>
+      <V1Hero image={gymPhotos.spaceAtmosphere} imageAlt="" onBack={onBack} mediaSlot="applyHero">
         <V1Kicker>{c.metadata}</V1Kicker>
         <V1Display className="mt-4 max-w-[14ch]">{c.headline}</V1Display>
         <p className="mt-6 max-w-md text-[16px] leading-relaxed text-[#F3EEE7]/85">{c.lede}</p>

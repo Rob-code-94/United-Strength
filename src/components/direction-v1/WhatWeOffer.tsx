@@ -45,8 +45,9 @@ const PATHWAYS: readonly TrainingPathway[] = [
 const [BUILD, BURN, PT, MOVE] = PATHWAYS;
 
 /**
- * 03 // TRAINING — locked editorial bento.
- * Build wide 3cols · Burn tall rowspan-2 · PT 1col · Move 2cols.
+ * 03 // TRAINING — off-center photo bento.
+ * Phone: Build full width, Burn tall on the left, Personal Training and Move stacked on the right.
+ * Desktop: Build wide 3cols · Burn tall rowspan-2 · PT 1col · Move 2cols.
  */
 export default function WhatWeOffer({ onNav }: Props) {
   const reduceMotion = useReducedMotion();
@@ -75,30 +76,30 @@ export default function WhatWeOffer({ onNav }: Props) {
         </h2>
       </motion.div>
 
-      <div className="mt-8 flex flex-col gap-2 md:mt-12 md:grid md:grid-cols-4 md:grid-rows-[minmax(240px,32vw)_minmax(240px,32vw)] md:gap-2">
+      <div className="mt-6 grid grid-cols-2 grid-rows-[minmax(188px,46vw)_minmax(148px,34vw)_minmax(148px,34vw)] gap-1 md:mt-12 md:grid-cols-4 md:grid-rows-[minmax(240px,32vw)_minmax(240px,32vw)] md:gap-2">
         <TrainingTile
           pathway={BUILD}
           onNav={onNav}
           index={0}
-          className="aspect-[4/5] w-full md:col-span-3 md:row-start-1 md:aspect-auto md:h-full"
+          className="col-span-2 row-start-1 h-full md:col-span-3"
         />
         <TrainingTile
           pathway={BURN}
           onNav={onNav}
           index={1}
-          className="aspect-[4/5] w-full md:col-span-1 md:row-span-2 md:row-start-1 md:aspect-auto md:h-full"
+          className="col-span-1 row-span-2 row-start-2 h-full md:col-span-1 md:row-start-1"
         />
         <TrainingTile
           pathway={PT}
           onNav={onNav}
           index={2}
-          className="aspect-[4/5] w-full md:col-span-1 md:row-start-2 md:aspect-auto md:h-full"
+          className="col-span-1 row-start-2 h-full md:row-span-1 md:row-start-2"
         />
         <TrainingTile
           pathway={MOVE}
           onNav={onNav}
           index={3}
-          className="aspect-[4/5] w-full md:col-span-2 md:row-start-2 md:aspect-auto md:h-full"
+          className="col-span-1 row-start-3 h-full md:col-span-2 md:row-span-1 md:row-start-2"
         />
       </div>
     </section>
