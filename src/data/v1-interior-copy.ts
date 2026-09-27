@@ -3,7 +3,7 @@
  * Stand-in media is noted in the page components, not shown as on-page copy.
  */
 
-/** Empty until Todd sends the Typeform URL. */
+/** Empty on purpose. Apply uses the on-page form, not a Typeform link. */
 export const TYPEFORM_APPLY_URL = "";
 
 /** Empty until scheduling decides where Run With Us goes. */
