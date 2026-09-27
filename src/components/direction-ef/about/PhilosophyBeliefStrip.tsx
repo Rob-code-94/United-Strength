@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
 import { gymPhotos } from "../../../assets/images/gym";
 import { PHILOSOPHY_HEALTH_AREAS } from "../../../data/about-copy";
-import { LOOKBOOK_EASE } from "../lookbook/constants";
 
 type Place = "bottom-left" | "top-right" | "center-left" | "bottom-right" | "top-left";
 
@@ -83,56 +82,76 @@ function BeliefPanel({
   );
 }
 
+/** Stay on the current belief until the scroll is 8% of a panel past the midpoint. */
+const SWITCH_MARGIN = 0.08;
+
+function settledIndex(exact: number, previous: number, count: number): number {
+  const nearest = Math.min(count - 1, Math.max(0, Math.round(exact)));
+  const distance = Math.abs(exact - nearest);
+  if (distance < 0.5 - SWITCH_MARGIN) return nearest;
+  return previous;
+}
+
 /**
  * Vertical scroll drives a full-screen belief strip inside the simulator scroller.
+ * The frame follows the scroll position and stops when the scroll stops.
  * Reduced motion stacks the five beliefs instead of translating them.
  */
 export default function PhilosophyBeliefStrip() {
   const reduceMotion = useReducedMotion();
   const runwayRef = useRef<HTMLDivElement>(null);
+  const settledRef = useRef(0);
   const [progress, setProgress] = useState(0);
+  const [settled, setSettled] = useState(0);
   const [viewHeight, setViewHeight] = useState(0);
   const count = PHILOSOPHY_HEALTH_AREAS.length;
-  const active = Math.min(count - 1, Math.round(progress * (count - 1)));
+
+  const read = () => {
+    const node = runwayRef.current;
+    const scroller = node?.closest("[data-sim-scroll]");
+    if (!node || !(scroller instanceof HTMLElement)) return;
+    const height = scroller.clientHeight;
+    if (height <= 0) return;
+    setViewHeight(height);
+    const start = node.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
+    const distance = Math.max(height * (count - 1), 1);
+    const nextProgress = Math.min(1, Math.max(0, -start / distance));
+    setProgress(nextProgress);
+    const nextSettled = settledIndex(nextProgress * (count - 1), settledRef.current, count);
+    if (nextSettled !== settledRef.current) {
+      settledRef.current = nextSettled;
+      setSettled(nextSettled);
+    }
+  };
+
+  const readRef = useRef(read);
+  readRef.current = read;
+
+  useLayoutEffect(() => {
+    if (reduceMotion) return;
+    readRef.current();
+  }, [reduceMotion, viewHeight]);
 
   useEffect(() => {
     if (reduceMotion) return;
     const runway = runwayRef.current;
     const scroller = runway?.closest("[data-sim-scroll]");
-    const scrollTarget: HTMLElement | Window =
-      scroller instanceof HTMLElement ? scroller : window;
-
-    const measure = () => {
-      const height =
-        scroller instanceof HTMLElement ? scroller.clientHeight : window.innerHeight;
-      setViewHeight(height);
-    };
-
-    const update = () => {
-      const node = runwayRef.current;
-      if (!node) return;
-      const viewTop =
-        scroller instanceof HTMLElement ? scroller.getBoundingClientRect().top : 0;
-      const height =
-        scroller instanceof HTMLElement ? scroller.clientHeight : window.innerHeight;
-      const start = node.getBoundingClientRect().top - viewTop;
-      const distance = Math.max(node.offsetHeight - height, 1);
-      setProgress(Math.min(1, Math.max(0, -start / distance)));
-    };
+    if (!(scroller instanceof HTMLElement) || !runway) return;
 
     let frame = 0;
     const onScroll = () => {
       cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(update);
+      frame = requestAnimationFrame(() => readRef.current());
     };
 
-    measure();
-    update();
-    window.addEventListener("resize", measure);
-    scrollTarget.addEventListener("scroll", onScroll, { passive: true });
+    const observer = new ResizeObserver(() => readRef.current());
+    observer.observe(scroller);
+    observer.observe(runway);
+    readRef.current();
+    scroller.addEventListener("scroll", onScroll, { passive: true });
     return () => {
-      window.removeEventListener("resize", measure);
-      scrollTarget.removeEventListener("scroll", onScroll);
+      observer.disconnect();
+      scroller.removeEventListener("scroll", onScroll);
       cancelAnimationFrame(frame);
     };
   }, [reduceMotion]);
@@ -148,6 +167,7 @@ export default function PhilosophyBeliefStrip() {
   }
 
   const port = viewHeight > 0 ? viewHeight : undefined;
+  const offset = progress * (count - 1) * (100 / count);
 
   return (
     <section
@@ -164,13 +184,12 @@ export default function PhilosophyBeliefStrip() {
           className="flex h-full"
           style={{
             width: `${count * 100}%`,
-            transform: `translate3d(-${active * (100 / count)}%, 0, 0)`,
-            transition: `transform 0.7s cubic-bezier(${LOOKBOOK_EASE.join(",")})`,
+            transform: `translate3d(-${offset}%, 0, 0)`,
           }}
         >
           {PHILOSOPHY_HEALTH_AREAS.map((area, index) => (
             <div key={area.n} className="h-full" style={{ width: `${100 / count}%` }}>
-              <BeliefPanel index={index} hidden={index !== active} stacked={false} />
+              <BeliefPanel index={index} hidden={index !== settled} stacked={false} />
             </div>
           ))}
         </div>

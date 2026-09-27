@@ -12,6 +12,10 @@ interface NumberTickerProps {
   loop?: boolean;
   /** Hold the landing number before a looped recount. */
   pauseMs?: number;
+  /** Count on mount instead of waiting until the number scrolls into view. */
+  immediate?: boolean;
+  /** Printed before the digits, e.g. `$`. */
+  prefix?: string;
   className?: string;
 }
 
@@ -26,19 +30,22 @@ export default function NumberTicker({
   pad = 0,
   loop = false,
   pauseMs = 900,
+  immediate = false,
+  prefix = "",
   className,
 }: NumberTickerProps) {
   const reduceMotion = useReducedMotion();
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: !loop, amount: 0.6 });
   const [value, setValue] = useState(reduceMotion ? end : start);
+  const shouldPlay = immediate || isInView;
 
   useEffect(() => {
     if (reduceMotion) {
       setValue(end);
       return;
     }
-    if (!isInView) return;
+    if (!shouldPlay) return;
 
     let frame = 0;
     let pause = 0;
@@ -72,13 +79,15 @@ export default function NumberTicker({
       cancelAnimationFrame(frame);
       window.clearTimeout(pause);
     };
-  }, [duration, end, isInView, loop, pauseMs, reduceMotion, start]);
+  }, [duration, end, loop, pauseMs, reduceMotion, shouldPlay, start]);
 
-  const shown = String(Math.round(value)).padStart(pad, "0");
+  const shown = `${prefix}${String(Math.round(value)).padStart(pad, "0")}`;
+  const landed = `${prefix}${String(end).padStart(pad, "0")}`;
 
   return (
     <span ref={ref} className={className}>
-      {shown}
+      <span aria-hidden>{shown}</span>
+      <span className="sr-only">{landed}</span>
     </span>
   );
 }
