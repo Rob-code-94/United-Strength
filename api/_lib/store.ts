@@ -83,9 +83,13 @@ async function readBlobStore(token: string): Promise<BrandKitStore | null> {
   return (await response.json()) as BrandKitStore;
 }
 
+/**
+ * Store is provisioned as a public Blob store — private puts are rejected.
+ * Kit JSON is already exposed via GET /api/brand-kit; keep pathname stable.
+ */
 async function writeBlobStore(token: string, store: BrandKitStore): Promise<void> {
   await put(BLOB_PATH, JSON.stringify(store), {
-    access: "private",
+    access: "public",
     addRandomSuffix: false,
     allowOverwrite: true,
     contentType: "application/json",
@@ -95,11 +99,19 @@ async function writeBlobStore(token: string, store: BrandKitStore): Promise<void
 
 export async function loadStore(): Promise<BrandKitStore> {
   const token = blobToken();
-  const existing = token ? await readBlobStore(token) : await readFileStore();
-  if (existing?.draft && existing.published) return normalizeStore(existing);
+  try {
+    const existing = token ? await readBlobStore(token) : await readFileStore();
+    if (existing?.draft && existing.published) return normalizeStore(existing);
+  } catch (error) {
+    console.error("[hub] brand-kit read failed", error);
+  }
   const seeded = seedStore();
-  if (token) await writeBlobStore(token, seeded);
-  else if (!process.env.VERCEL) await writeFileStore(seeded);
+  try {
+    if (token) await writeBlobStore(token, seeded);
+    else if (!process.env.VERCEL) await writeFileStore(seeded);
+  } catch (error) {
+    console.error("[hub] brand-kit seed write failed", error);
+  }
   return seeded;
 }
 
@@ -127,8 +139,9 @@ export async function saveHubAuth(record: HubAuthRecord): Promise<void> {
   const token = blobToken();
   const body = JSON.stringify(record);
   if (token) {
+    // Public store cannot accept private blobs; digest is not the raw password.
     await put(AUTH_BLOB_PATH, body, {
-      access: "private",
+      access: "public",
       addRandomSuffix: false,
       allowOverwrite: true,
       contentType: "application/json",
