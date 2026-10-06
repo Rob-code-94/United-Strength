@@ -9,10 +9,10 @@ import {
   SPACE_CHAPTERS,
   TEAM_INTRO,
   TEAM_MEMBERS,
-} from "@/data/about-copy";
-import { ARCHIVE_PAGE, BY_DESIGN, CULTIVATED, MOVE_THE_CITY } from "@/data/culture-copy";
-import { APPLY_MEMBERSHIP, EXPERIENCE_UNITED, MEMBERSHIP_PAGE } from "@/data/journey-copy";
-import { BUILD_CLASS, BURN_CLASS, PERSONAL_TRAINING_HUB } from "@/data/training-copy";
+} from "../data/about-copy";
+import { ARCHIVE_PAGE, BY_DESIGN, CULTIVATED, MOVE_THE_CITY } from "../data/culture-copy";
+import { APPLY_MEMBERSHIP, EXPERIENCE_UNITED, MEMBERSHIP_PAGE } from "../data/journey-copy";
+import { BUILD_CLASS, BURN_CLASS, PERSONAL_TRAINING_HUB } from "../data/training-copy";
 import {
   V1_BUILD_PROGRAMMING,
   V1_BUILD_STANDARD,
@@ -24,7 +24,7 @@ import {
   V1_MEMBERSHIP_EXPERIENCE_JOIN,
   V1_PT_STATS,
   V1_SPACE_TILES,
-} from "@/data/v1-interior-copy";
+} from "../data/v1-interior-copy";
 
 function clone<T>(value: T): T {
   return structuredClone(value);

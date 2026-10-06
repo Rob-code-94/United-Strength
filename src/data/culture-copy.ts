@@ -6,8 +6,9 @@
  * Copywright Part D: CULTIVATED, BY_DESIGN, ARCHIVE_PAGE updated Sep 2026.
  */
 
-import { archiveCovers } from "../assets/images/archive";
 import { RUN_CLUB_MAILTO } from "./contact";
+
+/** Cover URLs are resolved in Archive page components — keep this module Node-safe for hub API. */
 
 // ── Move the City // Run Club — Training Classes (Copywright _MOVE THE CITY) ─
 // MOVE_THE_CITY already done — leave as-is.
@@ -178,7 +179,7 @@ export const ARCHIVE_PAGE = {
       author: "Kara Shaffer",
       date: "November 25, 2025",
       href: "https://unitedstrengthgym.com/blog/bite-the-sandwichnbspby-kara-shaffer",
-      cover: archiveCovers.note01,
+      coverKey: "note01" as const,
       coverAlt: "Editorial still — Bite The Sandwich",
       excerpt: "A note on fuel, patience, and showing up for the work.",
     },
@@ -188,7 +189,7 @@ export const ARCHIVE_PAGE = {
       author: "Todd Johnson",
       date: "November 25, 2025",
       href: "https://unitedstrengthgym.com/blog/how-to-stay-consistent-with-your-workouts-amp-nutrition-during-the-holiday-season-by-todd-johnson",
-      cover: archiveCovers.note02,
+      coverKey: "note02" as const,
       coverAlt: "Editorial still — Holiday consistency",
       excerpt: "Stay consistent through the season without losing the joy of it.",
     },

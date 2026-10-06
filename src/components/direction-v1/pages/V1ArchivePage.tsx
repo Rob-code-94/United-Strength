@@ -1,6 +1,7 @@
 import { FormEvent, useState } from "react";
-import { ARCHIVE_PAGE } from "../../../data/culture-copy";
+import { archiveCoverUrl } from "../../../assets/images/archive";
 import { gymPhotos } from "../../../assets/images/gym";
+import { ARCHIVE_PAGE } from "../../../data/culture-copy";
 import { LookbookOffCenteredStack } from "../../direction-ef/lookbook";
 import { usePageCopy } from "../V1Kit";
 import {
@@ -142,7 +143,7 @@ export default function V1ArchivePage({ onBack, onNav }: PageProps) {
               date: post.date,
               excerpt: post.excerpt,
               href: link?.href ?? "#",
-              cover: link?.cover ?? "",
+              cover: archiveCoverUrl(link?.coverKey),
               coverAlt: link?.coverAlt ?? "",
               coverSlot: ARCHIVE_ISSUE_SLOTS[index] ?? ARCHIVE_POST_SLOTS[index],
               copyPathPrefix: `archive.posts.${index}`,

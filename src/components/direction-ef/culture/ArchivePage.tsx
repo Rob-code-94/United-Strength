@@ -1,3 +1,4 @@
+import { archiveCoverUrl } from "../../../assets/images/archive";
 import { ARCHIVE_PAGE } from "../../../data/culture-copy";
 import {
   LookbookAboutPageShell,
@@ -49,7 +50,15 @@ export default function ArchivePage({ onBack, onNav }: PageProps) {
         className="py-10 md:py-16 bg-white border-b border-neutral-200/60 scroll-mt-24"
       >
         <LookbookOffCenteredStack
-          items={c.posts}
+          items={c.posts.map((post) => ({
+            title: post.title,
+            author: post.author,
+            date: post.date,
+            excerpt: post.excerpt,
+            href: post.href,
+            cover: archiveCoverUrl(post.coverKey),
+            coverAlt: post.coverAlt,
+          }))}
           eyebrow="Archives"
           indexLabel="Archive"
         />

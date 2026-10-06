@@ -1,9 +1,26 @@
-import type { CSSProperties } from "react";
-import { V1_FACTS, V1_FACTS_ANSWERS, V1_FACTS_INTRO } from "@/data/v1-interior-copy";
-import { mergePages, seedPages, validatePages, type PageCopyKit } from "@/hub/page-copy";
+import { V1_FACTS, V1_FACTS_ANSWERS, V1_FACTS_INTRO } from "../data/v1-interior-copy";
+import {
+  mergePages,
+  seedPages,
+  validatePages,
+  type PageCopyKit,
+  getCopyPath,
+  setCopyPath,
+  listCopyPaths,
+  copyPencilId,
+  copyPathFromPencil,
+} from "./page-copy";
 
-export type { PageCopyKit } from "@/hub/page-copy";
-export { mergePages, seedPages, getCopyPath, setCopyPath, listCopyPaths, copyPencilId, copyPathFromPencil } from "@/hub/page-copy";
+export type { PageCopyKit };
+export {
+  mergePages,
+  seedPages,
+  getCopyPath,
+  setCopyPath,
+  listCopyPaths,
+  copyPencilId,
+  copyPathFromPencil,
+};
 
 /** Shared brand-kit shape. Donors stay in the hub UI; this file is data only. */
 
@@ -597,22 +614,23 @@ export function fontStack(family: FontFamily): string {
   }
 }
 
-export function kitStyle(kit: BrandKitFields): CSSProperties {
+/** Plain style map — Node-safe (no React types) for hub API import graph. */
+export function kitStyle(kit: BrandKitFields): Record<string, string> {
   return {
     backgroundColor: kit.colors.background,
     color: kit.colors.cream,
-    ["--v1-bg" as string]: kit.colors.background,
-    ["--v1-cream" as string]: kit.colors.cream,
-    ["--v1-gold" as string]: kit.colors.gold,
-    ["--v1-text" as string]: kit.colors.text,
-    ["--v1-display-family" as string]: fontStack(kit.type.displayFamily),
-    ["--v1-body-family" as string]: fontStack(kit.type.bodyFamily),
-    ["--v1-mono-family" as string]: fontStack(kit.type.monoFamily),
-    ["--v1-display-size" as string]: `${kit.type.displaySizePx}px`,
-    ["--v1-body-size" as string]: `${kit.type.bodySizePx}px`,
-    ["--v1-mono-size" as string]: `${kit.type.monoSizePx}px`,
-    ["--v1-display-color" as string]: kit.type.displayColor,
-    ["--v1-body-color" as string]: kit.type.bodyColor,
-    ["--v1-mono-color" as string]: kit.type.monoColor,
+    "--v1-bg": kit.colors.background,
+    "--v1-cream": kit.colors.cream,
+    "--v1-gold": kit.colors.gold,
+    "--v1-text": kit.colors.text,
+    "--v1-display-family": fontStack(kit.type.displayFamily),
+    "--v1-body-family": fontStack(kit.type.bodyFamily),
+    "--v1-mono-family": fontStack(kit.type.monoFamily),
+    "--v1-display-size": `${kit.type.displaySizePx}px`,
+    "--v1-body-size": `${kit.type.bodySizePx}px`,
+    "--v1-mono-size": `${kit.type.monoSizePx}px`,
+    "--v1-display-color": kit.type.displayColor,
+    "--v1-body-color": kit.type.bodyColor,
+    "--v1-mono-color": kit.type.monoColor,
   };
 }
