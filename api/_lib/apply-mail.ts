@@ -1,4 +1,4 @@
-import { MEMBERSHIP_INBOX } from "../../src/data/contact";
+import { MEMBERSHIP_INBOX } from "../../src/data/contact.js";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

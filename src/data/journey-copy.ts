@@ -13,9 +13,9 @@ import {
   MEMBERSHIP_INBOX,
   TRAINING_INBOX,
   TRAINING_INQUIRE_MAILTO,
-} from "./contact";
+} from "./contact.js";
 
-export { FACILITY_HOURS, FACILITY_ADDRESS } from "./training-copy";
+export { FACILITY_HOURS, FACILITY_ADDRESS } from "./training-copy.js";
 
 // ── Experience United — Copywright EXPERIENCE UNITED PAGE ($70) ─────────────
 

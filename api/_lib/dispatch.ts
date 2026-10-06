@@ -7,7 +7,7 @@ import {
   type BrandKitStore,
   type MediaLibraryItem,
   type MediaSlot,
-} from "../../src/hub/brand-kit";
+} from "../../src/hub/brand-kit.js";
 import { randomBytes } from "node:crypto";
 import {
   clearSessionCookie,
@@ -17,10 +17,10 @@ import {
   passwordsMatch,
   readSession,
   sessionCookie,
-} from "./session";
-import { sendApplication, sendHubReset } from "./apply-mail";
-import { sendRunClubSignup } from "./run-club-mail";
-import { loadHubAuth, loadStore, localMediaPath, saveHubAuth, saveMedia, saveStore } from "./store";
+} from "./session.js";
+import { sendApplication, sendHubReset } from "./apply-mail.js";
+import { sendRunClubSignup } from "./run-club-mail.js";
+import { loadHubAuth, loadStore, localMediaPath, saveHubAuth, saveMedia, saveStore } from "./store.js";
 
 export interface HubResult {
   status: number;

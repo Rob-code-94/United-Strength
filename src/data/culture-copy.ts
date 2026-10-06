@@ -6,7 +6,7 @@
  * Copywright Part D: CULTIVATED, BY_DESIGN, ARCHIVE_PAGE updated Sep 2026.
  */
 
-import { RUN_CLUB_MAILTO } from "./contact";
+import { RUN_CLUB_MAILTO } from "./contact.js";
 
 /** Cover URLs are resolved in Archive page components — keep this module Node-safe for hub API. */
 

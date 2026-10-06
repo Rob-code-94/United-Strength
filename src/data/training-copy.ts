@@ -6,7 +6,7 @@
  * Strip from live: Sign up / Free Trial / Book chrome → Experience United / mailto only.
  */
 
-import { TRAINING_INQUIRE_MAILTO } from "./contact";
+import { TRAINING_INQUIRE_MAILTO } from "./contact.js";
 
 export interface ScheduleRow {
   day: string;

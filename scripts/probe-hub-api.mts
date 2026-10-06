@@ -1,4 +1,4 @@
-import { dispatchHub } from "../api/_lib/dispatch.ts";
+import { dispatchHub } from "../api/_lib/dispatch.js";
 
 const r = await dispatchHub({
   method: "POST",

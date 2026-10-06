@@ -10,7 +10,7 @@ import {
   type BrandKitFields,
   type BrandKitStore,
   type MediaSlot,
-} from "../../src/hub/brand-kit";
+} from "../../src/hub/brand-kit.js";
 
 function normalizeFields(fields: BrandKitFields): BrandKitFields {
   const seed = seedFields();

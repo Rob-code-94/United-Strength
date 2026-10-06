@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { dispatchHub } from "./dispatch";
+import { dispatchHub } from "./dispatch.js";
 
 async function readBody(req: IncomingMessage): Promise<string | null> {
   if (req.method === "GET" || req.method === "HEAD" || req.method === "DELETE") return null;

@@ -1,4 +1,4 @@
-import { V1_FACTS, V1_FACTS_ANSWERS, V1_FACTS_INTRO } from "../data/v1-interior-copy";
+import { V1_FACTS, V1_FACTS_ANSWERS, V1_FACTS_INTRO } from "../data/v1-interior-copy.js";
 import {
   mergePages,
   seedPages,
@@ -9,7 +9,7 @@ import {
   listCopyPaths,
   copyPencilId,
   copyPathFromPencil,
-} from "./page-copy";
+} from "./page-copy.js";
 
 export type { PageCopyKit };
 export {
