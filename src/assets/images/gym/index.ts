@@ -11,6 +11,8 @@ import experienceBroll from "./experience-broll.jpg";
 import floorColumbus from "./floor-columbus.jpg";
 import rackWeights from "./rack-weights.jpg";
 import runClub from "./run-club.jpg";
+import runRouteMonday from "./run-route-monday.svg";
+import runRouteThursday from "./run-route-thursday.svg";
 
 export const gymPhotos = {
   heroFullBleed,
@@ -26,4 +28,7 @@ export const gymPhotos = {
   rackWeights,
   /** Run Club · Pexels 2402777 — urban community runners (HD stock) */
   runClub,
+  /** Run Club route maps — gold SVG placeholders until Todd drops yellow maps */
+  runRouteMonday,
+  runRouteThursday,
 } as const;

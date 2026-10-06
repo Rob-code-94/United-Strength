@@ -2,6 +2,8 @@ import { ArrowUpRight } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { gymPhotos } from "../../assets/images/gym";
 import { LOOKBOOK_EASE } from "../direction-ef/lookbook";
+import { usePageCopy } from "./V1Kit";
+import { HubCopyText, useHubCopyPencil } from "./pages/V1Interior";
 import NumberTicker from "./NumberTicker";
 
 interface Props {
@@ -11,24 +13,22 @@ interface Props {
 const ledeClass =
   "flex flex-col gap-3 text-[26px] font-bold leading-none tracking-[-0.04em] text-[#F3EEE7] sm:gap-4 sm:text-[32px] lg:gap-5 lg:text-[44px]";
 
-const pathways = [
+const PATHWAY_MEDIA = [
   {
-    title: "Experience United",
-    lede: "5 classes · 14 days · try the practice.",
     href: "/start-here/experience",
     label: "Experience United",
     image: gymPhotos.experienceBroll,
     objectPosition: "center 40%",
     circleClass: "bg-white text-[#111111]",
+    copyKey: "experience" as const,
   },
   {
-    title: "Apply for Membership",
-    lede: "Selective membership — reviewed by the team.",
     href: "/start-here/apply",
     label: "Apply for Membership",
     image: gymPhotos.runClub,
     objectPosition: "center 35%",
     circleClass: "bg-[#0A3C2E] text-[#F3EEE7]",
+    copyKey: "apply" as const,
   },
 ] as const;
 
@@ -36,8 +36,18 @@ const pathways = [
  * 07 // START HERE — Apple card strip adapted from Space carousel-08.
  * Two pathways only. Native scroll-snap; no Embla install.
  */
+function parseExperienceLede(lede: string): { classes: number; days: number; tail: string } | null {
+  const match = lede.match(/^(\d+)\s+classes\s·\s(\d+)\s+days\s·\s(.+)$/i);
+  if (!match) return null;
+  return { classes: Number(match[1]), days: Number(match[2]), tail: match[3] ?? "" };
+}
+
 export default function StartHere({ onNav }: Props) {
   const reduceMotion = useReducedMotion();
+  const { home } = usePageCopy();
+  const start = home.start;
+  const experiencePencil = useHubCopyPencil("home.start.pathways.experience.lede");
+  const applyPencil = useHubCopyPencil("home.start.pathways.apply.lede");
 
   return (
     <section
@@ -51,85 +61,122 @@ export default function StartHere({ onNav }: Props) {
         transition={{ duration: 0.7, ease: LOOKBOOK_EASE }}
         className="mx-auto flex max-w-3xl flex-col items-center text-center"
       >
-        <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#F3EEE7]/50">
-          07 // Start Here
-        </p>
+        <HubCopyText
+          path="home.start.eyebrow"
+          as="p"
+          className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#F3EEE7]/50"
+        >
+          {start.eyebrow}
+        </HubCopyText>
         <h2
           id="v1-start-heading"
           className="mt-3 font-sans text-[28px] font-bold uppercase leading-[1.1] tracking-[-0.04em] md:text-[40px]"
           style={{ fontFamily: "'Satoshi', sans-serif" }}
         >
-          Two ways to begin.
+          <HubCopyText path="home.start.headline">{start.headline}</HubCopyText>
         </h2>
       </motion.div>
 
       <div className="mx-auto mt-10 flex w-full snap-x snap-mandatory gap-6 overflow-x-auto pb-2 scrollbar-none lg:justify-center">
-        {pathways.map((path) => (
-          <button
-            key={path.href}
-            type="button"
-            data-start-card
-            onClick={() => onNav(path.href, path.label)}
-            aria-label={`${path.title}. ${path.lede}`}
-            className="group relative h-[460px] w-[280px] shrink-0 snap-start overflow-hidden rounded-2xl text-left sm:h-[520px] sm:w-[320px] lg:h-[600px] lg:w-[calc((100%-1.5rem)/2)] lg:max-w-[640px] motion-safe:transition-transform motion-safe:duration-300 motion-safe:hover:scale-[1.02]"
-          >
-            <img
-              src={path.image}
-              alt=""
-              aria-hidden
-              className="absolute inset-0 h-full w-full object-cover"
-              style={{ objectPosition: path.objectPosition }}
-            />
-            <span className="absolute inset-0 bg-gradient-to-b from-[#111111]/75 via-[#111111]/20 to-[#111111]/55" />
-            <span className="relative z-10 flex h-full flex-col justify-between p-6 sm:p-8">
-              <span className="flex flex-col gap-3">
-                <span className="text-[15px] font-medium text-[#F3EEE7]">{path.title}</span>
-                {path.href === "/start-here/experience" ? (
-                  <span className={ledeClass} style={{ fontFamily: "'Satoshi', sans-serif" }}>
-                    <span>
-                      <NumberTicker
-                        end={5}
-                        loop
-                        pauseMs={12000}
-                        duration={1.2}
-                        className="tabular-nums"
-                      />
-                      {" classes"}
-                    </span>
-                    <span>
-                      <NumberTicker
-                        end={14}
-                        loop
-                        pauseMs={12000}
-                        duration={1.4}
-                        className="tabular-nums"
-                      />
-                      {" days"}
-                    </span>
-                    <span>try the practice.</span>
+        {PATHWAY_MEDIA.map((path) => {
+          const copy = start.pathways[path.copyKey];
+          return (
+            <button
+              key={path.href}
+              type="button"
+              data-start-card
+              onClick={() => onNav(path.href, path.label)}
+              aria-label={`${copy.title}. ${copy.lede}`}
+              className="group relative h-[460px] w-[280px] shrink-0 snap-start overflow-hidden rounded-2xl text-left sm:h-[520px] sm:w-[320px] lg:h-[600px] lg:w-[calc((100%-1.5rem)/2)] lg:max-w-[640px] motion-safe:transition-transform motion-safe:duration-300 motion-safe:hover:scale-[1.02]"
+            >
+              <img
+                src={path.image}
+                alt=""
+                aria-hidden
+                className="absolute inset-0 h-full w-full object-cover"
+                style={{ objectPosition: path.objectPosition }}
+              />
+              <span className="absolute inset-0 bg-gradient-to-b from-[#111111]/75 via-[#111111]/20 to-[#111111]/55" />
+              <span className="relative z-10 flex h-full flex-col justify-between p-6 sm:p-8">
+                <span className="flex flex-col gap-3">
+                  <span className="text-[15px] font-medium text-[#F3EEE7]">
+                    <HubCopyText path={`home.start.pathways.${path.copyKey}.title`}>
+                      {copy.title}
+                    </HubCopyText>
                   </span>
-                ) : (
-                  <span className={ledeClass} style={{ fontFamily: "'Satoshi', sans-serif" }}>
-                    <span>Selective</span>
-                    <span>membership —</span>
-                    <span>reviewed by</span>
-                    <span>the team.</span>
+                  {path.copyKey === "experience" ? (
+                    (() => {
+                      const parsed = parseExperienceLede(copy.lede);
+                      return (
+                        <span
+                          className={ledeClass}
+                          style={{ fontFamily: "'Satoshi', sans-serif" }}
+                          {...experiencePencil}
+                        >
+                          {parsed ? (
+                            <>
+                              <span>
+                                <NumberTicker
+                                  end={parsed.classes}
+                                  loop
+                                  pauseMs={12000}
+                                  duration={1.2}
+                                  className="tabular-nums"
+                                />
+                                {" classes"}
+                              </span>
+                              <span>
+                                <NumberTicker
+                                  end={parsed.days}
+                                  loop
+                                  pauseMs={12000}
+                                  duration={1.4}
+                                  className="tabular-nums"
+                                />
+                                {" days"}
+                              </span>
+                              <span>{parsed.tail}</span>
+                            </>
+                          ) : (
+                            copy.lede
+                          )}
+                        </span>
+                      );
+                    })()
+                  ) : (
+                    <span
+                      className={ledeClass}
+                      style={{ fontFamily: "'Satoshi', sans-serif" }}
+                      {...applyPencil}
+                    >
+                      {(copy.lede.split(" — ").length > 1
+                        ? [
+                            copy.lede.split(" — ")[0],
+                            `— ${copy.lede.split(" — ")[1]?.split(" ").slice(0, 2).join(" ") ?? ""}`.trim(),
+                            copy.lede.split(" — ")[1]?.split(" ").slice(2, 4).join(" ") ?? "",
+                            copy.lede.split(" — ")[1]?.split(" ").slice(4).join(" ") ?? "",
+                          ].filter(Boolean)
+                        : [copy.lede]
+                      ).map((line) => (
+                        <span key={line}>{line}</span>
+                      ))}
+                    </span>
+                  )}
+                </span>
+                <span className="flex justify-end">
+                  <span
+                    className={`inline-flex h-11 w-11 items-center justify-center rounded-full ${path.circleClass}`}
+                  >
+                    <ArrowUpRight
+                      className="h-4 w-4 motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover:rotate-45"
+                      aria-hidden
+                    />
                   </span>
-                )}
-              </span>
-              <span className="flex justify-end">
-                <span
-                  className={`inline-flex h-11 w-11 items-center justify-center rounded-full ${path.circleClass}`}
-                >
-                  <ArrowUpRight
-                    className="h-4 w-4 motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover:rotate-45"
-                    aria-hidden
-                  />
                 </span>
               </span>
-            </span>
-          </button>
-        ))}
+            </button>
+          );
+        })}
       </div>
     </section>
   );

@@ -103,7 +103,7 @@ export default function HubLogin({ onSuccess }: HubLoginProps) {
     <section className="bg-background min-h-screen flex items-center justify-center relative px-4 py-8">
       <Card className="rounded-2xl shadow-md max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 overflow-hidden gap-6 p-0">
         <div className="p-6 sm:p-10 flex flex-col justify-center">
-          <p className="mb-6 font-sans text-xs font-bold uppercase tracking-[0.18em]">United Strength Club</p>
+          <p className="mb-6 font-sans text-xs font-bold uppercase tracking-[0.18em]">United Strength</p>
           <h1 className="text-xl font-bold">{mode === "sign-in" ? "Brand hub" : "Reset password"}</h1>
           <p className="text-muted-foreground text-sm font-medium">
             {mode === "sent"
@@ -224,11 +224,11 @@ export default function HubLogin({ onSuccess }: HubLoginProps) {
         <div className="hidden md:block relative min-h-[420px] bg-[#111111]">
           <img
             src={gymPhotos.experienceBroll}
-            alt="Stronger United mural at United Strength Club"
+            alt="Stronger United mural at United Strength"
             className="w-full h-full object-cover object-[center_40%]"
           />
           <p className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#111111] via-[#111111]/70 to-transparent px-8 pb-8 pt-16 font-sans text-xs font-bold uppercase tracking-[0.22em] text-[#F3EEE7]">
-            United Strength Club
+            United Strength
           </p>
         </div>
       </Card>

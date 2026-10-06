@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { LOOKBOOK_EASE } from "../direction-ef/lookbook/constants";
+import { HubCopyText } from "./pages/V1Interior";
 
 export type OpeningMedia =
   | {
@@ -28,6 +29,8 @@ interface OpeningSlideProps {
   emphasizeType?: boolean;
   /** Slow cinematic scale on the media plane (Odd Ritual pacing) */
   cinematic?: boolean;
+  copyTitlePath?: string;
+  copyLedePath?: string;
 }
 
 /**
@@ -43,6 +46,8 @@ export default function OpeningSlide({
   children,
   emphasizeType = true,
   cinematic = false,
+  copyTitlePath,
+  copyLedePath,
 }: OpeningSlideProps) {
   const reduceMotion = useReducedMotion();
   const [videoFailed, setVideoFailed] = useState(false);
@@ -136,7 +141,13 @@ export default function OpeningSlide({
             }}
           >
             <span className="opacity-55">// </span>
-            {title}
+            {copyTitlePath ? (
+              <HubCopyText path={copyTitlePath} typeRole="display">
+                {title}
+              </HubCopyText>
+            ) : (
+              title
+            )}
           </h2>
           {lede ? (
             <p
@@ -147,7 +158,13 @@ export default function OpeningSlide({
                 color: "var(--v1-body-color, var(--v1-cream))",
               }}
             >
-              {lede}
+              {copyLedePath ? (
+                <HubCopyText path={copyLedePath} typeRole="body">
+                  {lede}
+                </HubCopyText>
+              ) : (
+                lede
+              )}
             </p>
           ) : null}
           {children}

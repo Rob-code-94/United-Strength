@@ -6,6 +6,8 @@
  * Strip from live: Sign up / Free Trial / Book chrome → Experience United / mailto only.
  */
 
+import { TRAINING_INQUIRE_MAILTO } from "./contact";
+
 export interface ScheduleRow {
   day: string;
   times: string;
@@ -64,7 +66,7 @@ export const BUILD_CLASS: TrainingClassCopy = {
 
 /**
  * Source: unitedstrengthgym.com/classes/burn
- * Schedule on live site lists Mon–Thu only — do not invent Fri–Sun.
+ * Schedule lists Mon–Thu only.
  */
 export const BURN_CLASS: TrainingClassCopy = {
   n: "02",
@@ -73,8 +75,10 @@ export const BURN_CLASS: TrainingClassCopy = {
   headline: "BURN",
   lede: "HIIT intervals — maximal effort, then recovery.",
   body: [
-    "Burn is a class focused on HIIT training, which incorporates intervals of maximal effort followed by recovery. This type of training allows for optimal fat and calorie burning.",
-    "Burn will help build your cardiovascular and muscular endurance.",
+    "BURN is our approach to conditioning — intervals of maximal effort followed by recovery, programmed with the same intention we bring to strength.",
+    "The work is hard on purpose. It builds cardiovascular capacity, muscular endurance, and the mental skill of staying present when the interval gets uncomfortable.",
+    "You do not need to be the fittest person in the room. You need to be willing to push when it counts, recover when the clock says recover, and show up again.",
+    "Conditioning here supports a stronger life — not random burnout for its own sake.",
   ],
   communityNote:
     "The best way to understand BURN is to experience it. Experience United gives you the opportunity to train with us, meet our coaches, understand how our classes work, and decide if United is the right place for you.",
@@ -84,7 +88,6 @@ export const BURN_CLASS: TrainingClassCopy = {
     { day: "Wednesday", times: "7 pm" },
     { day: "Thursday", times: "6 am · 9 am · 6 pm" },
   ],
-  scheduleNote: "Times as published on unitedstrengthgym.com — additional days pending confirmation.",
   next: "03 // Balance",
 };
 
@@ -187,7 +190,7 @@ export const PERSONAL_TRAINING_HUB = {
 
   /** CTA — bottom inquire band */
   ctaSection: {
-    headline: "READY TO FIND THE RIGHT COACH?",
+    headline: "START WITH A CONVERSATION.",
     body: "You don't need to know exactly what you need before reaching out. Tell us where you are, what you're looking for, and we'll help you figure out the best place to start.",
     inquireLabel: "Inquire about training",
   },
@@ -256,5 +259,5 @@ export const TRAINING_CTA = {
   teamLabel: "Meet the Team",
   teamHref: "/about/team",
   inquireLabel: "Inquire about training",
-  inquireHref: "mailto:training@unitedstrengthgym.com",
+  inquireHref: TRAINING_INQUIRE_MAILTO,
 } as const;

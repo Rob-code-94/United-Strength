@@ -1,7 +1,8 @@
 import { motion, useReducedMotion } from "motion/react";
 import { gymPhotos } from "../../assets/images/gym";
 import { LOOKBOOK_EASE } from "../direction-ef/lookbook";
-import { useSlot } from "./V1Kit";
+import { usePageCopy, useSlot } from "./V1Kit";
+import { HubCopyText, V1MediaImg } from "./pages/V1Interior";
 
 interface Props {
   /** Kept for ConceptV1View parity — Space is a layout break, not a gateway. */
@@ -16,6 +17,8 @@ interface Props {
  */
 export default function SpaceExperience({ onNav: _onNav }: Props) {
   const reduceMotion = useReducedMotion();
+  const { home } = usePageCopy();
+  const space = home.space;
   const lead = useSlot("spaceLead", gymPhotos.floorColumbus);
   const detail = useSlot("spaceDetail", gymPhotos.equipmentClose);
 
@@ -33,7 +36,8 @@ export default function SpaceExperience({ onNav: _onNav }: Props) {
             transition={{ duration: 0.7, ease: LOOKBOOK_EASE }}
             className="relative z-0 w-[78%] overflow-hidden aspect-[4/5] md:w-[80%]"
           >
-            <img
+            <V1MediaImg
+              slot="spaceLead"
               src={lead}
               alt="United Strength training floor — benches, dumbbells, and Columbus banner"
               className="h-full w-full object-cover"
@@ -52,7 +56,8 @@ export default function SpaceExperience({ onNav: _onNav }: Props) {
             }}
             className="absolute right-0 top-[14%] z-10 w-[54%] overflow-hidden aspect-[3/4] md:top-[10%] md:w-[48%]"
           >
-            <img
+            <V1MediaImg
+              slot="spaceDetail"
               src={detail}
               alt="Dumbbell rack at United Strength"
               className="h-full w-full object-cover"
@@ -72,19 +77,27 @@ export default function SpaceExperience({ onNav: _onNav }: Props) {
           }}
           className="order-1 flex flex-col items-center text-center md:order-none md:col-span-5 md:items-start md:self-center md:text-left"
         >
-          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#5C5C5C]">
-            05 // The Space
-          </p>
+          <HubCopyText
+            path="home.space.eyebrow"
+            as="p"
+            className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#5C5C5C]"
+          >
+            {space.eyebrow}
+          </HubCopyText>
           <h2
             id="v1-space-heading"
             className="mt-3 max-w-[12ch] font-sans text-[24px] font-bold uppercase leading-[1.05] tracking-[-0.04em] md:text-[28px] lg:text-[32px]"
             style={{ fontFamily: "'Satoshi', sans-serif" }}
           >
-            The physical club
+            <HubCopyText path="home.space.headline">{space.headline}</HubCopyText>
           </h2>
-          <p className="mt-5 font-mono text-[9px] uppercase tracking-[0.18em] text-[#5C5C5C]">
-            Columbus · floor, racks &amp; iron
-          </p>
+          <HubCopyText
+            path="home.space.kicker"
+            as="p"
+            className="mt-5 font-mono text-[9px] uppercase tracking-[0.18em] text-[#5C5C5C]"
+          >
+            {space.kicker}
+          </HubCopyText>
         </motion.div>
       </div>
     </section>

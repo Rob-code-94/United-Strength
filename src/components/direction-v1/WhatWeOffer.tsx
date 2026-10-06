@@ -1,56 +1,68 @@
 import { motion, useReducedMotion } from "motion/react";
 import { gymPhotos } from "../../assets/images/gym";
 import { LOOKBOOK_EASE } from "../direction-ef/lookbook";
+import { usePageCopy } from "./V1Kit";
+import { HubCopyText } from "./pages/V1Interior";
 import TrainingTile, { type TrainingPathway } from "./TrainingTile";
 
 interface Props {
   onNav: (href: string, label: string) => void;
 }
 
-const PATHWAYS: readonly TrainingPathway[] = [
+const PATHWAY_MEDIA = [
   {
     n: "01",
-    label: "Build",
-    title: "Strength for life.",
     href: "/training/classes/build",
     image: gymPhotos.equipmentClose,
     objectPosition: "center 40%",
+    copyKey: "build" as const,
   },
   {
     n: "02",
-    label: "Burn",
-    title: "Burn.",
     href: "/training/classes/burn",
     image: gymPhotos.heroFullBleed,
     objectPosition: "center 45%",
+    copyKey: "burn" as const,
   },
   {
     n: "03",
-    label: "Personal Training",
-    title: "1:1 Coaching.",
     href: "/training/personal",
     image: gymPhotos.galleryCinematic,
     objectPosition: "center 35%",
+    copyKey: "personal" as const,
   },
   {
     n: "04",
-    label: "Move the City",
-    title: "Move the City.",
     href: "/training/move-the-city",
     image: gymPhotos.runClub,
     objectPosition: "center 40%",
+    copyKey: "runClub" as const,
   },
 ] as const;
 
-const [BUILD, BURN, PT, MOVE] = PATHWAYS;
-
 /**
  * 03 // TRAINING — off-center photo bento.
- * Phone: Build full width, Burn tall on the left, Personal Training and Move stacked on the right.
- * Desktop: Build wide 3cols · Burn tall rowspan-2 · PT 1col · Move 2cols.
+ * Phone: Build full width, Burn tall on the left, Personal Training and Run Club stacked on the right.
+ * Desktop: Build wide 3cols · Burn tall rowspan-2 · PT 1col · Run Club 2cols.
  */
 export default function WhatWeOffer({ onNav }: Props) {
   const reduceMotion = useReducedMotion();
+  const { home } = usePageCopy();
+  const training = home.training;
+  const pathways: readonly TrainingPathway[] = PATHWAY_MEDIA.map((item) => {
+    const copy = training.pathways[item.copyKey];
+    return {
+      n: item.n,
+      label: copy.label,
+      title: copy.title,
+      href: item.href,
+      image: item.image,
+      objectPosition: item.objectPosition,
+      labelCopyPath: `home.training.pathways.${item.copyKey}.label`,
+      titleCopyPath: `home.training.pathways.${item.copyKey}.title`,
+    };
+  });
+  const [BUILD, BURN, PT, RUN] = pathways;
 
   return (
     <section
@@ -64,15 +76,19 @@ export default function WhatWeOffer({ onNav }: Props) {
         transition={{ duration: 0.7, ease: LOOKBOOK_EASE }}
         className="border-b border-[#F3EEE7]/15 pb-6"
       >
-        <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#F3EEE7]/50">
-          03 // Training
-        </p>
+        <HubCopyText
+          path="home.training.eyebrow"
+          as="p"
+          className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#F3EEE7]/50"
+        >
+          {training.eyebrow}
+        </HubCopyText>
         <h2
           id="v1-training-heading"
           className="mt-3 max-w-[14ch] font-sans text-[28px] font-bold uppercase tracking-[-0.04em] md:text-[36px]"
           style={{ fontFamily: "'Satoshi', sans-serif" }}
         >
-          How we train.
+          <HubCopyText path="home.training.headline">{training.headline}</HubCopyText>
         </h2>
       </motion.div>
 
@@ -96,7 +112,7 @@ export default function WhatWeOffer({ onNav }: Props) {
           className="col-span-1 row-start-2 h-full md:row-span-1 md:row-start-2"
         />
         <TrainingTile
-          pathway={MOVE}
+          pathway={RUN}
           onNav={onNav}
           index={3}
           className="col-span-1 row-start-3 h-full md:col-span-2 md:row-span-1 md:row-start-2"

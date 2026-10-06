@@ -4,29 +4,14 @@ import {
 } from "motion/react";
 import { gymPhotos } from "../../assets/images/gym";
 import { LOOKBOOK_EASE } from "../direction-ef/lookbook";
-import { useSlot } from "./V1Kit";
+import { usePageCopy, useSlot } from "./V1Kit";
+import { HubCopyText } from "./pages/V1Interior";
 
-const PILLARS = [
-  {
-    n: "01",
-    title: "Foundation",
-    image: gymPhotos.architectureRaw,
-  },
-  {
-    n: "02",
-    title: "Reflection",
-    image: gymPhotos.galleryCinematic,
-  },
-  {
-    n: "03",
-    title: "Longevity",
-    image: gymPhotos.spaceAtmosphere,
-  },
-  {
-    n: "04",
-    title: "Move the City",
-    image: gymPhotos.equipmentClose,
-  },
+const PILLAR_IMAGES = [
+  gymPhotos.architectureRaw,
+  gymPhotos.galleryCinematic,
+  gymPhotos.spaceAtmosphere,
+  gymPhotos.equipmentClose,
 ] as const;
 
 /**
@@ -36,15 +21,17 @@ const PILLARS = [
  */
 export default function PillarsQuad() {
   const reduceMotion = useReducedMotion();
+  const { home } = usePageCopy();
+  const slideTitle = home.opening.slides["03"].title;
   const images = [
     useSlot("pillar1", gymPhotos.architectureRaw),
     useSlot("pillar2", gymPhotos.galleryCinematic),
     useSlot("pillar3", gymPhotos.spaceAtmosphere),
     useSlot("pillar4", gymPhotos.equipmentClose),
   ];
-  const pillars = PILLARS.map((pillar, index) => ({
+  const pillars = home.opening.pillars.map((pillar, index) => ({
     ...pillar,
-    image: images[index] ?? pillar.image,
+    image: images[index] ?? PILLAR_IMAGES[index] ?? gymPhotos.architectureRaw,
   }));
 
   return (
@@ -53,15 +40,15 @@ export default function PillarsQuad() {
       aria-label="03 The Four Pillars"
     >
       <div className="absolute inset-0 grid h-full grid-cols-2 grid-rows-2 md:flex md:flex-row">
-        {pillars.map((pillar, i) => (
+        {pillars.map((pillar, index) => (
           <motion.div
             key={pillar.n}
             className={`relative h-full min-h-0 min-w-0 border-white/20 md:h-full md:flex-1 ${
-              i % 2 === 0 ? "border-r md:border-r-0" : ""
-            } ${i < 2 ? "border-b md:border-b-0" : ""} ${
-              i > 0 ? "md:border-l" : ""
+              index % 2 === 0 ? "border-r md:border-r-0" : ""
+            } ${index < 2 ? "border-b md:border-b-0" : ""} ${
+              index > 0 ? "md:border-l" : ""
             }`}
-            style={{ zIndex: i + 1 }}
+            style={{ zIndex: index + 1 }}
             initial={
               reduceMotion
                 ? false
@@ -75,7 +62,7 @@ export default function PillarsQuad() {
             viewport={{ once: true, amount: 0.45 }}
             transition={{
               duration: 0.7,
-              delay: 0.06 + i * 0.1,
+              delay: 0.06 + index * 0.1,
               ease: LOOKBOOK_EASE,
             }}
           >
@@ -96,13 +83,13 @@ export default function PillarsQuad() {
                 US
               </span>
               <p className="font-mono text-[8px] tracking-[0.2em] text-[#F3EEE7]/55 md:text-[9px]">
-                {pillar.n}
+                <HubCopyText path={`home.opening.pillars.${index}.n`}>{pillar.n}</HubCopyText>
               </p>
               <p
                 className="mt-1 text-center font-sans text-[10px] font-bold uppercase leading-tight tracking-[-0.02em] text-[#F3EEE7] sm:text-[11px] md:text-[13px]"
                 style={{ fontFamily: "'Satoshi', sans-serif" }}
               >
-                {pillar.title}
+                <HubCopyText path={`home.opening.pillars.${index}.title`}>{pillar.title}</HubCopyText>
               </p>
             </div>
           </motion.div>
@@ -126,7 +113,7 @@ export default function PillarsQuad() {
               style={{ fontFamily: "'Satoshi', sans-serif" }}
             >
               <span className="text-[#F3EEE7]/55">// </span>
-              The Four Pillars
+              <HubCopyText path="home.opening.slides.03.title">{slideTitle}</HubCopyText>
             </h2>
           </motion.div>
         </div>

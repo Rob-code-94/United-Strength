@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" fill="none" role="img" aria-label="Thursday 3.1 mile route map">
+  <rect width="640" height="360" fill="#111111"/>
+  <path d="M72 300 L180 220 L280 260 L380 140 L480 180 L568 90" stroke="#C4A35A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="72" cy="300" r="10" fill="#C4A35A"/>
+  <circle cx="568" cy="90" r="8" fill="#C4A35A"/>
+  <text x="72" y="338" fill="#C4A35A" font-family="ui-monospace, monospace" font-size="14" letter-spacing="0.16em">START</text>
+  <text x="480" y="74" fill="#C4A35A" font-family="ui-monospace, monospace" font-size="12" letter-spacing="0.14em">3.1 MI</text>
+</svg>

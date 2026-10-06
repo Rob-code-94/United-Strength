@@ -78,7 +78,7 @@ export default function ConceptDView({ onNav }: SubViewProps) {
       >
         <img
           src={gymPhotos.heroFullBleed}
-          alt="United Strength Club — cinematic facility"
+          alt="United Strength — cinematic facility"
           className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
         />
       </section>

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { gymPhotos } from "../../assets/images/gym";
 import { gymVideos } from "../../assets/video";
-import { useSlot } from "./V1Kit";
+import { usePageCopy, useSlot } from "./V1Kit";
 import OpeningSlide from "./OpeningSlide";
 import PillarsQuad from "./PillarsQuad";
 
@@ -29,6 +29,8 @@ export default function OpeningCarousel({
   const touchOrigin = useRef<{ x: number; y: number } | null>(null);
   const [active, setActive] = useState(0);
   const verticalLocked = active < VERTICAL_UNLOCK_INDEX;
+  const { home } = usePageCopy();
+  const slides = home.opening.slides;
   const poster = useSlot("openingClubPoster", gymPhotos.galleryCinematic);
   const believe = useSlot("openingBelieve", gymPhotos.spaceAtmosphere);
   const experience = useSlot("openingExperience", gymPhotos.experienceBroll);
@@ -153,31 +155,35 @@ export default function OpeningCarousel({
 
   return (
     <section
-      className="relative w-full h-[100cqh] min-h-[100cqh] shrink-0 overflow-hidden bg-[#111111]"
+      className="relative w-full min-w-0 h-[100cqh] min-h-[100cqh] shrink-0 overflow-hidden bg-[#111111]"
       aria-roledescription="carousel"
       aria-label="United Strength opening chapters"
     >
       <div
         ref={scrollerRef}
-        className="flex h-full w-full overflow-x-auto overflow-y-hidden snap-x snap-mandatory scrollbar-none overscroll-x-contain overscroll-y-none"
+        className="flex h-full w-full min-w-0 overflow-x-auto overflow-y-hidden snap-x snap-mandatory scrollbar-none overscroll-x-contain overscroll-y-none"
         tabIndex={0}
       >
         <OpeningSlide
           n="01"
-          title="United Strength Club"
-          lede="A strength community for people who want more from their gym and life."
+          title={slides["01"].title}
+          lede={slides["01"].lede}
+          copyTitlePath="home.opening.slides.01.title"
+          copyLedePath="home.opening.slides.01.lede"
           media={{
             kind: "video",
             src: gymVideos.opening01,
             poster,
-            alt: "United Strength Club — facility",
+            alt: "United Strength — facility",
             objectPosition: "center 40%",
           }}
         />
         <OpeningSlide
           n="02"
-          title="What We Believe"
-          lede="People don't stay because of equipment. They stay because of how a place makes them feel."
+          title={slides["02"].title}
+          lede={slides["02"].lede}
+          copyTitlePath="home.opening.slides.02.title"
+          copyLedePath="home.opening.slides.02.lede"
           media={{
             kind: "image",
             src: believe,
@@ -189,8 +195,10 @@ export default function OpeningCarousel({
         {/* PDF §10 — visual intro only; no 5 CLASSES / 14 DAYS / pricing */}
         <OpeningSlide
           n="04"
-          title="Experience United"
-          lede="An introduction to the club — immersive, visual, and unhurried."
+          title={slides["04"].title}
+          lede={slides["04"].lede}
+          copyTitlePath="home.opening.slides.04.title"
+          copyLedePath="home.opening.slides.04.lede"
           emphasizeType={false}
           cinematic
           media={{

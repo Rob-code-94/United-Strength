@@ -21,9 +21,9 @@ export default function ConceptEView({ onNav }: SubViewProps) {
     <div className="flex flex-col bg-white text-[#181818] animate-fade-in-opacity font-sans selection:bg-neutral-100 selection:text-neutral-900">
       <ChapterIntro
         n="01"
-        title="United Strength Club"
+        title="United Strength"
         image={gymPhotos.galleryCinematic}
-        imageAlt="United Strength Club — facility b-roll"
+        imageAlt="United Strength — facility b-roll"
         next={{ n: "02", title: "What We Believe" }}
       />
       <ChapterIntro

@@ -1,5 +1,6 @@
 import { motion, useReducedMotion } from "motion/react";
 import { LOOKBOOK_EASE } from "../direction-ef/lookbook";
+import { HubCopyText } from "./pages/V1Interior";
 
 export interface TrainingPathway {
   n: string;
@@ -9,6 +10,8 @@ export interface TrainingPathway {
   href: string;
   image: string;
   objectPosition: string;
+  labelCopyPath?: string;
+  titleCopyPath?: string;
 }
 
 interface TrainingTileProps {
@@ -60,13 +63,22 @@ export default function TrainingTile({
       />
       <div className="absolute inset-x-0 bottom-0 z-10 p-3 transition-transform duration-500 ease-[cubic-bezier(0.21,0.47,0.32,0.98)] group-hover:-translate-y-1 group-active:-translate-y-1 @min-[200px]:p-4 md:p-5">
         <p className="font-mono text-[8px] uppercase leading-tight tracking-[0.12em] text-[#F3EEE7]/65 @min-[200px]:text-[10px] @min-[200px]:tracking-[0.2em]">
-          {pathway.n} // {pathway.label}
+          {pathway.n} //{" "}
+          {pathway.labelCopyPath ? (
+            <HubCopyText path={pathway.labelCopyPath}>{pathway.label}</HubCopyText>
+          ) : (
+            pathway.label
+          )}
         </p>
         <p
           className="mt-1 max-w-[16ch] font-sans text-[16px] font-black uppercase leading-[1.05] tracking-[-0.04em] text-[#F3EEE7] @min-[200px]:mt-1.5 @min-[200px]:text-[22px] md:text-[26px] lg:text-[28px]"
           style={{ fontFamily: "'Satoshi', sans-serif" }}
         >
-          {pathway.title}
+          {pathway.titleCopyPath ? (
+            <HubCopyText path={pathway.titleCopyPath}>{pathway.title}</HubCopyText>
+          ) : (
+            pathway.title
+          )}
         </p>
         <span className="mt-2 inline-block font-mono text-[11px] tracking-[0.16em] text-[#F3EEE7]/80">
           →

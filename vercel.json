@@ -5,6 +5,7 @@
   "outputDirectory": "dist",
   "rewrites": [
     { "source": "/api/brand-kit/media", "destination": "/api/brand-media" },
+    { "source": "/api/brand-kit/library", "destination": "/api/brand-library" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }

@@ -1,15 +1,14 @@
+import { useState, type FormEvent } from "react";
 import { gymPhotos } from "../../../assets/images/gym";
-import { MOVE_THE_CITY } from "../../../data/culture-copy";
-import { RUN_WITH_US_URL } from "../../../data/v1-interior-copy";
+import { usePageCopy } from "../V1Kit";
 import {
+  HubCopyText,
   V1Display,
   V1Heading,
   V1Hero,
-  V1HoldControl,
   V1InteriorShell,
   V1Kicker,
   V1MediaImg,
-  V1NavButton,
   V1Prose,
   V1Section,
 } from "./V1Interior";
@@ -28,18 +27,71 @@ const PEOPLE = [
 
 const PEOPLE_SLOTS = ["movePeople1", "movePeople2", "movePeople3", "movePeople4"] as const;
 
+const ROUTE_MEDIA = [
+  {
+    day: "Monday",
+    src: gymPhotos.runRouteMonday,
+    alt: "Monday long-run route map",
+    slot: "runRouteMonday" as const,
+    rowIndex: 0,
+  },
+  {
+    day: "Thursday",
+    src: gymPhotos.runRouteThursday,
+    alt: "Thursday 3.1 mile route map",
+    slot: "runRouteThursday" as const,
+    rowIndex: 1,
+  },
+] as const;
+
 /** Move the City is the Run Club. Stand-in stills until Todd sends the run footage. */
 export default function V1MoveTheCityPage({ onBack, onNav }: PageProps) {
-  const c = MOVE_THE_CITY;
+  const c = usePageCopy()["move-the-city"];
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [mobile, setMobile] = useState("");
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [done, setDone] = useState(false);
+
+  const submit = async (event: FormEvent) => {
+    event.preventDefault();
+    setPending(true);
+    setError(null);
+    try {
+      const response = await fetch("/api/run-club", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ name, email, mobile }),
+      });
+      const payload = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        setError(payload.error ?? "Signup could not be sent. Try again.");
+        return;
+      }
+      setDone(true);
+      setName("");
+      setEmail("");
+      setMobile("");
+    } catch {
+      setError("Signup could not be sent. Try again.");
+    } finally {
+      setPending(false);
+    }
+  };
 
   return (
     <V1InteriorShell onNav={onNav}>
       <V1Hero image={gymPhotos.runClub} imageAlt="Run club on a city street" onBack={onBack} mediaSlot="moveHero">
-        <V1Display>
+        <V1Display copyPath="move-the-city.headline">
           {c.headline}
-          <span className="mt-3 block font-mono text-[14px] font-medium tracking-[0.22em] text-[#F3EEE7]/80 md:text-[16px]">
+          <HubCopyText
+            path="move-the-city.subhead"
+            as="span"
+            className="mt-3 block font-mono text-[14px] font-medium tracking-[0.22em] text-[#F3EEE7]/80 md:text-[16px]"
+          >
             {c.subhead}
-          </span>
+          </HubCopyText>
         </V1Display>
       </V1Hero>
 
@@ -47,10 +99,17 @@ export default function V1MoveTheCityPage({ onBack, onNav }: PageProps) {
         <div className="grid items-start gap-10 md:grid-cols-12">
           <div className="md:col-span-5">
             <V1Kicker>
-              {c.story.n} // {c.story.title}
+              <HubCopyText path="move-the-city.story.n">{c.story.n}</HubCopyText>
+              {" // "}
+              <HubCopyText path="move-the-city.story.title">{c.story.title}</HubCopyText>
             </V1Kicker>
-            <V1Heading className="mt-6">{c.story.headline}</V1Heading>
-            <V1Prose paragraphs={c.story.body} />
+            <V1Heading className="mt-6" copyPath="move-the-city.story.headline">
+              {c.story.headline}
+            </V1Heading>
+            <V1Prose
+              paragraphs={c.story.body}
+              copyPaths={c.story.body.map((_, index) => `move-the-city.story.body.${index}`)}
+            />
           </div>
           <div className="md:col-span-7">
             <V1MediaImg
@@ -72,22 +131,29 @@ export default function V1MoveTheCityPage({ onBack, onNav }: PageProps) {
         />
         <div className="absolute inset-0 bg-[#111111]/55" />
         <div className="relative flex min-h-[70vh] items-end px-5 py-16 md:px-10 md:py-24">
-          <V1Heading className="max-w-[12ch]">{c.paceStatement}</V1Heading>
+          <V1Heading className="max-w-[12ch]" copyPath="move-the-city.paceStatement">
+            {c.paceStatement}
+          </V1Heading>
         </div>
       </section>
 
       <V1Section>
         <V1Kicker>
-          {c.runs.n} // {c.runs.title}
+          <HubCopyText path="move-the-city.runs.n">{c.runs.n}</HubCopyText>
+          {" // "}
+          <HubCopyText path="move-the-city.runs.title">{c.runs.title}</HubCopyText>
         </V1Kicker>
         <ul className="mt-8 divide-y divide-white/10 border-y border-white/10">
-          {c.runs.rows.map((row) => (
-            <li key={row.day} className="flex min-h-[44px] items-baseline justify-between gap-4 py-5">
-              <span className="font-sans text-[22px] font-bold uppercase tracking-[-0.03em]" style={{ fontFamily: "'Satoshi', sans-serif" }}>
-                {row.day}
+          {c.runs.rows.map((row, index) => (
+            <li key={`${row.day}-${index}`} className="flex min-h-[44px] items-baseline justify-between gap-4 py-5">
+              <span
+                className="font-sans text-[22px] font-bold uppercase tracking-[-0.03em]"
+                style={{ fontFamily: "'Satoshi', sans-serif" }}
+              >
+                <HubCopyText path={`move-the-city.runs.rows.${index}.day`}>{row.day}</HubCopyText>
               </span>
               <span className="font-mono text-[12px] uppercase tracking-[0.18em] text-[#F3EEE7]/70">
-                {row.detail}
+                <HubCopyText path={`move-the-city.runs.rows.${index}.detail`}>{row.detail}</HubCopyText>
               </span>
             </li>
           ))}
@@ -96,19 +162,45 @@ export default function V1MoveTheCityPage({ onBack, onNav }: PageProps) {
 
       <V1Section className="bg-[#181818]">
         <V1Kicker>
-          {c.route.n} // {c.route.title}
+          <HubCopyText path="move-the-city.route.n">{c.route.n}</HubCopyText>
+          {" // "}
+          <HubCopyText path="move-the-city.route.title">{c.route.title}</HubCopyText>
         </V1Kicker>
-        <div className="relative mt-10 h-40 w-full" aria-hidden="true">
-          <div className="absolute left-0 right-[12%] top-1/2 h-px bg-[#F3EEE7]/40" />
-          <span className="absolute left-0 top-1/2 h-2 w-2 -translate-y-1/2 bg-[var(--v1-highlight)]" />
-          <span className="absolute left-[28%] top-[calc(50%-18px)] font-mono text-[10px] uppercase tracking-[0.16em] text-[#F3EEE7]/50">
-            01
-          </span>
-          <span className="absolute left-[58%] top-[calc(50%-18px)] font-mono text-[10px] uppercase tracking-[0.16em] text-[#F3EEE7]/50">
-            02
-          </span>
+        <p className="mt-4 font-mono text-[12px] uppercase tracking-[0.22em] text-[#F3EEE7]/70">
+          <HubCopyText path="move-the-city.route.start">{c.route.start}</HubCopyText>
+        </p>
+        <div className="mt-10 grid gap-6 md:grid-cols-2">
+          {ROUTE_MEDIA.map((route, mapIndex) => {
+            const row = c.runs.rows[route.rowIndex];
+            const detail = row?.detail ?? "";
+            return (
+              <figure key={route.day} className="border border-white/10">
+                <V1MediaImg
+                  slot={route.slot}
+                  src={route.src}
+                  alt={route.alt}
+                  className="aspect-[16/9] w-full object-cover object-center"
+                  draggable={false}
+                />
+                <figcaption className="flex items-baseline justify-between gap-3 border-t border-white/10 px-4 py-4">
+                  <span className="font-mono text-[22px] leading-none tracking-tight text-[#F3EEE7]/90">
+                    {String(mapIndex + 1).padStart(2, "0")}
+                  </span>
+                  <span className="text-right">
+                    <span className="block font-mono text-[11px] uppercase tracking-[0.28em] text-[#F3EEE7]/85">
+                      // {route.day}
+                    </span>
+                    <span className="mt-1 block font-mono text-[10px] uppercase tracking-[0.18em] text-[#C4A35A]">
+                      <HubCopyText path={`move-the-city.runs.rows.${route.rowIndex}.detail`}>
+                        {detail}
+                      </HubCopyText>
+                    </span>
+                  </span>
+                </figcaption>
+              </figure>
+            );
+          })}
         </div>
-        <p className="font-mono text-[12px] uppercase tracking-[0.22em]">{c.route.start}</p>
       </V1Section>
 
       <section className="border-b border-white/10" aria-label="04 // People">
@@ -127,15 +219,80 @@ export default function V1MoveTheCityPage({ onBack, onNav }: PageProps) {
       </section>
 
       <V1Section>
-        <V1Heading>{c.closing.headline}</V1Heading>
-        <V1Prose paragraphs={c.closing.body} />
-        <div className="mt-8">
-          {RUN_WITH_US_URL ? (
-            <V1NavButton label={`${c.closing.ctaLabel} →`} href={RUN_WITH_US_URL} onNav={onNav} />
-          ) : (
-            <V1HoldControl label={`${c.closing.ctaLabel} →`} />
-          )}
-        </div>
+        <V1Heading copyPath="move-the-city.closing.headline">{c.closing.headline}</V1Heading>
+        <V1Prose
+          paragraphs={c.closing.body}
+          copyPaths={c.closing.body.map((_, index) => `move-the-city.closing.body.${index}`)}
+        />
+        {done ? (
+          <p className="mt-8 max-w-xl text-[16px] leading-relaxed text-[#F3EEE7]/85" role="status">
+            You're on the list. We'll be in touch about the next run.
+          </p>
+        ) : (
+          <form className="mt-8 max-w-xl space-y-4" onSubmit={(event) => void submit(event)} noValidate>
+            <div className="grid gap-2">
+              <label htmlFor="run-club-name" className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#F3EEE7]/55">
+                Name
+              </label>
+              <input
+                id="run-club-name"
+                name="name"
+                autoComplete="name"
+                required
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                className="min-h-[44px] w-full border border-white/15 bg-transparent px-3 text-[16px] text-[#F3EEE7] outline-none focus-visible:border-[#C4A35A]"
+              />
+            </div>
+            <div className="grid gap-2">
+              <label htmlFor="run-club-email" className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#F3EEE7]/55">
+                Email
+              </label>
+              <input
+                id="run-club-email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                className="min-h-[44px] w-full border border-white/15 bg-transparent px-3 text-[16px] text-[#F3EEE7] outline-none focus-visible:border-[#C4A35A]"
+              />
+            </div>
+            <div className="grid gap-2">
+              <label htmlFor="run-club-mobile" className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#F3EEE7]/55">
+                Mobile Number
+              </label>
+              <input
+                id="run-club-mobile"
+                name="mobile"
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                required
+                value={mobile}
+                onChange={(event) => setMobile(event.target.value)}
+                className="min-h-[44px] w-full border border-white/15 bg-transparent px-3 text-[16px] text-[#F3EEE7] outline-none focus-visible:border-[#C4A35A]"
+              />
+            </div>
+            {error ? (
+              <p className="text-[14px] text-red-300" role="alert">
+                {error}
+              </p>
+            ) : null}
+            <button
+              type="submit"
+              disabled={pending}
+              className="inline-flex min-h-[44px] items-center font-mono text-[11px] uppercase tracking-[0.22em] text-[#F3EEE7] disabled:opacity-50"
+            >
+              {pending ? "Sending…" : (
+                <>
+                  <HubCopyText path="move-the-city.closing.ctaLabel">{c.closing.ctaLabel}</HubCopyText> →
+                </>
+              )}
+            </button>
+          </form>
+        )}
       </V1Section>
     </V1InteriorShell>
   );

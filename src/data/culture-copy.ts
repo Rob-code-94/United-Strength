@@ -7,6 +7,7 @@
  */
 
 import { archiveCovers } from "../assets/images/archive";
+import { RUN_CLUB_MAILTO } from "./contact";
 
 // ── Move the City // Run Club — Training Classes (Copywright _MOVE THE CITY) ─
 // MOVE_THE_CITY already done — leave as-is.
@@ -42,7 +43,6 @@ export const MOVE_THE_CITY = {
       { day: "Thursday", detail: "// 3.1 Miles" },
       { day: "07:00 AM", detail: "// United Strength" },
     ],
-    note: "Exact run details confirmed before launch.",
   },
   route: {
     n: "03",
@@ -56,7 +56,7 @@ export const MOVE_THE_CITY = {
       "You don't need to be a United Strength member to join us.",
     ],
     ctaLabel: "Run With Us",
-    href: "mailto:info@unitedstrengthgym.com?subject=Move%20the%20City%20Run%20Club",
+    href: RUN_CLUB_MAILTO,
   },
 } as const;
 
@@ -132,22 +132,22 @@ export const CULTIVATED = {
   },
   principles: {
     n: "03",
-    title: "Cultivated // 001",
+    title: "Principles",
     rows: [
       {
         n: "01",
-        title: "The Idea",
-        body: "The idea was simple: bring together people who are committed to growth, challenge them physically, create space for meaningful conversations, and build new relationships.",
+        title: "Right People",
+        body: "Bring together people committed to growth — challenge them physically, and build new relationships.",
       },
       {
         n: "02",
-        title: "Community",
-        body: "It wasn't about competition. It was about community.",
+        title: "Right Room",
+        body: "An intentionally small space. Not about competition. About community.",
       },
       {
         n: "03",
-        title: "The Work",
-        body: "We lifted. We ran. We talked. We pushed past comfort zones. And we built new connections.",
+        title: "Right Conversations",
+        body: "We lift. We run. We talk. We push past comfort zones — and leave with something that lasts.",
       },
       {
         n: "04",

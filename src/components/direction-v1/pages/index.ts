@@ -3,6 +3,7 @@ export { default as V1FounderPage } from "./V1FounderPage";
 export { default as V1ApplyPage } from "./V1ApplyPage";
 export { default as V1MembershipPage } from "./V1MembershipPage";
 export { default as V1BuildPage } from "./V1BuildPage";
+export { default as V1BurnPage } from "./V1BurnPage";
 export { default as V1SpacePage } from "./V1SpacePage";
 export { default as V1TeamPage } from "./V1TeamPage";
 export { default as V1FactsPage } from "./V1FactsPage";

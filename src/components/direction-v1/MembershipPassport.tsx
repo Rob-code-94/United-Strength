@@ -1,6 +1,7 @@
 import { motion, useReducedMotion } from "motion/react";
-import { MEMBERSHIP_PAGE } from "../../data/journey-copy";
 import { LOOKBOOK_EASE } from "../direction-ef/lookbook";
+import { usePageCopy } from "./V1Kit";
+import { HubCopyText } from "./pages/V1Interior";
 import NumberTicker from "./NumberTicker";
 
 interface Props {
@@ -26,6 +27,9 @@ const TICKET_MASK = {
  */
 export default function MembershipPassport({ onNav }: Props) {
   const reduceMotion = useReducedMotion();
+  const pages = usePageCopy();
+  const membership = pages.home.membership;
+  const tiers = pages.membership.tiers;
   const explore = () => onNav("/membership", "Explore Membership");
 
   return (
@@ -42,29 +46,34 @@ export default function MembershipPassport({ onNav }: Props) {
       >
         <div className="md:grid md:grid-cols-12 md:items-start md:gap-12 lg:gap-16">
           <div className="md:col-span-5">
-            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#F3EEE7]/50">
-              // Membership
-            </p>
+            <HubCopyText
+              path="home.membership.eyebrow"
+              as="p"
+              className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#F3EEE7]/50"
+            >
+              {membership.eyebrow}
+            </HubCopyText>
             <h2
               id="v1-membership-heading"
               className="mt-4 max-w-[16ch] font-sans text-[28px] font-bold uppercase leading-[1.05] tracking-[-0.04em] md:text-[36px] lg:text-[40px]"
               style={{ fontFamily: "'Satoshi', sans-serif" }}
             >
-              Four memberships.
-              <br />
-              Different ways to train.
-              <br />
-              One United.
+              {membership.headline.map((line, index) => (
+                <span key={`${index}-${line}`}>
+                  {index > 0 ? <br /> : null}
+                  <HubCopyText path={`home.membership.headline.${index}`}>{line}</HubCopyText>
+                </span>
+              ))}
             </h2>
             <p className="mt-5 max-w-[34ch] text-[15px] leading-relaxed tracking-[-0.01em] text-[#F3EEE7]/75 md:mt-6 md:text-[16px]">
-              Choose the level of coaching and access that works for you.
+              <HubCopyText path="home.membership.lede">{membership.lede}</HubCopyText>
             </p>
             <button
               type="button"
               onClick={explore}
               className="mt-8 inline-flex min-h-[44px] items-center gap-2 border-b border-[#F3EEE7]/50 pb-1 font-mono text-[11px] uppercase tracking-[0.18em] text-[#F3EEE7] transition-opacity hover:opacity-60 md:mt-10"
             >
-              Explore Membership →
+              <HubCopyText path="home.membership.cta">{membership.cta}</HubCopyText>
             </button>
           </div>
 
@@ -85,15 +94,21 @@ export default function MembershipPassport({ onNav }: Props) {
             >
               <div className="min-w-0 flex-1 px-5 py-5 md:px-6 md:py-5">
                 <header className="pb-3" style={{ borderBottom: RULE }}>
-                  <p
+                  <HubCopyText
+                    path="home.membership.ticket.brand"
+                    as="p"
                     className="font-sans text-[16px] font-bold uppercase tracking-[-0.02em] md:text-[18px]"
                     style={{ fontFamily: "'Satoshi', sans-serif" }}
                   >
-                    United Strength Club
-                  </p>
-                  <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.05em] text-[#666660]">
-                    // Membership record
-                  </p>
+                    {membership.ticket.brand}
+                  </HubCopyText>
+                  <HubCopyText
+                    path="home.membership.ticket.recordLabel"
+                    as="p"
+                    className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.05em] text-[#666660]"
+                  >
+                    {membership.ticket.recordLabel}
+                  </HubCopyText>
                 </header>
 
                 <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 font-mono text-[9px] uppercase tracking-[0.05em] text-[#666660] md:grid-cols-3">
@@ -128,7 +143,7 @@ export default function MembershipPassport({ onNav }: Props) {
                 </dl>
 
                 <ol className="mt-3">
-                  {MEMBERSHIP_PAGE.tiers.map((tier, index) => {
+                  {tiers.map((tier, index) => {
                     const weekCount = tier.subtitle.match(/^(\d+)/);
                     return (
                       <li
@@ -146,7 +161,7 @@ export default function MembershipPassport({ onNav }: Props) {
                             className="tabular-nums"
                           />
                           {" // "}
-                          {tier.name}
+                          <HubCopyText path={`membership.tiers.${index}.name`}>{tier.name}</HubCopyText>
                         </span>
                         <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.05em] text-[#666660] md:text-[11px]">
                           {weekCount ? (
@@ -158,10 +173,14 @@ export default function MembershipPassport({ onNav }: Props) {
                                 duration={1.2}
                                 className="tabular-nums"
                               />
-                              {tier.subtitle.slice(weekCount[1].length)}
+                              <HubCopyText path={`membership.tiers.${index}.subtitle`}>
+                                {tier.subtitle.slice(weekCount[1].length)}
+                              </HubCopyText>
                             </>
                           ) : (
-                            tier.subtitle
+                            <HubCopyText path={`membership.tiers.${index}.subtitle`}>
+                              {tier.subtitle}
+                            </HubCopyText>
                           )}
                         </span>
                       </li>
@@ -180,13 +199,21 @@ export default function MembershipPassport({ onNav }: Props) {
               />
 
               <div className="flex flex-col items-center justify-center gap-4 px-5 py-5 md:w-[30%] md:max-w-[13rem] md:px-4">
-                <p className="text-center font-mono text-[10px] uppercase leading-relaxed tracking-[0.05em] text-[#666660]">
-                  237 Cleveland Ave / Columbus
-                </p>
+                <HubCopyText
+                  path="home.membership.ticket.address"
+                  as="p"
+                  className="text-center font-mono text-[10px] uppercase leading-relaxed tracking-[0.05em] text-[#666660]"
+                >
+                  {membership.ticket.address}
+                </HubCopyText>
                 <div className="flex size-[6.25rem] items-center justify-center rounded-full border border-[#111111]/35 p-3 text-center">
-                  <p className="font-mono text-[8px] uppercase leading-[1.35] tracking-[0.04em] text-[#666660]">
-                    Strength • People • A healthier city
-                  </p>
+                  <HubCopyText
+                    path="home.membership.ticket.seal"
+                    as="p"
+                    className="font-mono text-[8px] uppercase leading-[1.35] tracking-[0.04em] text-[#666660]"
+                  >
+                    {membership.ticket.seal}
+                  </HubCopyText>
                 </div>
               </div>
             </article>

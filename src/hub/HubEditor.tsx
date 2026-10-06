@@ -1,43 +1,60 @@
 import { useEffect, useRef, useState } from "react";
-import { Save } from "lucide-react";
+import { ArrowLeft, Save } from "lucide-react";
 import AppSidebar from "@/components/shadcn-space/blocks/dashboard-shell-03/app-sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import FileUpload02 from "@/hub/FileUpload02";
+import { Textarea } from "@/components/ui/textarea";
+import { ColorFields, TypeFields } from "@/hub/BrandKitFormFields";
+import HubLibraryPanel from "@/hub/HubLibraryPanel";
 import HubPreview, { type PreviewTarget, type TypeRole } from "@/hub/HubPreview";
 import {
-  FONT_FAMILIES,
   MEDIA_SLOTS,
+  getCopyPath,
+  listCopyPaths,
+  mergeFaq,
+  setCopyPath as patchCopyPath,
   type BrandKitFields,
-  type FontFamily,
+  type FaqKit,
   type MediaSlot,
+  type PageCopyKit,
 } from "@/hub/brand-kit";
 import type { HubPageId } from "@/hub/hub-pages";
-
-interface EditorState {
-  draft: BrandKitFields;
-  draftUpdatedAt: string;
-}
+import { useKitDraft, type KitEditorState } from "@/hub/useKitDraft";
+import { V1_FACTS } from "@/data/v1-interior-copy";
+import { inferTypeRoleFromPath } from "@/components/direction-v1/pages/V1Interior";
 
 interface HubEditorProps {
-  initial: EditorState;
-  onChange: (next: EditorState) => void;
+  initial: KitEditorState;
+  onChange: (next: KitEditorState) => void;
+  onGoHome: () => void;
+  onGoBrandKit: () => void;
 }
 
 /**
  * Donor: @shadcn-space/dashboard-shell-03 (Pro).
  * Settings stay in the fixed sidebar. The preview column scrolls on its own.
  */
-export default function HubEditor({ initial, onChange }: HubEditorProps) {
-const [tab, setTab] = useState<"brand" | "type" | "media" | "footer" | null>(null);
-  const [draft, setDraft] = useState(initial.draft);
-  const [expected, setExpected] = useState(initial.draftUpdatedAt);
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
+export default function HubEditor({ initial, onChange, onGoHome, onGoBrandKit }: HubEditorProps) {
+  const {
+    draft,
+    setDraft,
+    library,
+    message,
+    setMessage,
+    error,
+    setError,
+    pending,
+    applyResponse,
+    save,
+    act,
+    logout,
+  } = useKitDraft(initial, onChange);
+
+  const [tab, setTab] = useState<"brand" | "type" | "media" | "footer" | "faq" | "copy" | null>(null);
   const [mediaSlot, setMediaSlot] = useState<MediaSlot>("strongerUnited");
   const [typeRole, setTypeRole] = useState<TypeRole | null>(null);
+  const [copyPath, setCopyPath] = useState<string | null>(null);
   const [pageId, setPageId] = useState<HubPageId>("home");
   const previewRef = useRef<HTMLDivElement>(null);
 
@@ -48,80 +65,34 @@ const [tab, setTab] = useState<"brand" | "type" | "media" | "footer" | null>(nul
   useEffect(() => {
     const section = document.getElementById(`hub-settings-${tab}`);
     section?.scrollIntoView({ block: "nearest", inline: "nearest" });
-  }, [tab, typeRole, mediaSlot]);
+  }, [tab, typeRole, mediaSlot, copyPath]);
 
-  const applyResponse = (payload: EditorState & { error?: string }) => {
-    if (payload.draft && payload.draftUpdatedAt) {
-      setDraft(payload.draft);
-      setExpected(payload.draftUpdatedAt);
-      onChange({ draft: payload.draft, draftUpdatedAt: payload.draftUpdatedAt });
+  useEffect(() => {
+    if (tab !== "copy" || !copyPath) return;
+    const field = document.getElementById(`hub-copy-field-${copyPath.replace(/\./g, "-")}`);
+    field?.scrollIntoView({ block: "nearest", inline: "nearest" });
+    if (field instanceof HTMLTextAreaElement || field instanceof HTMLInputElement) {
+      field.focus();
     }
-  };
-
-  const save = async () => {
-    setPending(true);
-    setError(null);
-    setMessage(null);
-    try {
-      const response = await fetch("/api/brand-kit", {
-        method: "PUT",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ kit: draft, expectedUpdatedAt: expected }),
-      });
-      const payload = (await response.json()) as EditorState & { error?: string };
-      if (response.status === 409) {
-        applyResponse(payload);
-        setError(payload.error ?? "This kit was updated elsewhere. Reload and try again.");
-        return;
-      }
-      if (!response.ok) {
-        setError(payload.error ?? "Brand kit could not be saved.");
-        return;
-      }
-      applyResponse(payload);
-      setMessage("Draft saved. Publish when you want the live site to change.");
-    } catch {
-      setError("Brand kit could not be saved. Try again.");
-    } finally {
-      setPending(false);
-    }
-  };
-
-  const act = async (action: "publish" | "revert") => {
-    setPending(true);
-    setError(null);
-    setMessage(null);
-    try {
-      const response = await fetch("/api/brand-kit", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ action }),
-      });
-      const payload = (await response.json()) as EditorState & { error?: string };
-      if (!response.ok) {
-        setError(payload.error ?? "That action failed.");
-        return;
-      }
-      applyResponse(payload);
-      setMessage(action === "publish" ? "Published. The live V1 site uses this kit." : "Draft reverted to the published kit.");
-    } catch {
-      setError("That action failed. Try again.");
-    } finally {
-      setPending(false);
-    }
-  };
-
-  const logout = async () => {
-    await fetch("/api/hub-session", { method: "DELETE" });
-    window.location.assign("/hub");
-  };
+  }, [tab, copyPath]);
 
   const slotLabel = MEDIA_SLOTS.find((slot) => slot.key === mediaSlot)?.label ?? "Image";
 
   const sidebar = (
     <div className="flex flex-col gap-8 pb-4">
+      <div className="flex flex-col gap-2">
+        <Button type="button" variant="outline" className="min-h-[44px]" onClick={onGoHome}>
+          <ArrowLeft className="size-4" />
+          Hub home
+        </Button>
+        <Button type="button" variant="secondary" className="min-h-[44px]" onClick={onGoBrandKit}>
+          Brand kit
+        </Button>
+      </div>
       {tab === null ? (
-        <p className="text-sm text-muted-foreground">Click a pencil on the page.</p>
+        <p className="text-sm text-muted-foreground">
+          Click a pencil on the page to edit copy, images, footer, or FAQ. For fonts and colors, open Brand kit.
+        </p>
       ) : null}
       {tab === "brand" ? (
         <div id="hub-settings-brand">
@@ -130,28 +101,40 @@ const [tab, setTab] = useState<"brand" | "type" | "media" | "footer" | null>(nul
       ) : null}
       {tab === "type" && typeRole ? (
         <div id="hub-settings-type">
-          <TypeFields type={draft.type} role={typeRole} onChange={(type) => setDraft({ ...draft, type })} />
+          <TypeFields
+            type={draft.type}
+            role={typeRole}
+            colors={draft.colors}
+            onChange={(type) => setDraft({ ...draft, type })}
+          />
         </div>
       ) : null}
       {tab === "media" ? (
         <div id="hub-settings-media" className="space-y-6">
           <div className="space-y-1">
             <p className="text-xl font-semibold">{slotLabel}</p>
-            <p className="text-sm text-muted-foreground">Upload stays on the draft until you publish.</p>
+            <p className="text-sm text-muted-foreground">Assign from the library or upload a new image.</p>
           </div>
           {draft.media[mediaSlot] ? (
-            <p className="text-xs text-muted-foreground break-all">Current draft: {draft.media[mediaSlot]}</p>
+            <img
+              src={draft.media[mediaSlot]}
+              alt=""
+              className="aspect-video w-full rounded-xl border border-border object-cover"
+            />
           ) : (
-            <p className="text-xs text-muted-foreground">Using the built-in image for this slot.</p>
+            <div className="flex aspect-video items-center justify-center rounded-xl border border-dashed border-border bg-muted/40 text-sm text-muted-foreground">
+              No image yet — using the built-in slot image until you assign one.
+            </div>
           )}
-          <FileUpload02
-            key={mediaSlot}
-            slot={mediaSlot}
-            onUploaded={() => {
-              void fetch("/api/brand-kit")
-                .then((response) => response.json())
-                .then((payload: EditorState) => applyResponse(payload));
+          <HubLibraryPanel
+            library={library}
+            activeSlot={mediaSlot}
+            slotLabel={slotLabel}
+            onSync={(payload) => {
+              applyResponse(payload);
+              setMessage("Saved draft");
             }}
+            onError={(msg) => setError(msg || null)}
           />
         </div>
       ) : null}
@@ -163,6 +146,38 @@ const [tab, setTab] = useState<"brand" | "type" | "media" | "footer" | null>(nul
             onFooter={(footer) => setDraft({ ...draft, footer })}
             onCopyright={(copyright) => setDraft({ ...draft, copyright })}
           />
+        </div>
+      ) : null}
+      {tab === "faq" ? (
+        <div id="hub-settings-faq">
+          <FaqFields faq={draft.faq} onChange={(faq) => setDraft({ ...draft, faq })} />
+        </div>
+      ) : null}
+      {tab === "copy" && copyPath ? (
+        <div id="hub-settings-copy" className="space-y-8">
+          <CopyFields
+            pages={draft.pages}
+            path={copyPath}
+            onChange={(pages) => setDraft({ ...draft, pages })}
+            onFocusPath={(path) => {
+              setCopyPath(path);
+              setTypeRole(inferTypeRoleFromPath(path));
+            }}
+          />
+          {typeRole ? (
+            <div className="border-t border-border pt-6">
+              <TypeFields
+                type={draft.type}
+                role={typeRole}
+                colors={draft.colors}
+                onChange={(type) => setDraft({ ...draft, type })}
+              />
+              <p className="mt-3 text-xs text-muted-foreground">
+                Type applies to every {typeRole === "mono" ? "chapter number" : typeRole === "display" ? "display heading" : "body paragraph"}{" "}
+                on the site — not only this field.
+              </p>
+            </div>
+          ) : null}
         </div>
       ) : null}
       {error ? (
@@ -194,177 +209,73 @@ const [tab, setTab] = useState<"brand" | "type" | "media" | "footer" | null>(nul
   );
 
   return (
-    <AppSidebar sidebar={sidebar}>
+    <AppSidebar
+      sidebar={sidebar}
+      headerActions={
+        <>
+          <Button type="button" variant="outline" size="sm" className="min-h-[44px] hidden md:inline-flex" onClick={onGoHome}>
+            Hub home
+          </Button>
+          <Button type="button" variant="secondary" size="sm" className="min-h-[44px] hidden md:inline-flex" onClick={onGoBrandKit}>
+            Brand kit
+          </Button>
+        </>
+      }
+    >
       <div ref={previewRef} className="h-full overflow-y-auto p-4 md:p-6">
+        <div className="mb-4 flex flex-wrap gap-2 md:hidden">
+          <Button type="button" variant="outline" size="sm" className="min-h-[44px]" onClick={onGoHome}>
+            Hub home
+          </Button>
+          <Button type="button" variant="secondary" size="sm" className="min-h-[44px]" onClick={onGoBrandKit}>
+            Brand kit
+          </Button>
+        </div>
         <HubPreview
           draft={draft}
           tab={tab}
           mediaSlot={mediaSlot}
           typeRole={typeRole}
+          copyPath={copyPath}
           pageId={pageId}
           onPageChange={setPageId}
           onSelect={(target: PreviewTarget) => {
             if (target.kind === "brand") {
-              setTab("brand");
-              setTypeRole(null);
+              onGoBrandKit();
               return;
             }
             if (target.kind === "footer") {
               setTab("footer");
               setTypeRole(null);
+              setCopyPath(null);
+              return;
+            }
+            if (target.kind === "faq") {
+              setTab("faq");
+              setTypeRole(null);
+              setCopyPath(null);
               return;
             }
             if (target.kind === "media") {
               setTab("media");
               setMediaSlot(target.slot);
               setTypeRole(null);
+              setCopyPath(null);
+              return;
+            }
+            if (target.kind === "copy") {
+              setTab("copy");
+              setCopyPath(target.path);
+              setTypeRole(target.typeRole ?? inferTypeRoleFromPath(target.path));
               return;
             }
             setTab("type");
             setTypeRole(target.role);
+            setCopyPath(null);
           }}
         />
       </div>
     </AppSidebar>
-  );
-}
-
-function ColorFields({
-  colors,
-  onChange,
-}: {
-  colors: BrandKitFields["colors"];
-  onChange: (colors: BrandKitFields["colors"]) => void;
-}) {
-  const fields: { key: keyof BrandKitFields["colors"]; label: string }[] = [
-    { key: "background", label: "Background" },
-    { key: "cream", label: "Cream type" },
-    { key: "gold", label: "Gold" },
-    { key: "text", label: "Text on cream" },
-  ];
-  return (
-    <div className="space-y-6 max-w-xl">
-      <div className="space-y-1">
-        <p className="text-xl font-semibold">Brand</p>
-        <p className="text-sm text-muted-foreground">Hex colors for the V1 homepage.</p>
-      </div>
-      {fields.map((field) => (
-        <div key={field.key} className="grid gap-2">
-          <Label htmlFor={field.key}>{field.label}</Label>
-          <Input
-            id={field.key}
-            value={colors[field.key]}
-            onChange={(event) => onChange({ ...colors, [field.key]: event.target.value })}
-            className="h-11"
-            spellCheck={false}
-          />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function TypeFields({
-  type,
-  role,
-  onChange,
-}: {
-  type: BrandKitFields["type"];
-  role: TypeRole;
-  onChange: (type: BrandKitFields["type"]) => void;
-}) {
-  const selects: { key: "displayFamily" | "bodyFamily" | "monoFamily"; role: TypeRole; label: string }[] = [
-    { key: "displayFamily", role: "display", label: "Display" },
-    { key: "bodyFamily", role: "body", label: "Body" },
-    { key: "monoFamily", role: "mono", label: "Numbers" },
-  ];
-  const sizes: { key: "displaySizePx" | "bodySizePx" | "monoSizePx"; role: TypeRole; label: string }[] = [
-    { key: "displaySizePx", role: "display", label: "Display size" },
-    { key: "bodySizePx", role: "body", label: "Body size" },
-    { key: "monoSizePx", role: "mono", label: "Number size" },
-  ];
-  const colors: { key: "displayColor" | "bodyColor" | "monoColor"; role: TypeRole; label: string }[] = [
-    { key: "displayColor", role: "display", label: "Display color" },
-    { key: "bodyColor", role: "body", label: "Body color" },
-    { key: "monoColor", role: "mono", label: "Number color" },
-  ];
-  const visibleSelects = selects.filter((field) => field.role === role);
-  const visibleSizes = sizes.filter((field) => field.role === role);
-  const visibleColors = colors.filter((field) => field.role === role);
-  const roleName = role === "mono" ? "chapter number" : role === "display" ? "display heading" : "body paragraph";
-
-  useEffect(() => {
-    if (!role) return;
-    const familyId = role === "mono" ? "monoFamily" : role === "display" ? "displayFamily" : "bodyFamily";
-    const field = document.getElementById(familyId);
-    field?.focus({ preventScroll: true });
-    field?.scrollIntoView({ block: "nearest", inline: "nearest" });
-  }, [role]);
-
-  return (
-    <div className="space-y-6 max-w-xl">
-      <div className="space-y-1">
-        <p className="text-xl font-semibold">Type</p>
-        <p className="text-sm text-muted-foreground">
-          This applies to every {roleName} on the site. Approved families only. Sizes are pixels.
-        </p>
-      </div>
-      {visibleSelects.map((field) => (
-        <div key={field.key} className="grid gap-2">
-          <Label htmlFor={field.key}>{field.label}</Label>
-          <select
-            id={field.key}
-            className="min-h-[44px] rounded-lg border border-input bg-background px-3 text-sm"
-            value={type[field.key]}
-            onChange={(event) => onChange({ ...type, [field.key]: event.target.value as FontFamily })}
-          >
-            {FONT_FAMILIES.map((family) => (
-              <option key={family} value={family}>
-                {family}
-              </option>
-            ))}
-          </select>
-        </div>
-      ))}
-      {visibleSizes.map((field) => (
-        <div key={field.key} className="grid gap-2">
-          <Label htmlFor={field.key}>{field.label}</Label>
-          <Input
-            id={field.key}
-            type="number"
-            min={10}
-            max={96}
-            value={type[field.key]}
-            onChange={(event) => onChange({ ...type, [field.key]: Number(event.target.value) })}
-            className="h-11"
-          />
-        </div>
-      ))}
-      {visibleColors.map((field) => {
-        const swatch = /^#[0-9A-Fa-f]{6}$/.test(type[field.key] ?? "") ? type[field.key] : "#F3EEE7";
-        return (
-          <div key={field.key} className="grid gap-2">
-            <Label htmlFor={field.key}>{field.label}</Label>
-            <div className="flex items-center gap-3">
-              <input
-                type="color"
-                aria-label={`${field.label} swatch`}
-                value={swatch}
-                onChange={(event) => onChange({ ...type, [field.key]: event.target.value })}
-                className="size-11 shrink-0 cursor-pointer rounded-lg border border-input bg-background p-1"
-              />
-              <Input
-                id={field.key}
-                value={type[field.key] ?? "#F3EEE7"}
-                onChange={(event) => onChange({ ...type, [field.key]: event.target.value })}
-                className="h-11"
-                spellCheck={false}
-              />
-            </div>
-          </div>
-        );
-      })}
-    </div>
   );
 }
 
@@ -406,6 +317,18 @@ function FooterFields({
           <Label htmlFor="email">Email</Label>
           <Input id="email" value={footer.email} onChange={(event) => onFooter({ ...footer, email: event.target.value })} className="h-11" />
         </div>
+        <div className="grid gap-2">
+          <Label htmlFor="phone">Phone (call / text)</Label>
+          <Input
+            id="phone"
+            type="tel"
+            inputMode="tel"
+            placeholder="Optional — hides Connect icon when empty"
+            value={footer.phone ?? ""}
+            onChange={(event) => onFooter({ ...footer, phone: event.target.value })}
+            className="h-11"
+          />
+        </div>
       </div>
       <div className="grid gap-2">
         <Label htmlFor="instagram">Instagram URL</Label>
@@ -434,6 +357,127 @@ function FooterFields({
             }}
             className="h-11"
           />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function CopyFields({
+  pages,
+  path,
+  onChange,
+  onFocusPath,
+}: {
+  pages: PageCopyKit;
+  path: string;
+  onChange: (pages: PageCopyKit) => void;
+  onFocusPath: (path: string) => void;
+}) {
+  // Section pencils pass a prefix (e.g. philosophy.beliefs.0); field pencils pass a leaf path.
+  const underPrefix = listCopyPaths(pages).filter(
+    (item) => item === path || item.startsWith(`${path}.`),
+  );
+  const paths = (underPrefix.length > 0 ? underPrefix : [path]).slice(0, 40);
+  const isSection = underPrefix.length > 1 || getCopyPath(pages, path) === undefined;
+
+  return (
+    <div className="space-y-6 max-w-2xl">
+      <div className="space-y-1">
+        <p className="text-xl font-semibold">{isSection ? "Section copy" : "Page copy"}</p>
+        <p className="text-sm text-muted-foreground">
+          {isSection
+            ? "Edit every field in this section. Font, size, and color for this type role are below."
+            : "Edit the words, then font, size, and color for this type role below."}
+        </p>
+        <p className="text-xs text-muted-foreground break-all">{path}</p>
+      </div>
+      {paths.map((itemPath) => {
+        const value = getCopyPath(pages, itemPath) ?? "";
+        const id = `hub-copy-field-${itemPath.replace(/\./g, "-")}`;
+        const multiline = value.length > 80 || itemPath.includes("body") || itemPath.includes("perspective");
+        return (
+          <div key={itemPath} className="grid gap-2 border-t border-border pt-4">
+            <Label htmlFor={id} className="break-all text-xs uppercase tracking-[0.14em] text-muted-foreground">
+              {itemPath}
+            </Label>
+            {multiline ? (
+              <Textarea
+                id={id}
+                value={value}
+                rows={4}
+                onFocus={() => onFocusPath(itemPath)}
+                onChange={(event) => onChange(patchCopyPath(pages, itemPath, event.target.value))}
+              />
+            ) : (
+              <Input
+                id={id}
+                value={value}
+                className="h-11"
+                onFocus={() => onFocusPath(itemPath)}
+                onChange={(event) => onChange(patchCopyPath(pages, itemPath, event.target.value))}
+              />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function FaqFields({ faq, onChange }: { faq: FaqKit; onChange: (faq: FaqKit) => void }) {
+  const items = mergeFaq(faq).items;
+  const groupFor = (n: string) =>
+    V1_FACTS.find((group) => group.items.some((item) => item.n === n))?.title ?? "FAQ";
+
+  return (
+    <div className="space-y-6 max-w-2xl">
+      <div className="space-y-1">
+        <p className="text-xl font-semibold">FAQ</p>
+        <p className="text-sm text-muted-foreground">
+          Twenty questions and answers. Save draft, then publish for the live site.
+        </p>
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor="faq-intro">Intro</Label>
+        <Input
+          id="faq-intro"
+          value={faq.intro}
+          onChange={(event) => onChange({ ...faq, intro: event.target.value })}
+          className="h-11"
+        />
+      </div>
+      {items.map((item, index) => (
+        <div key={item.n} className="space-y-3 border-t border-border pt-4">
+          <p className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
+            {item.n} · {groupFor(item.n)}
+          </p>
+          <div className="grid gap-2">
+            <Label htmlFor={`faq-q-${item.n}`}>Question</Label>
+            <Input
+              id={`faq-q-${item.n}`}
+              value={item.q}
+              onChange={(event) => {
+                const next = items.slice();
+                next[index] = { ...item, q: event.target.value };
+                onChange({ ...faq, items: next });
+              }}
+              className="h-11"
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor={`faq-a-${item.n}`}>Answer</Label>
+            <Textarea
+              id={`faq-a-${item.n}`}
+              value={item.a}
+              rows={4}
+              onChange={(event) => {
+                const next = items.slice();
+                next[index] = { ...item, a: event.target.value };
+                onChange({ ...faq, items: next });
+              }}
+            />
+          </div>
         </div>
       ))}
     </div>

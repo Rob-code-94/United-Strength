@@ -1,8 +1,10 @@
+import { MEMBERSHIP_INBOX } from "../../src/data/contact";
+
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/** Todd's membership inbox. Override with APPLY_TO_EMAIL. */
-const TO_DEFAULT = "membership@unitedstrengthgym.com";
-const FROM_DEFAULT = "United Strength Club <onboarding@resend.dev>";
+/** Todd's membership inbox. Override with APPLY_TO_EMAIL (leave empty to use MEMBERSHIP_INBOX). */
+const TO_DEFAULT = MEMBERSHIP_INBOX;
+const FROM_DEFAULT = "United Strength <onboarding@resend.dev>";
 
 export interface ApplicationInput {
   name: string;

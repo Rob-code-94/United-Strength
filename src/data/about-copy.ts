@@ -131,6 +131,7 @@ export const FOUNDER_CHAPTERS = {
     title: "Story",
     metadata: "( Journey )",
     headline: "",
+    midCaption: "LEAVE THE WORLD A BETTER PLACE THAN HOW YOU FOUND IT.",
     body: [
       "Before anything else, I'm a father and a husband.",
       "Showing up for my daughter and building a legacy she can be proud of is what drives me.",
@@ -198,10 +199,17 @@ export interface TeamMember {
   id: string;
   name: string;
   role: string;
+  /** Legacy alias — same as focus */
   specialty: string;
+  /** Focus areas shown collapsed */
+  focus: string;
   /** Short lede for grid */
   lede: string;
-  /** Full bio on expand — source: live coach page */
+  /** Credential lines (education, certs) */
+  credentials: readonly string[];
+  /** Personal bio / coaching perspective */
+  perspective: string;
+  /** Full bio string kept for EF / legacy consumers */
   bio: string;
   /** Source URL for client review */
   source: string;
@@ -220,7 +228,15 @@ export const TEAM_MEMBERS: TeamMember[] = [
     name: "Todd Johnson",
     role: "Owner, Coach",
     specialty: "Strength & HIIT circuit training",
+    focus: "Strength & HIIT circuit training · Bodybuilding",
     lede: "Building a community that truly cares — 20+ years in fitness, owner since 2014.",
+    credentials: [
+      "B.S. Exercise Physiology & Sports Management",
+      "ACSM CPT",
+      "USAW",
+    ],
+    perspective:
+      "I have been working in the fitness and wellness industry for over 20 years, starting in a hospital setting with physical therapy and rehab, then shifting to strength and conditioning and personal training. I opened my first gym in 2014 and transitioned to opening United Strength in 2021. My passion lies within building a community that truly cares about one another and working to help people reach their fitness goals. Favorite exercises: Back squat & Bench press.",
     bio: "Education: Bachelor of Science in Exercise Physiology & Sports Management. Certifications: ACSM CPT; USAW. I have been working in the fitness and wellness industry for over 20 years, starting in a hospital setting with physical therapy and rehab, then shifting to strength and conditioning and personal training. I opened my first gym in 2014 and transitioned to opening United Strength in 2021. My passion lies within building a community that truly cares about one another and working to help people reach their fitness goals. Style of training: Strength & HIIT circuit training; Bodybuilding. Favorite exercises: Back squat & Bench press.",
     source: "https://www.unitedstrengthgym.com/johnson",
   },
@@ -229,7 +245,16 @@ export const TEAM_MEMBERS: TeamMember[] = [
     name: "Jenna Farkas",
     role: "Coach",
     specialty: "Bodybuilding, circuits, HIIT",
+    focus: "Bodybuilding · Circuits · HIIT · Nutrition",
     lede: "Physical therapy background · WNBF Bikini pro · nutrition and strength.",
+    credentials: [
+      "Bachelors of Health Science, Bowling Green State University",
+      "Physical Therapist Assistant Program, Kent State Ashtabula",
+      "ACSM CPT",
+      "AFPA Weight Management and Nutrition and Fitness",
+    ],
+    perspective:
+      "I worked as a physical therapy assistant for 7+ years before joining United Strength in 2021. I competed in bodybuilding in the NPC and WNBF, winning my WNBF Bikini pro card in 2020. Favorite exercises: Deadlifts, anything shoulder and back.",
     bio: "Education: Bachelors of Health Science at Bowling Green State University and Physical Therapist Assistant Program at Kent State Ashtabula. Certifications: ACSM CPT, AFPA Weight management and Nutrition and Fitness. I worked as a physical therapy assistant for 7+ years before joining United Strength in 2021. I competed in bodybuilding in the NPC and WNBF, winning my WNBF Bikini pro card in 2020. Style of training: Bodybuilding, circuits, HIIT. Favorite exercises: Deadlifts, anything shoulder and back.",
     source: "https://www.unitedstrengthgym.com/farkas",
   },
@@ -238,7 +263,15 @@ export const TEAM_MEMBERS: TeamMember[] = [
     name: "Jason Katz",
     role: "Coach",
     specialty: "Powerlifting and bodybuilding",
+    focus: "Powerlifting · Bodybuilding · HIIT",
     lede: "Seven years coaching — powerlifting base with thoughtful progressions.",
+    credentials: [
+      "USAW",
+      "PPSC (Pain-Free Performance Specialist)",
+      "Precision Nutrition Level 1",
+    ],
+    perspective:
+      "I have been coaching and working in the fitness field for seven years. I translate my training style with clients, helping them build a strong base and incorporate HIIT for fat loss. I focus on teaching proper form and the science behind the exercises. Thoughtful programming and proper progressions have gotten my clients to exceed their original goals — from clients who lost 100lbs in less than a year to collegiate athletes. Favorite exercise: Deadlift.",
     bio: "Certifications: USAW, PPSC (pain-free performance specialist), and Precision Nutrition Level 1 coach. I have been coaching and working in the fitness field for seven years. I translate my training style with clients, helping them build a strong base and incorporate HIIT for fat loss. I focus on teaching proper form and the science behind the exercises. Thoughtful programming and proper progressions have gotten my clients to exceed their original goals — from clients who lost 100lbs in less than a year to collegiate athletes. Style of training: Powerlifting and bodybuilding. Favorite exercise: Deadlift.",
     source: "https://www.unitedstrengthgym.com/katz",
   },
@@ -247,7 +280,18 @@ export const TEAM_MEMBERS: TeamMember[] = [
     name: "Kara Shaffer",
     role: "Coach",
     specialty: "Bodybuilding, kettlebell, HIIT, mobility",
+    focus: "Bodybuilding · Kettlebell · HIIT · Mobility · Calisthenics",
     lede: "Gymnastics coach turned trainer — form, alignment, and strength.",
+    credentials: [
+      "NASM CPT",
+      "USA Gymnastics",
+      "IIN Health Coaching",
+      "SOP Pilates Reformer",
+      "NCI Nutrition Coach",
+      "ATG Certification",
+    ],
+    perspective:
+      "I started as a competitive gymnastics coach from 2014–2021, then moved into personal training in 2019. Coaching gymnastics taught me how to be hands-on and how to have an eye for form. Pilates reformer taught me how to breathe correctly while exercising and the importance of body alignment. My goal is to combine all of this with resistance training for an optimized workout.",
     bio: "Certifications: NASM CPT, USA Gymnastics, IIN Health Coaching, SOP Pilates Reformer, NCI Nutrition Coach, ATG Certification. I started as a competitive gymnastics coach from 2014–2021, then moved into personal training in 2019. Coaching gymnastics taught me how to be hands-on and how to have an eye for form. Pilates reformer taught me how to breathe correctly while exercising and the importance of body alignment. My goal is to combine all of this with resistance training for an optimized workout. Style of training: Bodybuilding, kettlebell, HIIT, calisthenics, + mobility.",
     source: "https://www.unitedstrengthgym.com/shaffer",
   },
@@ -320,7 +364,7 @@ export interface FaqItem {
 
 /**
  * Source: FAQ PAGE.txt — 20 questions, 4 sections.
- * Answers: placeholder "Details coming." where doc deferred; kept existing if stronger.
+ * Answers kept in sync with V1_FACTS_ANSWERS for final public FAQ.
  */
 export const FAQ_ITEMS: FaqItem[] = [
   // ── GENERAL ──────────────────────────────────────────────────────────────
@@ -363,7 +407,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     section: "training",
     q: "Can I train on my own?",
-    a: "Details coming.",
+    a: "Open gym access depends on your membership. Classes and coaching are the core of how we train — if you want guidance built around you, personal training is the clearest path.",
   },
   {
     section: "training",
@@ -373,7 +417,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     section: "training",
     q: "Do I need to be a member to work with a coach?",
-    a: "Details coming.",
+    a: "No. Personal training is available to members and non-members. Inquire at training@unitedstrengthgym.com and we will help you find the right fit.",
   },
   // ── MEMBERSHIP ───────────────────────────────────────────────────────────
   {
@@ -394,7 +438,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     section: "memberships",
     q: "What is Experience United?",
-    a: "Details coming.",
+    a: "Experience United is five classes over 14 days — a chance to train with us, meet our coaches, and understand how United works before choosing a membership.",
   },
   {
     section: "memberships",
@@ -404,7 +448,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     section: "memberships",
     q: "Can I cancel my membership?",
-    a: "Details coming.",
+    a: "Yes. Membership terms and cancellations are reviewed with you during the application and onboarding process so expectations are clear before you join.",
   },
   // ── VISITING UNITED ───────────────────────────────────────────────────────
   {
@@ -420,7 +464,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     section: "visiting",
     q: "When can members access the gym?",
-    a: "Details coming.",
+    a: "Member access follows the facility hours posted for United Strength. Your coach or the front desk can confirm the current schedule when you join.",
   },
   {
     section: "visiting",

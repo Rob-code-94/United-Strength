@@ -1,46 +1,75 @@
 import { useReducedMotion } from "motion/react";
 import { gymPhotos } from "../../../assets/images/gym";
 import { gymVideos } from "../../../assets/video";
-import { BY_DESIGN } from "../../../data/culture-copy";
+import { usePageCopy } from "../V1Kit";
 import Portfolio from "../../shadcn-space/blocks/portfolio-04/portfolio";
-import { V1BackButton, V1Heading, V1InteriorShell, V1MediaImg, useHubPencil } from "./V1Interior";
+import {
+  HubCopyText,
+  V1Display,
+  V1Heading,
+  V1Hero,
+  V1InteriorShell,
+  V1MediaImg,
+} from "./V1Interior";
 
 interface PageProps {
   onBack: () => void;
   onNav: (href: string, label: string) => void;
 }
 
-const SATOSHI = { fontFamily: "'Satoshi', sans-serif" } as const;
-
-const BEAT = "border-b border-white/10 bg-[#111111] px-5 py-[12vw] md:px-[6vw]";
+const OFFERING_MEDIA = [
+  { slot: "byDesignLeft" as const, src: gymPhotos.spaceAtmosphere },
+  { slot: "byDesignRight" as const, src: gymPhotos.architectureRaw },
+] as const;
 
 export default function V1ByDesignPage({ onBack, onNav }: PageProps) {
   const reduceMotion = useReducedMotion();
-  const displayPencil = useHubPencil("type-display");
-  const bodyPencil = useHubPencil("type-body");
-  const [space, equipment, materials, hospitality] = BY_DESIGN.principles.rows;
-  const marginLine = `${BY_DESIGN.manifesto.body[1].split(". ")[0]}.`;
+  const c = usePageCopy()["by-design"];
+  const [space, equipment, materials, hospitality] = c.principles.rows;
+  const [manifestoLead, ...manifestoRest] = c.manifesto.body;
+  const offerings = [
+    { principle: materials, media: OFFERING_MEDIA[0], rowIndex: 2 },
+    { principle: hospitality, media: OFFERING_MEDIA[1], rowIndex: 3 },
+  ];
 
   return (
     <V1InteriorShell onNav={onNav}>
-      <section className="relative h-[100cqh] min-h-[520px] w-full overflow-hidden bg-[#111111]">
-        <V1MediaImg
-          slot="byDesignHero"
-          src={gymPhotos.architectureRaw}
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        <div className="absolute inset-0 bg-[#111111]/40" />
-        <V1BackButton onBack={onBack} />
-        <div className="absolute bottom-16 left-5 right-5 z-10 md:bottom-20 md:left-10 md:right-10">
-          <h1
-            {...displayPencil}
-            className="font-sans text-[40px] font-medium uppercase leading-[0.95] tracking-[0.12em] text-[#F3EEE7] md:text-[64px]"
-            style={SATOSHI}
+      <V1Hero
+        image={gymPhotos.architectureRaw}
+        imageAlt=""
+        onBack={onBack}
+        mediaSlot="byDesignHero"
+        position="center 35%"
+      >
+        <V1Display copyPath="by-design.headline">{c.headline}</V1Display>
+        <p className="mt-4 font-mono text-[12px] uppercase tracking-[0.22em] text-[#F3EEE7]/75">
+          // <HubCopyText path="by-design.lede">{c.lede}</HubCopyText>
+        </p>
+      </V1Hero>
+
+      <section className="border-b border-neutral-200/60 bg-[#F3EEE7] px-5 py-16 md:px-10 md:py-24">
+        <div className="mx-auto max-w-6xl md:ml-[12%] md:max-w-xl">
+          <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#5C5C5C]">
+            <HubCopyText path="by-design.manifesto.n">{c.manifesto.n}</HubCopyText>
+            {" // "}
+            <HubCopyText path="by-design.manifesto.title">{c.manifesto.title}</HubCopyText>
+          </p>
+          <h2
+            className="mt-6 text-[32px] font-normal leading-[1.05] tracking-[-0.02em] text-[#181818] md:text-[44px]"
+            style={{ fontFamily: "'Instrument Serif', serif" }}
           >
-            {BY_DESIGN.headline}
-          </h1>
-          <p {...bodyPencil} className="mt-4 text-[16px] text-[#F3EEE7]/85">{BY_DESIGN.lede}</p>
+            <HubCopyText path="by-design.manifesto.headline">{c.manifesto.headline}</HubCopyText>
+          </h2>
+          {manifestoLead ? (
+            <p className="mt-6 max-w-xl text-[16px] leading-relaxed text-[#5C5C5C]">
+              <HubCopyText path="by-design.manifesto.body.0">{manifestoLead}</HubCopyText>
+            </p>
+          ) : null}
+          {manifestoRest.map((paragraph, index) => (
+            <p key={paragraph} className="mt-4 max-w-xl text-[16px] leading-relaxed text-[#5C5C5C]">
+              <HubCopyText path={`by-design.manifesto.body.${index + 1}`}>{paragraph}</HubCopyText>
+            </p>
+          ))}
         </div>
       </section>
 
@@ -48,126 +77,111 @@ export default function V1ByDesignPage({ onBack, onNav }: PageProps) {
         slides={[
           {
             image: gymPhotos.floorColumbus,
-            title: `01 / ${space.title}`,
-            description: space.body,
+            title: `01 // ${space?.title ?? ""}`,
+            description: space?.body ?? "",
             slot: "byDesignFrame1",
           },
           {
             image: gymPhotos.equipmentClose,
-            title: `02 / ${equipment.title}`,
-            description: equipment.body,
+            title: `02 // ${equipment?.title ?? ""}`,
+            description: equipment?.body ?? "",
             slot: "byDesignFrame2",
           },
         ]}
       />
 
-      <section className={BEAT}>
-        <div className="mx-auto grid max-w-6xl grid-cols-1 md:grid-cols-12">
-          <div className="flex flex-col gap-6 md:col-span-6 md:col-start-4">
-            {BY_DESIGN.manifesto.body.map((paragraph) => (
-              <p
-                key={paragraph}
-                className="text-[22px] font-normal leading-snug tracking-[-0.02em] text-[#F3EEE7] md:text-[28px]"
-                style={SATOSHI}
+      <section
+        className="border-b border-white/10 bg-[#181818] py-14 md:py-24"
+        aria-label="By Design film"
+      >
+        <div className="overflow-hidden border-y border-white/10">
+          {reduceMotion ? (
+            <V1MediaImg
+              slot="byDesignWide"
+              src={gymPhotos.galleryCinematic}
+              alt=""
+              className="aspect-[16/9] w-full object-cover md:aspect-[21/9]"
+            />
+          ) : (
+            <video
+              className="aspect-[16/9] w-full object-cover md:aspect-[21/9]"
+              autoPlay
+              loop
+              muted
+              playsInline
+              poster={gymPhotos.galleryCinematic}
+              src={gymVideos.opening01}
+              onLoadedMetadata={(event) => {
+                event.currentTarget.playbackRate = 0.5;
+              }}
+            />
+          )}
+        </div>
+      </section>
+
+      <section
+        className="border-b border-neutral-200/60 bg-[#F3EEE7] px-5 py-14 md:px-10 md:py-20"
+        aria-label={`${c.principles.n} ${c.principles.title}`}
+      >
+        <div className="mx-auto flex max-w-6xl flex-col gap-8">
+          <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#5C5C5C]">
+            <HubCopyText path="by-design.principles.n">{c.principles.n}</HubCopyText>
+            {" // "}
+            <HubCopyText path="by-design.principles.title">{c.principles.title}</HubCopyText>
+          </p>
+
+          <ul className="flex flex-col border-t border-neutral-200">
+            {offerings.map(({ principle, media, rowIndex }) => (
+              <li
+                key={principle.n}
+                className="grid grid-cols-12 gap-3 border-b border-neutral-200 py-7 md:gap-6 md:py-10"
               >
-                {paragraph}
-              </p>
+                <span className="col-span-2 pt-1 font-mono text-[10px] tracking-widest text-[#5C5C5C] sm:col-span-1">
+                  <HubCopyText path={`by-design.principles.rows.${rowIndex}.n`}>{principle.n}</HubCopyText>
+                </span>
+                <div className="col-span-10 flex flex-col gap-3 sm:col-span-11 md:grid md:grid-cols-12 md:items-start md:gap-6">
+                  <h3
+                    className="text-[15px] font-bold uppercase tracking-tight text-[#181818] md:col-span-3"
+                    style={{ fontFamily: "'Satoshi', sans-serif" }}
+                  >
+                    <HubCopyText path={`by-design.principles.rows.${rowIndex}.title`}>
+                      {principle.title}
+                    </HubCopyText>
+                  </h3>
+                  <p className="text-[15px] leading-relaxed text-[#5C5C5C] md:col-span-6">
+                    <HubCopyText path={`by-design.principles.rows.${rowIndex}.body`}>
+                      {principle.body}
+                    </HubCopyText>
+                  </p>
+                  <div className="hidden md:col-span-3 md:block">
+                    <V1MediaImg
+                      slot={media.slot}
+                      src={media.src}
+                      alt=""
+                      className="aspect-[4/5] w-full object-cover"
+                    />
+                  </div>
+                </div>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       </section>
 
-      <section className="overflow-hidden border-b border-white/10 bg-[#111111]" aria-label="Morning light">
-        {reduceMotion ? (
-          <V1MediaImg
-            slot="byDesignWide"
-            src={gymPhotos.galleryCinematic}
-            alt=""
-            className="aspect-[21/9] w-full object-cover"
-          />
-        ) : (
-          <video
-            className="aspect-[21/9] w-full object-cover"
-            autoPlay
-            loop
-            muted
-            playsInline
-            poster={gymPhotos.galleryCinematic}
-            src={gymVideos.opening01}
-            onLoadedMetadata={(event) => {
-              event.currentTarget.playbackRate = 0.5;
-            }}
-          />
-        )}
-      </section>
-
-      <section className={BEAT} aria-label="Detail crops">
-        <div className="mx-auto grid max-w-6xl grid-cols-1 items-start gap-8 md:grid-cols-[1fr_0.8fr_1.2fr] md:gap-10">
-          <V1MediaImg
-            slot="byDesignTall"
-            src={gymPhotos.spaceAtmosphere}
-            alt=""
-            className="aspect-[3/5] w-full object-cover"
-          />
-          <V1MediaImg
-            slot="byDesignSquare"
-            src={gymPhotos.rackWeights}
-            alt=""
-            className="aspect-square w-full object-cover md:mt-[25%]"
-          />
-          <V1MediaImg
-            slot="byDesignRest"
-            src={gymPhotos.galleryCinematic}
-            alt=""
-            className="aspect-[16/10] w-full object-cover"
-          />
+      <section className="border-b border-neutral-200/60 bg-[#F3EEE7] px-5 py-16 md:px-10 md:py-24">
+        <div className="mx-auto max-w-6xl md:ml-[28%] md:max-w-xl">
+          <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#5C5C5C]">
+            <HubCopyText path="by-design.quote.n">{c.quote.n}</HubCopyText>
+            {" // "}
+            <HubCopyText path="by-design.quote.title">{c.quote.title}</HubCopyText>
+          </p>
+          <p
+            className="mt-8 text-[28px] font-normal leading-[1.15] tracking-[-0.02em] text-[#181818] md:text-[40px]"
+            style={{ fontFamily: "'Instrument Serif', serif" }}
+          >
+            <HubCopyText path="by-design.quote.text">{c.quote.text}</HubCopyText>
+          </p>
         </div>
-      </section>
-
-      <section className={BEAT} aria-label="Materials and hospitality">
-        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 md:grid-cols-2 md:gap-8">
-          <figure>
-            <V1MediaImg
-              slot="byDesignLeft"
-              src={gymPhotos.equipmentClose}
-              alt=""
-              className="aspect-[4/5] w-full object-cover"
-            />
-            <figcaption className="mt-4">
-              <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#F3EEE7]/55">
-                03 / {materials.title}
-              </p>
-              <p className="mt-2 max-w-sm text-[15px] leading-relaxed text-[#F3EEE7]/85">
-                {materials.body}
-              </p>
-            </figcaption>
-          </figure>
-          <figure>
-            <V1MediaImg
-              slot="byDesignRight"
-              src={gymPhotos.floorColumbus}
-              alt=""
-              className="aspect-[4/5] w-full object-cover"
-            />
-            <figcaption className="mt-4">
-              <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#F3EEE7]/55">
-                04 / {hospitality.title}
-              </p>
-              <p className="mt-2 max-w-sm text-[15px] leading-relaxed text-[#F3EEE7]/85">
-                {hospitality.body}
-              </p>
-            </figcaption>
-          </figure>
-        </div>
-      </section>
-
-      <section className={BEAT}>
-        <p
-          className="mx-auto max-w-6xl text-[22px] leading-snug tracking-[-0.02em] text-[#F3EEE7] md:ml-[28%] md:max-w-xl md:text-[28px]"
-          style={SATOSHI}
-        >
-          {marginLine}
-        </p>
       </section>
 
       <section className="relative min-h-[80vh] border-b border-white/10">
@@ -179,7 +193,7 @@ export default function V1ByDesignPage({ onBack, onNav }: PageProps) {
         />
         <div className="absolute inset-0 bg-[#111111]/45" />
         <div className="relative flex min-h-[80vh] flex-col justify-end px-5 py-16 md:px-10 md:py-24">
-          <V1Heading>Built with intention.</V1Heading>
+          <V1Heading copyPath="by-design.manifesto.headline">{c.manifesto.headline}</V1Heading>
           <p className="mt-4 font-mono text-[12px] uppercase tracking-[0.22em] text-[#F3EEE7]/80">
             // By Design
           </p>

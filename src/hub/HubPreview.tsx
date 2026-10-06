@@ -1,15 +1,14 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Pencil } from "lucide-react";
-import { gymPhotos } from "@/assets/images/gym";
-import strongerUnitedMark from "@/assets/images/brand/stronger-united.png";
-import ClubCrestSVG from "@/components/direction-v1/brand/ClubCrestSVG";
+import ConceptV1View from "@/components/ConceptV1View";
 import { LockedNavOverlay } from "@/components/direction-v1/LockedNavOverlay";
 import { useSidebar } from "@/components/ui/sidebar";
 import { V1KitValue } from "@/components/direction-v1/V1Kit";
-import { HubMarkProvider } from "@/components/direction-v1/pages/V1Interior";
+import { HubMarkProvider, inferTypeRoleFromPath } from "@/components/direction-v1/pages/V1Interior";
 import V1ApplyPage from "@/components/direction-v1/pages/V1ApplyPage";
 import V1ArchivePage from "@/components/direction-v1/pages/V1ArchivePage";
 import V1BuildPage from "@/components/direction-v1/pages/V1BuildPage";
+import V1BurnPage from "@/components/direction-v1/pages/V1BurnPage";
 import V1ByDesignPage from "@/components/direction-v1/pages/V1ByDesignPage";
 import V1CultivatedPage from "@/components/direction-v1/pages/V1CultivatedPage";
 import V1ExperiencePage from "@/components/direction-v1/pages/V1ExperiencePage";
@@ -20,26 +19,22 @@ import V1MoveTheCityPage from "@/components/direction-v1/pages/V1MoveTheCityPage
 import V1PersonalTrainingPage from "@/components/direction-v1/pages/V1PersonalTrainingPage";
 import V1SpacePage from "@/components/direction-v1/pages/V1SpacePage";
 import V1TeamPage from "@/components/direction-v1/pages/V1TeamPage";
-import {
-  MEDIA_SLOTS,
-  fontStack,
-  type BrandKitFields,
-  type MediaSlot,
-} from "@/hub/brand-kit";
+import { PhilosophyPage as EfPhilosophyPage } from "@/components/direction-ef/about";
+import { MEDIA_SLOTS, type BrandKitFields, type MediaSlot } from "@/hub/brand-kit";
 import { hubPage, hubPageFromHref, type HubPageId } from "@/hub/hub-pages";
 
 const STAGE_WIDTH = 1280;
 const HEX = /^#[0-9A-Fa-f]{6}$/;
 
-type HubTab = "brand" | "type" | "media" | "footer" | null;
+type HubTab = "brand" | "type" | "media" | "footer" | "faq" | "copy" | null;
 export type TypeRole = "mono" | "display" | "body";
-type MarkId = TypeRole | "footer" | MediaSlot;
 
 interface HubPreviewProps {
   draft: BrandKitFields;
   tab: HubTab;
   mediaSlot: MediaSlot;
   typeRole: TypeRole | null;
+  copyPath: string | null;
   pageId: HubPageId;
   onSelect: (target: PreviewTarget) => void;
   onPageChange: (pageId: HubPageId) => void;
@@ -49,33 +44,92 @@ export type PreviewTarget =
   | { kind: "brand" }
   | { kind: "type"; role: TypeRole }
   | { kind: "media"; slot: MediaSlot }
-  | { kind: "footer" };
+  | { kind: "footer" }
+  | { kind: "faq" }
+  | { kind: "copy"; path: string; typeRole?: TypeRole };
 
 interface PencilAnchor {
   id: string;
+  typeRole?: TypeRole;
   left: number;
   top: number;
+  area: number;
 }
 
-const PILLARS: { slot: MediaSlot; title: string; fallback: string }[] = [
-  { slot: "pillar1", title: "Foundation", fallback: gymPhotos.architectureRaw },
-  { slot: "pillar2", title: "Reflection", fallback: gymPhotos.galleryCinematic },
-  { slot: "pillar3", title: "Longevity", fallback: gymPhotos.spaceAtmosphere },
-  { slot: "pillar4", title: "Move the City", fallback: gymPhotos.equipmentClose },
-];
+const OVERLAP_PX = 40;
+
+/** Skip marks inside hidden/inert ancestors, but stop at the preview stage
+ *  (the stage itself is always aria-hidden for a11y and must not wipe all pencils). */
+function isHiddenFromPencil(node: HTMLElement, stage: HTMLElement): boolean {
+  let cur: HTMLElement | null = node;
+  while (cur && cur !== stage) {
+    if (cur.getAttribute("aria-hidden") === "true") return true;
+    if (cur.hasAttribute("inert")) return true;
+    cur = cur.parentElement;
+  }
+  return false;
+}
+
+function centerInFrame(
+  box: DOMRect,
+  frameBox: DOMRect,
+  pad = 8,
+): boolean {
+  const cx = box.left + box.width / 2;
+  const cy = box.top + box.height / 2;
+  return (
+    cx >= frameBox.left - pad &&
+    cx <= frameBox.right + pad &&
+    cy >= frameBox.top - pad &&
+    cy <= frameBox.bottom + pad
+  );
+}
+
+function pencilPriority(id: string): number {
+  if (id.startsWith("copy-section:")) return 50;
+  if (id.startsWith("media-")) return 40;
+  if (id === "footer" || id === "faq" || id === "brand") return 30;
+  if (id.startsWith("copy:")) return 20;
+  if (id.startsWith("type-")) return 10;
+  return 0;
+}
+
+/** Collapse anchors whose centers are within OVERLAP_PX (keep highest priority / largest area). */
+function collapseOverlapping(anchors: PencilAnchor[]): PencilAnchor[] {
+  const sorted = [...anchors].sort((a, b) => {
+    const byPri = pencilPriority(b.id.split("::")[0] ?? "") - pencilPriority(a.id.split("::")[0] ?? "");
+    if (byPri !== 0) return byPri;
+    return b.area - a.area;
+  });
+  const kept: PencilAnchor[] = [];
+  for (const anchor of sorted) {
+    const hits = kept.some(
+      (other) => Math.hypot(other.left - anchor.left, other.top - anchor.top) < OVERLAP_PX,
+    );
+    if (!hits) kept.push(anchor);
+  }
+  return kept.sort((a, b) => a.top - b.top || a.left - b.left);
+}
 
 function color(value: string, fallback: string): string {
   return HEX.test(value) ? value : fallback;
 }
 
-function regionLabel(tab: HubTab, mediaSlot: MediaSlot, typeRole: TypeRole | null): string {
+function regionLabel(
+  tab: HubTab,
+  mediaSlot: MediaSlot,
+  typeRole: TypeRole | null,
+  copyPath: string | null,
+): string {
   if (tab === null) return "Click a pencil on the page.";
   if (tab === "brand") return "Editing brand colors";
   if (tab === "footer") return "Editing footer and copyright";
+  if (tab === "faq") return "Editing FAQ questions and answers";
+  if (tab === "copy") return copyPath ? `Editing copy · ${copyPath}` : "Editing page copy";
   if (tab === "type") {
-    if (typeRole === "mono") return "Editing chapter number";
-    if (typeRole === "display") return "Editing chapter title";
-    if (typeRole === "body") return "Editing chapter text";
+    if (typeRole === "mono") return "Editing chapter number type";
+    if (typeRole === "display") return "Editing title type";
+    if (typeRole === "body") return "Editing body type";
     return "Editing type";
   }
   const slot = MEDIA_SLOTS.find((item) => item.key === mediaSlot);
@@ -85,9 +139,25 @@ function regionLabel(tab: HubTab, mediaSlot: MediaSlot, typeRole: TypeRole | nul
 function pencilName(id: string): string {
   if (id === "brand") return "Edit brand colors";
   if (id === "footer") return "Edit footer";
-  if (id === "type-mono") return "Edit chapter number";
-  if (id === "type-display") return "Edit chapter title";
-  if (id === "type-body") return "Edit chapter text";
+  if (id === "faq") return "Edit FAQ copy";
+  if (id === "type-mono") return "Edit chapter number type";
+  if (id === "type-display") return "Edit title type";
+  if (id === "type-body") return "Edit body type";
+  if (id.startsWith("copy-section:")) {
+    const path = id.slice("copy-section:".length);
+    const belief = path.match(/\.beliefs\.(\d+)$/);
+    if (belief) {
+      const n = String(Number(belief[1]) + 1).padStart(2, "0");
+      return `Edit belief ${n} copy`;
+    }
+    const leaf = path.split(".").slice(-2).join(" ") || path;
+    return `Edit ${leaf} section`;
+  }
+  if (id.startsWith("copy:")) {
+    const path = id.slice("copy:".length);
+    const leaf = path.split(".").pop() ?? "copy";
+    return `Edit ${leaf}`;
+  }
   if (id.startsWith("media-")) {
     const slot = id.slice("media-".length);
     if (isMediaSlot(slot)) return `Edit ${MEDIA_SLOTS.find((item) => item.key === slot)?.label ?? "media"}`;
@@ -99,7 +169,16 @@ function isMediaSlot(value: string): value is MediaSlot {
   return MEDIA_SLOTS.some((item) => item.key === value);
 }
 
-export default function HubPreview({ draft, tab, mediaSlot, typeRole, pageId, onSelect, onPageChange }: HubPreviewProps) {
+export default function HubPreview({
+  draft,
+  tab,
+  mediaSlot,
+  typeRole,
+  copyPath,
+  pageId,
+  onSelect,
+  onPageChange,
+}: HubPreviewProps) {
   const frameRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
@@ -110,7 +189,6 @@ export default function HubPreview({ draft, tab, mediaSlot, typeRole, pageId, on
   const cream = color(draft.colors.cream, "#F3EEE7");
   const gold = color(draft.colors.gold, "#C4A35A");
   const background = color(draft.colors.background, "#111111");
-  const ink = color(draft.colors.text, "#181818");
   const page = hubPage(pageId);
   const isHome = page.id === "home";
 
@@ -123,24 +201,35 @@ export default function HubPreview({ draft, tab, mediaSlot, typeRole, pageId, on
       setScale(width > 0 ? Math.min(1, width / STAGE_WIDTH) : 1);
       setStageHeight(stage.offsetHeight);
       const frameBox = frame.getBoundingClientRect();
-      const next: PencilAnchor[] = [];
+      const collected: PencilAnchor[] = [];
       for (const node of stage.querySelectorAll<HTMLElement>("[data-hub-pencil]")) {
         const id = node.dataset.hubPencil;
         if (!id) continue;
+        if (isHiddenFromPencil(node, stage)) continue;
         const box = node.getBoundingClientRect();
         if (box.width < 1 || box.height < 1) continue;
+        if (!centerInFrame(box, frameBox)) continue;
         const maxLeft = Math.max(4, frame.clientWidth - 48);
         const maxTop = Math.max(4, frame.clientHeight - 48);
         const rawLeft = id.startsWith("type-")
           ? box.right - frameBox.left + 8
           : box.left - frameBox.left + box.width / 2 - 22;
         const rawTop = box.top - frameBox.top + box.height / 2 - 22;
-        next.push({
-          id: `${id}::${next.length}`,
+        // Only soft-clamp for tiny overflow; do not drag off-stage marks onto the edge.
+        if (rawLeft < -24 || rawLeft > frame.clientWidth + 24) continue;
+        if (rawTop < -24 || rawTop > frame.clientHeight + 24) continue;
+        const rawRole = node.dataset.hubTypeRole;
+        const typeRole: TypeRole | undefined =
+          rawRole === "display" || rawRole === "body" || rawRole === "mono" ? rawRole : undefined;
+        collected.push({
+          id: `${id}::${collected.length}`,
+          typeRole,
           left: Math.min(maxLeft, Math.max(4, rawLeft)),
           top: Math.min(maxTop, Math.max(4, rawTop)),
+          area: box.width * box.height,
         });
       }
+      const next = collapseOverlapping(collected);
       setAnchors((current) => {
         const same =
           current.length === next.length &&
@@ -154,32 +243,31 @@ export default function HubPreview({ draft, tab, mediaSlot, typeRole, pageId, on
       });
     };
     measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(frame);
-    observer.observe(stage);
-    return () => observer.disconnect();
-  }, [draft, tab, mediaSlot, typeRole, pageId]);
-
-  const active = (id: MarkId) => {
-    if (tab === null) return false;
-    if (tab === "brand") return true;
-    if (tab === "footer") return id === "footer";
-    if (tab === "media") return id === mediaSlot;
-    if (typeRole === null) return id === "mono" || id === "display" || id === "body";
-    return id === typeRole;
-  };
-
-  const mark = (id: MarkId): CSSProperties => {
-    if (tab === null || tab === "brand") return {};
-    if (active(id)) {
-      return { boxShadow: `inset 0 0 0 4px ${gold}`, opacity: 1, position: "relative", zIndex: 2 };
-    }
-    return { opacity: 0.35 };
-  };
+    const resizeObserver = new ResizeObserver(measure);
+    resizeObserver.observe(frame);
+    resizeObserver.observe(stage);
+    // Carousel / inert toggles change which marks are visible without resizing.
+    const mutationObserver = new MutationObserver(measure);
+    mutationObserver.observe(stage, {
+      attributes: true,
+      attributeFilter: ["aria-hidden", "inert"],
+      subtree: true,
+      childList: true,
+    });
+    return () => {
+      resizeObserver.disconnect();
+      mutationObserver.disconnect();
+    };
+  }, [draft, tab, mediaSlot, typeRole, copyPath, pageId]);
 
   const pressed = (id: string) => {
     if (id === "brand") return tab === "brand";
     if (id === "footer") return tab === "footer";
+    if (id === "faq") return tab === "faq";
+    if (id.startsWith("copy-section:")) {
+      return tab === "copy" && copyPath === id.slice("copy-section:".length);
+    }
+    if (id.startsWith("copy:")) return tab === "copy" && copyPath === id.slice("copy:".length);
     if (id === "type-mono") return tab === "type" && typeRole === "mono";
     if (id === "type-display") return tab === "type" && typeRole === "display";
     if (id === "type-body") return tab === "type" && typeRole === "body";
@@ -197,7 +285,18 @@ export default function HubPreview({ draft, tab, mediaSlot, typeRole, pageId, on
     setMenuOpen(false);
   };
 
-  const choose = (id: string) => {
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      setMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [menuOpen]);
+
+  const choose = (id: string, anchorRole?: TypeRole) => {
     setMenuOpen(false);
     if (isMobile) setOpenMobile(true);
     else setOpen(true);
@@ -207,6 +306,32 @@ export default function HubPreview({ draft, tab, mediaSlot, typeRole, pageId, on
     }
     if (id === "footer") {
       onSelect({ kind: "footer" });
+      return;
+    }
+    if (id === "faq") {
+      onSelect({ kind: "faq" });
+      return;
+    }
+    if (id.startsWith("copy-section:")) {
+      const path = id.slice("copy-section:".length).trim();
+      if (path) {
+        onSelect({
+          kind: "copy",
+          path,
+          typeRole: anchorRole ?? inferTypeRoleFromPath(path),
+        });
+      }
+      return;
+    }
+    if (id.startsWith("copy:")) {
+      const path = id.slice("copy:".length).trim();
+      if (path) {
+        onSelect({
+          kind: "copy",
+          path,
+          typeRole: anchorRole ?? inferTypeRoleFromPath(path),
+        });
+      }
       return;
     }
     if (id === "type-mono" || id === "type-display" || id === "type-body") {
@@ -221,7 +346,10 @@ export default function HubPreview({ draft, tab, mediaSlot, typeRole, pageId, on
   };
 
   return (
-    <div className="relative flex flex-col gap-2">
+    <div
+      className="relative flex flex-col gap-2"
+      onWheelCapture={menuOpen ? (event) => event.preventDefault() : undefined}
+    >
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm font-medium text-foreground">Editing {page.label}</p>
         <button
@@ -251,11 +379,16 @@ export default function HubPreview({ draft, tab, mediaSlot, typeRole, pageId, on
           </div>
         </div>
       ) : null}
-      <p className="text-xs text-muted-foreground">{regionLabel(tab, mediaSlot, typeRole)}</p>
+      <p className="text-xs text-muted-foreground">{regionLabel(tab, mediaSlot, typeRole, copyPath)}</p>
       {tab === "media" && !draft.media[mediaSlot] ? (
         <p className="text-xs text-muted-foreground">Using the built-in image</p>
       ) : null}
-      <div ref={frameRef} className="relative w-full" style={{ height: Math.ceil(stageHeight * scale) }}>
+      <div
+        ref={frameRef}
+        className={`relative w-full ${menuOpen ? "pointer-events-none overflow-hidden" : ""}`}
+        style={{ height: Math.ceil(stageHeight * scale) }}
+        inert={menuOpen ? true : undefined}
+      >
         <div className="absolute inset-0 overflow-hidden rounded-xl border border-border bg-neutral-200">
         <div
           ref={stageRef}
@@ -270,129 +403,11 @@ export default function HubPreview({ draft, tab, mediaSlot, typeRole, pageId, on
             outlineOffset: tab === "brand" ? -8 : undefined,
           }}
         >
-          {isHome ? (
-          <div
-            data-hub-pencil="brand"
-            className="flex items-center justify-between px-10 py-4 text-[11px] uppercase tracking-[0.18em]"
-            style={{ borderBottom: `1px solid ${cream}` }}
-          >
-            <span>Menu</span>
-            <span>United Strength</span>
-            <span>Columbus, OH</span>
-          </div>
-          ) : null}
-
-          {isHome ? (
-          <>
-          <div className="flex h-[360px]">
-            <PreviewImage
-              slot="openingClubPoster"
-              src={draft.media.openingClubPoster}
-              fallback={gymPhotos.galleryCinematic}
-              alt=""
-              className="h-full w-1/2 object-cover"
-              style={mark("openingClubPoster")}
-              marker="openingClubPoster"
-            />
-            <TypeBlock draft={draft} cream={cream} gold={gold} mark={mark} title={page.title} body={page.body} />
-          </div>
-
-          <div className="grid grid-cols-2">
-            <PreviewImage
-              slot="openingBelieve"
-              src={draft.media.openingBelieve}
-              fallback={gymPhotos.spaceAtmosphere}
-              alt=""
-              className="h-40 w-full object-cover"
-              style={mark("openingBelieve")}
-              marker="openingBelieve"
-            />
-            <PreviewImage
-              slot="openingExperience"
-              src={draft.media.openingExperience}
-              fallback={gymPhotos.experienceBroll}
-              alt=""
-              className="h-40 w-full object-cover"
-              style={mark("openingExperience")}
-              marker="openingExperience"
-            />
-          </div>
-
-          <div className="grid grid-cols-4">
-            {PILLARS.map((pillar) => (
-              <div key={pillar.slot} className="relative h-44" style={mark(pillar.slot)} data-hub-pencil={`media-${pillar.slot}`}>
-                <PreviewImage
-                  slot={pillar.slot}
-                  src={draft.media[pillar.slot]}
-                  fallback={pillar.fallback}
-                  alt=""
-                  className="h-full w-full object-cover"
-                />
-                <span className="absolute bottom-3 left-3 text-xs uppercase tracking-[0.14em] text-white">
-                  {pillar.title}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-2" style={{ backgroundColor: cream, color: ink }}>
-            <PreviewImage
-              slot="spaceLead"
-              src={draft.media.spaceLead}
-              fallback={gymPhotos.floorColumbus}
-              alt=""
-              className="h-48 w-full object-cover"
-              style={mark("spaceLead")}
-              marker="spaceLead"
-            />
-            <PreviewImage
-              slot="spaceDetail"
-              src={draft.media.spaceDetail}
-              fallback={gymPhotos.equipmentClose}
-              alt=""
-              className="h-48 w-full object-cover"
-              style={mark("spaceDetail")}
-              marker="spaceDetail"
-            />
-          </div>
-          </>
-          ) : (
           <V1KitValue value={draft}>
             <HubMarkProvider>
               <InteriorPreview pageId={pageId} onNavigate={openPage} />
             </HubMarkProvider>
           </V1KitValue>
-          )}
-
-          {isHome ? (
-          <footer className="flex items-center justify-between gap-8 px-10 py-8" style={{ backgroundColor: background, color: cream }}>
-            <div className="min-w-0" style={mark("footer")} data-hub-pencil="footer">
-              <p className="text-sm font-bold uppercase tracking-[0.14em]">{draft.footer.wordmark}</p>
-              <p className="mt-2 text-xs uppercase tracking-[0.12em]" style={{ color: gold }}>
-                {draft.footer.addressLine} {draft.footer.postalCode}
-              </p>
-              <p className="mt-3 text-xs uppercase tracking-[0.12em]" style={{ color: gold }}>{draft.footer.exploreLabel}</p>
-              <p className="mt-1 text-xs uppercase tracking-[0.12em]">{draft.footer.explore.map((link) => link.label).join(" · ")}</p>
-              <p className="mt-4 text-[11px] uppercase tracking-[0.16em]">{draft.copyright}</p>
-            </div>
-            <div style={mark("crest")} data-hub-pencil="media-crest">
-              {draft.media.crest ? (
-                <PreviewImage slot="crest" src={draft.media.crest} fallback="" alt="" className="h-16 w-16 object-contain" />
-              ) : (
-                <ClubCrestSVG className="h-16 w-auto" color="#8A8070" />
-              )}
-            </div>
-            <div style={mark("strongerUnited")} data-hub-pencil="media-strongerUnited">
-              <PreviewImage
-                slot="strongerUnited"
-                src={draft.media.strongerUnited}
-                fallback={strongerUnitedMark}
-                alt=""
-                className="h-12 w-auto max-w-[220px] object-contain"
-              />
-            </div>
-          </footer>
-          ) : null}
         </div>
         </div>
         {anchors.map((anchor) => (
@@ -402,12 +417,12 @@ export default function HubPreview({ draft, tab, mediaSlot, typeRole, pageId, on
             aria-label={pencilName(anchor.id.split("::")[0] ?? anchor.id)}
             aria-pressed={pressed(anchor.id.split("::")[0] ?? anchor.id)}
             className={`absolute z-10 grid size-11 place-items-center rounded-full border shadow-sm ${
-              pressed(anchor.id)
+              pressed(anchor.id.split("::")[0] ?? anchor.id)
                 ? "border-foreground bg-foreground text-background"
                 : "border-border bg-background/90 text-muted-foreground"
             }`}
             style={{ left: anchor.left, top: anchor.top }}
-            onClick={() => choose(anchor.id.split("::")[0] ?? anchor.id)}
+            onClick={() => choose(anchor.id.split("::")[0] ?? anchor.id, anchor.typeRole)}
           >
             <Pencil className="size-4" aria-hidden />
           </button>
@@ -422,9 +437,11 @@ function InteriorPreview({ pageId, onNavigate }: { pageId: HubPageId; onNavigate
   const onNav = (href: string, label: string) => onNavigate(href, label);
   switch (pageId) {
     case "home":
-      return null;
+      return <ConceptV1View skipKitProvider onNav={onNav} />;
     case "founder":
       return <V1FounderPage onBack={onBack} onNav={onNav} />;
+    case "philosophy":
+      return <EfPhilosophyPage onBack={onBack} onNav={onNav} />;
     case "team":
       return <V1TeamPage onBack={onBack} onNav={onNav} />;
     case "space":
@@ -433,6 +450,8 @@ function InteriorPreview({ pageId, onNavigate }: { pageId: HubPageId; onNavigate
       return <V1FactsPage onBack={onBack} onNav={onNav} />;
     case "build":
       return <V1BuildPage onBack={onBack} onNav={onNav} />;
+    case "burn":
+      return <V1BurnPage onBack={onBack} onNav={onNav} />;
     case "personal-training":
       return <V1PersonalTrainingPage onBack={onBack} onNav={onNav} />;
     case "move-the-city":
@@ -454,97 +473,4 @@ function InteriorPreview({ pageId, onNavigate }: { pageId: HubPageId; onNavigate
       return neverPage;
     }
   }
-}
-
-function TypeBlock({
-  draft,
-  cream,
-  gold,
-  mark,
-  title,
-  body,
-}: {
-  draft: BrandKitFields;
-  cream: string;
-  gold: string;
-  mark: (id: TypeRole) => CSSProperties;
-  title: string;
-  body: string;
-}) {
-  return (
-    <div className="flex w-1/2 flex-col justify-end gap-4 p-10">
-      <p style={mark("mono")}>
-        <span
-          data-hub-pencil="type-mono"
-          style={{ fontFamily: fontStack(draft.type.monoFamily), fontSize: draft.type.monoSizePx, lineHeight: 1, color: color(draft.type.monoColor, cream) }}
-        >
-          01
-        </span>
-      </p>
-      <p className="uppercase" style={mark("display")}>
-        <span
-          data-hub-pencil="type-display"
-          style={{
-            fontFamily: fontStack(draft.type.displayFamily),
-            fontSize: draft.type.displaySizePx,
-            fontWeight: 700,
-            letterSpacing: "-0.04em",
-            color: color(draft.type.displayColor, cream),
-          }}
-        >
-          {title}
-        </span>
-      </p>
-      <p style={mark("body")}>
-        <span
-          data-hub-pencil="type-body"
-          className="block max-w-[36ch]"
-          style={{ fontFamily: fontStack(draft.type.bodyFamily), fontSize: draft.type.bodySizePx, color: color(draft.type.bodyColor, cream) }}
-        >
-          {body}
-        </span>
-      </p>
-      <span className="block h-px w-16" style={{ backgroundColor: gold }} />
-    </div>
-  );
-}
-
-function PreviewImage({
-  slot,
-  src,
-  fallback,
-  alt,
-  className,
-  style,
-  marker,
-}: {
-  slot: MediaSlot;
-  src: string;
-  fallback: string;
-  alt: string;
-  className?: string;
-  style?: CSSProperties;
-  marker?: MediaSlot;
-}) {
-  const [broken, setBroken] = useState(false);
-  useEffect(() => {
-    setBroken(false);
-  }, [src]);
-  const usingFallback = !src || broken;
-  const chosen = usingFallback ? fallback : src;
-  if (!chosen) return null;
-  return (
-    <img
-      key={`${slot}-${usingFallback ? "fallback" : "upload"}`}
-      src={chosen}
-      alt={alt}
-      className={className}
-      style={style}
-      data-hub-pencil={marker ? `media-${marker}` : undefined}
-      draggable={false}
-      onError={() => {
-        if (!usingFallback) setBroken(true);
-      }}
-    />
-  );
 }

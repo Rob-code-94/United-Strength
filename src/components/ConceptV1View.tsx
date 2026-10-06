@@ -13,6 +13,8 @@ interface SubViewProps {
   onNav: (href: string, label: string) => void;
   /** Slide 04 unlocks parent vertical scroll; 01–03 stay locked */
   onVerticalScrollUnlockChange?: (unlocked: boolean) => void;
+  /** Hub preview already wraps V1KitValue — skip nested fetch provider */
+  skipKitProvider?: boolean;
 }
 
 /**
@@ -20,12 +22,10 @@ interface SubViewProps {
  * Vertical spine 02–07 after opening carousel · continuous overlap.
  * Spec: docs/wireframes/home-direction-v1.md
  */
-export default function ConceptV1View(props: SubViewProps) {
-  return (
-    <V1KitProvider>
-      <V1Home {...props} />
-    </V1KitProvider>
-  );
+export default function ConceptV1View({ skipKitProvider, ...props }: SubViewProps) {
+  const home = <V1Home {...props} />;
+  if (skipKitProvider) return home;
+  return <V1KitProvider>{home}</V1KitProvider>;
 }
 
 function V1Home({
@@ -35,7 +35,7 @@ function V1Home({
   const kit = useV1Kit();
   return (
     <div
-      className="flex flex-col overflow-x-hidden font-sans animate-fade-in-opacity selection:bg-[#F3EEE7]/20 selection:text-[#F3EEE7]"
+      className="flex min-w-0 flex-col overflow-x-hidden font-sans animate-fade-in-opacity selection:bg-[#F3EEE7]/20 selection:text-[#F3EEE7]"
       style={kitStyle(kit)}
     >
       <OpeningCarousel

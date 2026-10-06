@@ -25,7 +25,7 @@ const PATHS = [
     label: "Apply for Membership",
     cta: "Apply",
     image: gymPhotos.heroFullBleed,
-    imageAlt: "United Strength Club — membership",
+    imageAlt: "United Strength — membership",
     accent: true,
   },
 ] as const;

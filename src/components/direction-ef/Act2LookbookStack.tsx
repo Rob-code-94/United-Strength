@@ -94,7 +94,7 @@ const PHOTOS: PhotoPrint[] = [
     id: "membership",
     label: "Membership",
     image: gymPhotos.heroFullBleed,
-    imageAlt: "United Strength Club — membership",
+    imageAlt: "United Strength — membership",
     widthPct: 62,
     widthPctMobile: 90,
     aspect: "16 / 10",

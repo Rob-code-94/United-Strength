@@ -399,16 +399,16 @@ Not in this handoff: Stripe, Supabase, Firebase, MongoDB, Formspree, or Web3Form
   - Notes: Invite the confirmed client account as Admin on `Rob-code-94/United-Strength`, or transfer ownership under GitHub Settings → General only after they accept. Then Vercel → this project → Settings → General → Transfer. Client accepts the email. Use re-import (client adds the Git repo as a new Vercel project and copies the env keys) only if transfer is blocked because the project sits on a personal team. Production refuses hub login until `HUB_PASSWORD` and `HUB_SESSION_SECRET` are set on their project. Blob saves fail until `BLOB_READ_WRITE_TOKEN` is set there. Leave Mariana on sandbox (`unitedstrength.sandbox`, location `48730`, region `48547`) until the Oct 1 cutover rows above.
 - [ ] **Ops** — Point unitedstrengthgym.com at the client Vercel project · 09/26/2026
   - Notes: Add `unitedstrengthgym.com` and `www.unitedstrengthgym.com` under the client project's Settings → Domains. At the registrar (confirm which one with Todd; do not assume GoDaddy), set the records Vercel displays. Expected if unchanged: A `@` → `76.76.21.21`, CNAME `www` → `cname.vercel-dns.com`. Wait for the automatic certificate. Do not change DNS until the client project is the one that should replace the current Squarespace site. After it is live, send Todd the final `/privacy-policy` and `/terms-of-service` URLs (existing parked row).
-- [ ] **Ops** — Write `HANDOFF.md` at repo root and walk it once · 09/26/2026
-  - Notes: Sections: repo URL, their Vercel project URL, hub login note (password lives in Vercel env, not in the doc), Mariana sandbox vs Oct 1 production swap (`docs/integrations/oct-1-cutover-runbook.md`). How to change an env key: Vercel → Settings → Environment Variables → redeploy. Push to `main` deploys. Roll back from Vercel Deployments. Costs to name: Vercel plan, Vercel Blob, domain renewal, Mariana/Xplor. Developer contact for later work. 30-minute call: open Vercel, trigger one deploy, open the live domain. Client adds a card if they leave the free tier.
+- [x] **Ops** — Write `HANDOFF.md` at repo root and walk it once · 09/26/2026
+  - Notes: [`HANDOFF.md`](../HANDOFF.md) written 10/06/2026 (pre-transfer gate, transfer order, brand-assets pointer, Todd/Nick leftovers). Walkthrough still happens on the ownership call.
 - [ ] **Ops** — Revoke developer access after the walkthrough · 09/26/2026
   - Notes: Remove developer access from the GitHub repo, the Vercel project, and the domain registrar. Keep write access only if Todd confirms a maintenance retainer before the call. Do not remove the developer from Mariana until Nick's Oct 1 cutover is done, if that login is still required that day.
 - [ ] **Ops** — Apply mail cannot be delivered yet · 09/26/2026
   - Notes: Moved from QA pre-delivery. Message Todd before handoff. Form checks work (empty name, `not-an-email`, empty phone). `POST /api/apply` returns 503 while `RESEND_API_KEY` is unset. Default From `onboarding@resend.dev` does not deliver to `membership@unitedstrengthgym.com` until a sending domain is verified. He picks the inbox and the email service (Resend or otherwise). Do not paste API keys into this file.
 - [ ] **Ops** — Hub password reset waits on the club email · 09/27/2026
   - Notes: The hub sign-in has Reset password. It emails a 30-minute link only after the same email setup as Apply (`RESEND_API_KEY` and a verified From). Set `HUB_RESET_EMAIL` to the inbox Todd wants. If that is empty, the link uses `APPLY_TO_EMAIL`, then `membership@unitedstrengthgym.com`. Saving the new password uses the same private storage as the brand kit (Vercel Blob). Until Resend is connected, the button says the email is not connected. Do not paste API keys or the password into this file.
-- [ ] **UI** — Archive subscribe shows no confirmation after a valid email · 09/26/2026
-  - Notes: Moved from QA pre-delivery. `/culture/archive`, “Get the next archive.” A bad email shows “Enter a valid email.” A valid address clears the error and the page stays silent. Submit does not email anyone (`V1ArchivePage` `onSubmit`). Same Todd email setup as Apply, then show a confirmation after a real send.
+- [x] **UI** — Archive subscribe shows no confirmation after a valid email · 09/26/2026
+  - Notes: Fixed in WT. Invalid → “Enter a valid email.” Valid with no list tool → “Subscription unavailable. Try again later.” (fail-closed). Thanks message when a list is connected. Re-checked deep QA 10/06/2026 · `qa-report/2026-10-06T19-15-43/CLIENT_QA_REPORT.md`.
 
 ---
 
@@ -416,8 +416,8 @@ Not in this handoff: Stripe, Supabase, Firebase, MongoDB, Formspree, or Web3Form
 
 Source: full QA of `http://localhost:5173`. Report: `qa-report/2026-09-27T10-50-50/CLIENT_QA_REPORT.md`. Do not commit `qa-report/` unless asked.
 
-- [ ] **UI** — Hub preview menu ignores Escape · 09/27/2026
-  - Notes: `/hub`, preview Menu. Escape left the menu open. A pencil click does close it and opens settings. Match the public V1 menu: Escape closes it, and the preview should not scroll while it is open. `HubPreview.tsx`.
+- [x] **UI** — Hub preview menu ignores Escape · 09/27/2026
+  - Notes: Fixed in WT (`HubPreview.tsx` keydown Escape). Re-checked signed-in hub 10/06/2026 — Escape closes preview Menu.
 
 ## QA — pre-delivery 09/26/2026
 
@@ -435,6 +435,131 @@ Source: deep QA of `http://localhost:5174` (local working tree). Report: `qa-rep
   - Notes: Shop is `target="_blank"` `rel="noopener noreferrer"`. Click opened theunitedlimited.com in a new tab and left the club page in place. Checked 09/27/2026.
 - [x] **Ops** — Apply mail cannot be delivered yet · 09/26/2026
   - Notes: Moved to Ownership handoff. Form checks work. `POST /api/apply` returns 503 while `RESEND_API_KEY` is unset. Default From `onboarding@resend.dev` does not deliver to `membership@unitedstrengthgym.com` until a sending domain is verified. Checked 09/27/2026.
-- [ ] **Ops** — GitHub main still renders the old Apply page · 09/26/2026
-  - Notes: This QA ran on the local working tree (`V1ApplyPage` on port 5174). `HEAD` `src/App.tsx` still mounts EF `ApplyPage` (~line 830). The form commit did not include the route switch.
+- [x] **Ops** — GitHub main still renders the old Apply page · 09/26/2026
+  - Notes: Local WT `V1ApplyPage` is Typeform/mailto (`Begin Application`). **Still true:** `origin/main` can lag until commit+push. Pre-transfer gate 10/06 — do not transfer GitHub until WT is on `main`.
+
+---
+
+## Final handoff
+
+Source: Todd emails 10/2026 (design revisions + ownership). Hub = brand kit **plus** marketing page copy (COPY-501–506); nav/layout/forms stay Dev.
+
+### Tell Todd (hub vs code)
+- [x] **Ops** — Reply: what hub can edit (colors, type roles, **page copy**, media slots, footer, crest, FAQ Q&A, team still/GIF) vs what needs Dev (nav, layout, forms, env) · 10/04/2026
+  - Notes: Matrix in [`docs/client/hub-editable-matrix.md`](../docs/client/hub-editable-matrix.md). Copy pencils on all InteriorPreview pages.
+- [x] **Ops** — Walkthrough shows Save draft / Publish for hub edits; FAQ + page Copy tabs; pencils on editorial text · 10/04/2026
+  - Notes: Same matrix § Save vs Publish + Copy row. Audit: [`docs/client/hub-live-audit-2026-10-03.md`](../docs/client/hub-live-audit-2026-10-03.md).
+
+### Developer sprint (from design email)
+- [x] **Copy** — Home: United Strength Club → United Strength · 10/03/2026
+  - Notes: Public-facing rename shipped (V1 home, footers, kit copyright, journey apply, index title). Checked 10/03/2026.
+- [x] **UI** — Home How We Train: Build / Burn / Run Club / Personal Training · 10/03/2026
+  - Notes: WhatWeOffer tile 04 renamed Run Club; bento + `/training/move-the-city` href unchanged. Checked 10/03/2026.
+- [x] **UI** — Footer Connect: phone/text icon + number · 10/03/2026
+  - Notes: V1 Connect Phone icon + brand-kit `footer.phone` = `614-754-7524`. Hub editable. Checked 10/03/2026.
+- [x] **UI** — Philosophy: click/tap panels with arrows; center closing statement · 10/03/2026
+  - Notes: Belief strip is click/tap carousel (arrows + swipe); close centered. Checked 10/03/2026.
+- [x] **UI** — Founder: mid-image caption; center closing statement · 10/03/2026
+  - Notes: Mid-image caption + centered What I Believe close. Checked 10/03/2026.
+- [x] **UI** — Team: focus / credentials / bio hierarchy; GIF-ready portraits · 10/03/2026
+  - Notes: Focus / Credentials / Perspective hierarchy + V1TeamPortrait (GIF/video-ready). Checked 10/03/2026.
+- [x] **UI** — Space: hover/tap category descriptions · 10/03/2026
+  - Notes: Six why-it-matters notes filled on V1_SPACE_TILES. Checked 10/03/2026.
+- [x] **UI** — Space: ~40% light see-through overlay for category notes · 10/03/2026
+  - Notes: Centered glass panel (~42% height) on hover / focus / tap; larger centered type. Resting state shows bottom label only. `V1SpacePage.tsx`.
+- [x] **Bug** — Facts: accordion opens answer under question · 10/03/2026
+  - Notes: FAQ (`/about/faq`) answers wired from FAQ_ITEMS; accordion under each Q; kicker says FAQ. Checked 10/03/2026.
+- [x] **Other** — Hub-editable FAQ Q&A (20 items) · 10/03/2026
+  - Notes: Brand-kit `faq` + Hub FAQ tab (pencil on FAQ intro). Published kit drives `V1FactsPage`. Team portraits: still or GIF (5 MB GIF / 3 MB still).
+- [x] **UI** — Build: Experience United as main CTA (no free trial) · 10/03/2026
+  - Notes: `V1BuildPage` + `V1_BUILD_START` already Experience United; Strength Standard + schedule kept. Checked 10/03/2026.
+- [x] **UI** — Burn: V1 page matching Build system · 10/03/2026
+  - Notes: `V1BurnPage` (dark shell, Experience United, schedule). App `isV1` + hub. Balance left Coming Soon. Checked 10/03/2026.
+- [x] **UI** — Burn: Build-length editorial expand · 10/03/2026
+  - Notes: Session + outcomes + photo band; no Strength Standard; schedule disclaimer removed. Checked 10/03/2026.
+- [x] **Copy** — Remove unfinished public disclaimers (pending / Details coming / XX+) · 10/03/2026
+  - Notes: FAQ answers filled; PT stats concrete; Build Strength Standard link CTA removed (section kept). Checked 10/03/2026.
+- [x] **UI** — Run Club: rename Move the City page; yellow route maps; Name/Email/Mobile capture · 10/03/2026
+  - Notes: Path stays `/training/move-the-city`. Gold SVG Mon/Thu route placeholders + `POST /api/run-club` form. Swap maps when Todd delivers. Checked 10/03/2026.
+- [x] **UI** — Nav: Move the City top-level Coming Soon; Run Club under Training · 10/03/2026
+  - Notes: Overlay peer after Longevity → `/move-the-city` Coming Soon. Run Club stays `/training/move-the-city`. Checked 10/03/2026.
+- [x] **UI** — Personal Training: two-image Ways to Train; START WITH A CONVERSATION; remove equipment image · 10/03/2026
+  - Notes: Editorial on-image Two Ways tiles; closer headline updated; `ptBand` removed. Checked 10/03/2026.
+- [x] **UI** — Personal Training: Find the Right Coach → Meet the Team deep links · 10/03/2026
+  - Notes: PT coaches = TEAM_MEMBERS (Todd/Jenna/Jason/Kara) → `/about/team#coach-{id}`; Team scrolls + opens bio. Checked 10/03/2026.
+- [x] **UI** — By Design: simplify sequence; carousel controls; delete three-photo block · 10/03/2026
+  - Notes: Hero → manifesto → Portfolio (controls on carousel) → video → Materials/Hospitality → closing → Built with Intention. Detail crops removed. Checked 10/03/2026.
+- [x] **UI** — By Design: editorial aesthetic polish (V1Interior + Cultivated chapters) · 10/03/2026
+  - Notes: `V1Hero`/`V1Section`/`V1Kicker` ladder; `#181818` beats; Portfolio mono Prev/Next; Materials/Hospitality full-bleed chapters (distinct assets). Checked 10/03/2026.
+- [x] **UI** — By Design: Materials/Hospitality alabaster offerings index · 10/03/2026
+  - Notes: Cream `#F3EEE7` ruled index (about-us-13 DNA); md inset stills on `byDesignLeft`/`byDesignRight`; mobile type-only. Checked 10/03/2026.
+- [x] **UI** — Cultivated: blank type-art slot + Odd Ritual principle editorials · 10/03/2026
+  - Notes: Type art empty until hub `cultivatedTypeArt`; People/Room/Conversations unique light layouts; definition on cream. Checked 10/03/2026.
+- [x] **UI** — By Design: cream + Instrument Serif manifesto/pull · 10/03/2026
+  - Notes: Text beats on `#F3EEE7`; Portfolio/film/offerings index unchanged. Checked 10/03/2026.
+- [x] **UI** — Cultivated: video hero, typography artwork, three principle sections, 001 media · 10/03/2026
+  - Notes: Silent video hero (back only); type-art hub slot ~75vh; definition; Right People/Room/Conversations chapters. Swap type art + media when Todd drops assets. Checked 10/03/2026.
+- [x] **UI** — Archive: type → featured → issues/PDF → articles → Mailchimp subscribe · 10/03/2026
+  - Notes: Oversized type; cinematic Featured (gold hover); ARCHIVE // 00n hover cover; text articles; `VITE_MAILCHIMP_ARCHIVE_ACTION`. Checked 10/03/2026.
+- [x] **UI** — Archive: Featured hub image + Todd five-beat order · 10/03/2026
+  - Notes: Default `galleryCinematic` + `archiveFeatured` hub; overlays `pointer-events-none`; order Type → Feature → Issues → Articles → Subscribe → Authors coda. Checked 10/03/2026.
+- [x] **UI** — Membership: fast glitch price reveal · 10/03/2026
+  - Notes: `NumberTicker` `mode="glitch"` (~0.28s flick) on tier prices + join fee. Checked 10/03/2026.
+- [x] **UI** — Experience United: larger beats; reviews section · 10/03/2026
+  - Notes: Immersive edge-reaching beats; Testimonial quotes before First Visit. Checked 10/03/2026. Fidelity 10/03/2026: true edge-bleed (col-span-9 / full-bleed strips), left↔center type rhythm, `// Voices` band before First Visit.
+- [x] **UI** — Apply: Typeform embed or clean handoff (no second progress) · 10/03/2026
+  - Notes: Forms03 removed. `VITE_TYPEFORM_APPLY_URL` embeds; else Begin → mailto. No second progress. Checked 10/03/2026.
+
+### Todd provides (blockers)
+- [x] **Other** — GitHub username for United Strength account · 10/03/2026
+  - Notes: `UnitedStrength`. Checked 10/06/2026.
+- [x] **Other** — Vercel account for United Strength · 10/03/2026
+  - Notes: `info@unitedstrengthgym.com` / team United Strength. Checked 10/06/2026.
+- [x] **Other** — Resend account + Sending API key (local) · 10/06/2026
+  - Notes: Domain unitedstrengthgym.com + Sending key saved in local `.env.local` only (gitignored). From: `United Strength <membership@unitedstrengthgym.com>`. Still must add the same env on **his** Vercel after transfer — see Ownership Resend row.
+- [ ] **Other** — Final brand kit + page assets (incl. Cultivated artwork, route maps, coach GIFs, reviews) · 10/03/2026
+  - Notes: **Crests / colors / fonts / pillar marks** now in-repo at [`docs/client/brand-assets/`](../docs/client/brand-assets/) (copied 10/06; map in README). Hub can take PNG ≤3 MB for `crest` / `strongerUnited`; OTFs not uploadable. **Still Todd:** founder collage, run maps, coach GIFs, Cultivated type art, reviews. Do not auto-Publish pack.
+- [ ] **Other** — Typeform apply URL · 10/03/2026
+  - Notes: Set `VITE_TYPEFORM_APPLY_URL` on Vercel to activate in-page embed.
+- [x] **Other** — Mailchimp for Archive · 10/03/2026
+  - Notes: **Disregarded 10/06/2026** — not required for handoff. Archive subscribe can stay unconnected / fail closed until Todd asks for a list tool later.
+- [x] **Other** — Phone number for footer Connect · 10/03/2026
+  - Notes: `614-754-7524` seeded in brand-kit. Checked 10/03/2026.
+- [ ] **Other** — Go-live date after revisions + assets · 10/03/2026
+
+### Ownership / accounts
+- [ ] **Ops** — Transfer GitHub then Vercel after usernames arrive; no retainer; revoke after walkthrough · 10/03/2026
+  - Notes: Ready — GitHub `UnitedStrength`, Vercel team United Strength (`info@…`). Transfer repo first, then Vercel project.
+- [ ] **Ops** — DNS walkthrough: Vercel A/CNAME only; leave Google Workspace MX/TXT · 10/03/2026
+- [ ] **Ops** — Resend under his account; membership@unitedstrengthgym.com; connect env on his Vercel · 10/03/2026
+  - Notes: Account + key exist; local `.env.local` has `RESEND_API_KEY` + From. **Open:** put `RESEND_API_KEY`, `APPLY_FROM_EMAIL=United Strength <membership@unitedstrengthgym.com>`, leave `APPLY_TO_EMAIL` empty on **his** Vercel, then redeploy. Do not point To at info@. Connect footer icon stays info@.
+- [ ] **Ops** — Nick/Mariana final checklist (Privacy, Terms, production URLs, Columbus location, SMS if still required) · 10/03/2026
+- [ ] **Ops** — Send individual quotes: Foundation / Longevity / Move the City (future pages) · 10/03/2026
+  - Notes: **Estimate only (not scheduled this wave).** Once Todd has concept/content: Foundation **2.5–3.5 days**; Longevity hub **2.5–3.5 days** (+**1.5–2 days** each child if live); Move the City platform (not Run Club) **3–4 days**. Bundle 3 hubs only: **8–11 days** × usual day rate. Confirm after content packet.
+- [ ] **Ops** — Final ownership list: GitHub, Vercel, Blob, domain, Resend, Mariana, Typeform, analytics if any · 10/03/2026
+  - Notes: Mailchimp disregarded 10/06/2026 — not part of handoff stack.
+
+---
+
+## QA — deep pre-transfer 10/06/2026
+
+Source: deep crawl + browser + hub of `http://localhost:5173`. Report: `qa-report/2026-10-06T19-15-43/CLIENT_QA_REPORT.md`. Brand pack check-only (not wired).
+
+### Passed (close / no new ticket)
+
+- [x] **UI** — Voices Prev/Next enabled; advances quotes · 10/06/2026
+- [x] **Copy** — Membership How to Join `$70` (no `$75`) · 10/06/2026
+- [x] **UI** — Apply = Begin Application mailto/Typeform path · 10/06/2026
+- [x] **UI** — Archive fail-closed message when list unset · 10/06/2026
+- [x] **UI** — Hub Escape + crest Media upload UI + Copy pencil + Save draft · 10/06/2026
+- [x] **Ops** — Brand pack preserved in `docs/client/brand-assets/` + hub map README · 10/06/2026
+
+### Open from this run
+
+- [ ] **UI** — Home tablet `scrollportOverflowX: 197` · parked polish 10/06/2026
+  - Notes: Same as 10/04. Mobile/desktop clean. Possible opening carousel / DEV studio chrome. Not a go-live blocker for phone-first.
+- [ ] **Ops** — Pre-transfer gate: **commit + push WT to `main` before GitHub → Vercel transfer** · 10/06/2026
+  - Notes: Transferring today’s `origin/main` without the Oct WT ships old Apply / Escape / Archive behavior. Order: sanitize env → commit/push → transfer GitHub (`UnitedStrength`) → transfer Vercel → paste Resend/hub env → DNS → walkthrough → revoke. See ownership rows above.
+- [ ] **Ops** — Mariana embed framing / Nick production (sandbox deny) · still open · 10/06/2026
+  - Notes: `/buy` shell shows correct fallback. Not a local UI bug.
 

@@ -1,3 +1,5 @@
+import { INFO_INBOX } from "@/data/contact";
+
 /**
  * Full-viewport maintenance gate for Oct 1 migration morning.
  * Enable with `VITE_MAINTENANCE_MODE=true` (rebuild/redeploy).
@@ -6,7 +8,7 @@ export default function MaintenancePage() {
   return (
     <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-[#111111] px-6 text-center text-[#F3EEE7]">
       <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#F3EEE7]/50">
-        United Strength Club
+        United Strength
       </p>
       <h1
         className="mt-4 max-w-[16ch] font-sans text-[28px] font-bold uppercase leading-[1.1] tracking-[-0.04em] md:text-[36px]"
@@ -19,7 +21,7 @@ export default function MaintenancePage() {
         maintenance. Thank you for your patience — Columbus, Ohio.
       </p>
       <p className="mt-10 font-mono text-[9px] uppercase tracking-[0.18em] text-[#F3EEE7]/40">
-        Questions · info@unitedstrengthgym.com
+        Questions · {INFO_INBOX}
       </p>
     </div>
   );

@@ -1,4 +1,6 @@
 import { motion, useReducedMotion } from "motion/react";
+import { HubCopyText, V1MediaImg } from "@/components/direction-v1/pages/V1Interior";
+import type { MediaSlot } from "@/hub/brand-kit";
 import { LOOKBOOK_EASE } from "./constants";
 
 export interface OffCenteredStackItem {
@@ -9,6 +11,10 @@ export interface OffCenteredStackItem {
   cover: string;
   coverAlt: string;
   excerpt?: string;
+  /** When set, cover resolves through brand-kit + hub media pencils. */
+  coverSlot?: MediaSlot;
+  /** Hub page-copy prefix, e.g. `archive.posts.0`. */
+  copyPathPrefix?: string;
 }
 
 interface LookbookOffCenteredStackProps {
@@ -17,6 +23,8 @@ interface LookbookOffCenteredStackProps {
   eyebrow?: string;
   /** Mono index suffix — e.g. Archive → `01 // Archive` */
   indexLabel?: string;
+  /** Light = EF cream/white pages; dark = V1 charcoal canvas */
+  tone?: "light" | "dark";
 }
 
 /** Alternating off-center offsets — inset from edges (not flush). */
@@ -40,8 +48,15 @@ export default function LookbookOffCenteredStack({
   items,
   eyebrow = "Archives",
   indexLabel = "Archive",
+  tone = "light",
 }: LookbookOffCenteredStackProps) {
   const reduceMotion = useReducedMotion();
+  const metaClass =
+    tone === "dark" ? "text-[#F3EEE7]/55" : "text-[#5C5C5C]";
+  const focusOutline =
+    tone === "dark"
+      ? "focus-visible:outline-[#F3EEE7]"
+      : "focus-visible:outline-[#181818]";
 
   return (
     <div className="flex flex-col gap-6 md:gap-8">
@@ -51,10 +66,14 @@ export default function LookbookOffCenteredStack({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.55, ease: LOOKBOOK_EASE }}
       >
-        <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#5C5C5C]">
+        <p
+          className={`font-mono text-[10px] uppercase tracking-[0.28em] ${metaClass}`}
+        >
           // {eyebrow}
         </p>
-        <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#5C5C5C] inline-flex items-center gap-2">
+        <p
+          className={`font-mono text-[10px] uppercase tracking-[0.22em] inline-flex items-center gap-2 ${metaClass}`}
+        >
           Scroll
           <span aria-hidden>↓</span>
         </p>
@@ -142,13 +161,24 @@ export default function LookbookOffCenteredStack({
                         ? 0.12
                         : Math.min(0.08 + i * 0.06, 0.28),
                   }}
-                  className={`group relative block w-[88%] sm:w-[78%] md:w-[62%] max-w-[420px] aspect-[3/4] overflow-hidden bg-[#181818] shadow-[0_18px_40px_-12px_rgba(0,0,0,0.5)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#181818] ${sideClass}`}
+                  className={`group relative block w-[88%] sm:w-[78%] md:w-[62%] max-w-[420px] aspect-[3/4] overflow-hidden bg-[#181818] shadow-[0_18px_40px_-12px_rgba(0,0,0,0.5)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${focusOutline} ${sideClass}`}
                 >
-                  <img
-                    src={item.cover}
-                    alt={item.coverAlt}
-                    className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none grayscale contrast-110 brightness-95"
-                  />
+                  {item.coverSlot ? (
+                    <V1MediaImg
+                      slot={item.coverSlot}
+                      src={item.cover}
+                      alt={item.coverAlt}
+                      className="absolute inset-0 h-full w-full object-cover select-none pointer-events-none grayscale contrast-110 brightness-95"
+                      draggable={false}
+                    />
+                  ) : (
+                    <img
+                      src={item.cover}
+                      alt={item.coverAlt}
+                      className="absolute inset-0 h-full w-full object-cover select-none pointer-events-none grayscale contrast-110 brightness-95"
+                      draggable={false}
+                    />
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/10" />
 
                   <div className="relative z-10 flex h-full flex-col justify-between p-5 md:p-6 text-white">
@@ -161,15 +191,33 @@ export default function LookbookOffCenteredStack({
                         className="text-[1.25rem] sm:text-[1.45rem] leading-snug tracking-tight font-bold line-clamp-3 group-hover:opacity-80 transition-opacity"
                         style={{ fontFamily: "'Satoshi', sans-serif" }}
                       >
-                        {item.title}
+                        {item.copyPathPrefix ? (
+                          <HubCopyText path={`${item.copyPathPrefix}.title`}>{item.title}</HubCopyText>
+                        ) : (
+                          item.title
+                        )}
                       </h3>
                       {item.excerpt ? (
                         <p className="text-[13px] leading-relaxed text-white/75 line-clamp-2">
-                          {item.excerpt}
+                          {item.copyPathPrefix ? (
+                            <HubCopyText path={`${item.copyPathPrefix}.excerpt`}>{item.excerpt}</HubCopyText>
+                          ) : (
+                            item.excerpt
+                          )}
                         </p>
                       ) : null}
                       <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-white/65">
-                        {item.author} · {item.date}
+                        {item.copyPathPrefix ? (
+                          <>
+                            <HubCopyText path={`${item.copyPathPrefix}.author`}>{item.author}</HubCopyText>
+                            {" · "}
+                            <HubCopyText path={`${item.copyPathPrefix}.date`}>{item.date}</HubCopyText>
+                          </>
+                        ) : (
+                          <>
+                            {item.author} · {item.date}
+                          </>
+                        )}
                       </span>
                       <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-white min-h-[44px] inline-flex items-center pt-1 border-t border-white/20">
                         [ Read ]

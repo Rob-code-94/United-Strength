@@ -9,7 +9,7 @@
  * - VITE_MARIANA_REGION_ID (optional, default 48547)
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type EmbedKind = "buy" | "schedule" | "account";
 
@@ -24,9 +24,14 @@ const TITLES: Record<EmbedKind, string> = {
   account: "My Account",
 };
 
+function marianaTenant(): string {
+  return (
+    import.meta.env.VITE_MARIANA_TENANT?.trim() || "unitedstrength.sandbox"
+  );
+}
+
 function buildEmbedSrc(kind: EmbedKind): string {
-  const tenant =
-    import.meta.env.VITE_MARIANA_TENANT?.trim() || "unitedstrength.sandbox";
+  const tenant = marianaTenant();
   const locationId =
     import.meta.env.VITE_MARIANA_LOCATION_ID?.trim() || "48730";
   const regionId = import.meta.env.VITE_MARIANA_REGION_ID?.trim() || "48547";
@@ -51,23 +56,65 @@ function buildEmbedSrc(kind: EmbedKind): string {
   }
 }
 
+/** Sandbox tenant currently denies framing — prefer new-tab handoff. */
+function prefersExternalHandoff(tenant: string): boolean {
+  return tenant.includes("sandbox");
+}
+
 /**
  * Minimal chrome around Mariana iframe — white page, back to club site.
+ * When the tenant refuses framing (X-Frame-Options), offer open-in-new-tab.
  */
 export default function MarianaEmbedPage({ kind, onBack }: MarianaEmbedPageProps) {
-  const [loadState, setLoadState] = useState<"loading" | "ready" | "error">(
-    "loading",
+  const tenant = marianaTenant();
+  const externalFirst = prefersExternalHandoff(tenant);
+  const [loadState, setLoadState] = useState<"loading" | "ready" | "blocked">(
+    () => (externalFirst ? "blocked" : "loading"),
   );
   const [frameKey, setFrameKey] = useState(0);
+  const [forceEmbed, setForceEmbed] = useState(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const title = TITLES[kind];
   const src = buildEmbedSrc(kind);
+  const showFrame = !externalFirst || forceEmbed;
 
   useEffect(() => {
+    if (!showFrame) {
+      setLoadState("blocked");
+      return;
+    }
     setLoadState("loading");
     setFrameKey((k) => k + 1);
-  }, [kind]);
+  }, [kind, showFrame]);
+
+  /** Framing denial still fires load; detect chrome-error / blank when readable. */
+  const onFrameLoad = () => {
+    const frame = iframeRef.current;
+    if (!frame) {
+      setLoadState("ready");
+      return;
+    }
+    try {
+      const href = frame.contentWindow?.location?.href ?? "";
+      if (
+        !href ||
+        href === "about:blank" ||
+        href.startsWith("chrome-error:") ||
+        href.startsWith("chrome-untrusted:")
+      ) {
+        setLoadState("blocked");
+        return;
+      }
+      setLoadState("ready");
+    } catch {
+      // Opaque cross-origin — usually a successful frame; sandbox often lies.
+      // If tenant is sandbox, keep offering handoff via header Open↗.
+      setLoadState(externalFirst ? "blocked" : "ready");
+    }
+  };
 
   const retry = () => {
+    setForceEmbed(true);
     setLoadState("loading");
     setFrameKey((k) => k + 1);
   };
@@ -88,7 +135,14 @@ export default function MarianaEmbedPage({ kind, onBack }: MarianaEmbedPageProps
         >
           {title}
         </p>
-        <span className="w-11 shrink-0" aria-hidden />
+        <a
+          href={src}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex min-h-[44px] min-w-[44px] items-center justify-end font-mono text-[10px] uppercase tracking-[0.18em] text-[#0A3C2E] underline-offset-4 hover:underline"
+        >
+          Open ↗
+        </a>
       </header>
 
       <div className="relative flex-1 min-h-[70vh] w-full bg-white">
@@ -98,42 +152,52 @@ export default function MarianaEmbedPage({ kind, onBack }: MarianaEmbedPageProps
           </p>
         ) : null}
 
-        {loadState === "error" ? (
+        {loadState === "blocked" || !showFrame ? (
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-4 bg-white px-6 text-center">
             <p
               className="font-sans text-[16px] font-bold uppercase tracking-[-0.03em] text-[#181818]"
               style={{ fontFamily: "'Satoshi', sans-serif" }}
             >
-              Member tools unavailable
+              Open member tools
             </p>
-            <p className="max-w-[36ch] text-[14px] leading-relaxed text-[#5C5C5C]">
-              We couldn&apos;t load this page. Check your connection and try again,
-              or return to the club site.
+            <p className="max-w-[40ch] text-[14px] leading-relaxed text-[#5C5C5C]">
+              This Mariana page can&apos;t be shown inside the club site yet
+              (framing is blocked on the current tenant). Open it in a new tab
+              to buy, book, or manage your account.
             </p>
+            <a
+              href={src}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex min-h-[44px] items-center bg-[#0A3C2E] px-6 font-mono text-[11px] uppercase tracking-[0.22em] text-[#F3EEE7]"
+            >
+              Continue to {title} →
+            </a>
             <button
               type="button"
               onClick={retry}
-              className="min-h-[44px] px-5 font-mono text-[10px] uppercase tracking-[0.18em] text-[#0A3C2E] underline-offset-4 hover:underline"
+              className="min-h-[44px] px-5 font-mono text-[10px] uppercase tracking-[0.18em] text-[#5C5C5C] underline-offset-4 hover:underline"
             >
-              Retry
+              Retry embed
             </button>
           </div>
         ) : (
           <iframe
+            ref={iframeRef}
             key={frameKey}
             title={`United Strength — ${title}`}
             src={src}
             className="absolute inset-0 h-full w-full border-0"
             allow="payment *; clipboard-write *"
             referrerPolicy="no-referrer-when-downgrade"
-            onLoad={() => setLoadState("ready")}
-            onError={() => setLoadState("error")}
+            onLoad={onFrameLoad}
+            onError={() => setLoadState("blocked")}
           />
         )}
       </div>
 
       <p className="px-5 py-3 text-center font-mono text-[9px] uppercase tracking-[0.16em] text-[#5C5C5C]">
-        Member tools powered by Mariana Tek · Sandbox until Oct 1 cutover
+        Member tools powered by Mariana Tek · Use Open if the frame stays blank
       </p>
     </div>
   );

@@ -1,8 +1,13 @@
 import { gymPhotos } from "@/assets/images/gym";
-import { FOUNDER_CHAPTERS, SPACE_CHAPTERS, TEAM_INTRO } from "@/data/about-copy";
+import {
+  FOUNDER_CHAPTERS,
+  PHILOSOPHY_CHAPTERS,
+  SPACE_CHAPTERS,
+  TEAM_INTRO,
+} from "@/data/about-copy";
 import { ARCHIVE_PAGE, BY_DESIGN, CULTIVATED, MOVE_THE_CITY } from "@/data/culture-copy";
 import { APPLY_MEMBERSHIP, EXPERIENCE_UNITED, MEMBERSHIP_PAGE } from "@/data/journey-copy";
-import { BUILD_CLASS, PERSONAL_TRAINING_HUB } from "@/data/training-copy";
+import { BUILD_CLASS, BURN_CLASS, PERSONAL_TRAINING_HUB } from "@/data/training-copy";
 import { V1_FACTS_INTRO } from "@/data/v1-interior-copy";
 
 export interface HubPageOption {
@@ -17,7 +22,7 @@ export const HUB_PAGES = [
   {
     id: "home",
     label: "Home",
-    title: "// United Strength Club",
+    title: "// United Strength",
     body: "A strength community for people who want more from their gym and life.",
     image: gymPhotos.galleryCinematic,
   },
@@ -27,6 +32,13 @@ export const HUB_PAGES = [
     title: FOUNDER_CHAPTERS.origin.headline,
     body: FOUNDER_CHAPTERS.origin.lede,
     image: gymPhotos.architectureRaw,
+  },
+  {
+    id: "philosophy",
+    label: "Philosophy",
+    title: PHILOSOPHY_CHAPTERS.hero.headline,
+    body: PHILOSOPHY_CHAPTERS.place.headline,
+    image: gymPhotos.heroFullBleed,
   },
   {
     id: "team",
@@ -57,6 +69,13 @@ export const HUB_PAGES = [
     image: gymPhotos.floorColumbus,
   },
   {
+    id: "burn",
+    label: "Burn",
+    title: BURN_CLASS.headline,
+    body: BURN_CLASS.lede,
+    image: gymPhotos.experienceBroll,
+  },
+  {
     id: "personal-training",
     label: "Personal Training",
     title: PERSONAL_TRAINING_HUB.headline,
@@ -65,7 +84,7 @@ export const HUB_PAGES = [
   },
   {
     id: "move-the-city",
-    label: "Move the City",
+    label: "Run Club",
     title: MOVE_THE_CITY.headline,
     body: MOVE_THE_CITY.lede,
     image: gymPhotos.runClub,
@@ -124,12 +143,14 @@ const HREF_PAGE: Partial<Record<string, HubPageId>> = {
   "/": "home",
   "/home": "home",
   "/about/founder": "founder",
+  "/about/philosophy": "philosophy",
   "/about/team": "team",
   "/team": "team",
   "/about/the-space": "space",
   "/about/faq": "faq",
   "/faq": "faq",
   "/training/classes/build": "build",
+  "/training/classes/burn": "burn",
   "/training/personal": "personal-training",
   "/training/move-the-city": "move-the-city",
   "/culture/move-the-city": "move-the-city",

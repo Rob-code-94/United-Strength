@@ -1,8 +1,6 @@
 import * as React from "react";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { MediaSlot } from "@/hub/brand-kit";
 import { V1MediaImg } from "@/components/direction-v1/pages/V1Interior";
 
@@ -55,88 +53,91 @@ export default function Portfolio({ slides }: { slides: readonly PortfolioSlide[
 
   return (
     <section aria-label="Space and equipment" className="overflow-x-hidden border-b border-white/10 bg-[#111111]">
-      <div className="mx-auto max-w-6xl px-5 py-8 md:px-10">
-        <div className="flex items-end justify-end gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            className="size-11 min-h-11 min-w-11 rounded-none border-white/30 bg-transparent text-[#F3EEE7] hover:bg-white/10"
+      <div className="relative">
+        <Carousel
+          setApi={setApi}
+          opts={{
+            align: "start",
+            loop: true,
+            skipSnaps: false,
+            containScroll: false,
+          }}
+          className="w-full"
+        >
+          <CarouselContent className="-ml-2 md:-ml-3">
+            {duplicatedData.map((item, index) => {
+              const isActive = index === selectedIndex;
+              return (
+                <CarouselItem
+                  key={`${item.title}-${index}`}
+                  className={cn(
+                    "pl-2 transition-all duration-700 ease-in-out motion-reduce:transition-none md:pl-3",
+                    isActive ? "basis-[82%] md:basis-[75%]" : "basis-[18%] md:basis-[12.5%]",
+                  )}
+                >
+                  <div className="relative overflow-hidden">
+                    {item.slot ? (
+                      <V1MediaImg
+                        slot={item.slot}
+                        pencil={index < slides.length}
+                        src={item.image}
+                        alt=""
+                        className={cn(
+                          "h-[56vh] w-full object-cover transition-all duration-700 motion-reduce:transition-none md:h-[72vh]",
+                          !isActive && "brightness-75",
+                        )}
+                      />
+                    ) : (
+                      <img
+                        src={item.image}
+                        alt=""
+                        className={cn(
+                          "h-[56vh] w-full object-cover transition-all duration-700 motion-reduce:transition-none md:h-[72vh]",
+                          !isActive && "brightness-75",
+                        )}
+                      />
+                    )}
+                  </div>
+                </CarouselItem>
+              );
+            })}
+          </CarouselContent>
+        </Carousel>
+
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-end gap-1 px-4 pb-4 md:px-8 md:pb-6">
+          <button
+            type="button"
+            className="pointer-events-auto inline-flex min-h-11 min-w-11 items-center justify-center px-2 font-mono text-[11px] uppercase tracking-[0.22em] text-[#F3EEE7] transition-colors hover:text-[#C4A35A]"
             onClick={() => api?.scrollPrev()}
           >
-            <ChevronLeft className="size-5" />
+            Prev
             <span className="sr-only">Previous frame</span>
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            className="size-11 min-h-11 min-w-11 rounded-none border-white/30 bg-transparent text-[#F3EEE7] hover:bg-white/10"
+          </button>
+          <span className="pointer-events-none inline-flex min-h-11 items-center font-mono text-[11px] text-[#F3EEE7]/35" aria-hidden>
+            /
+          </span>
+          <button
+            type="button"
+            className="pointer-events-auto inline-flex min-h-11 min-w-11 items-center justify-center px-2 font-mono text-[11px] uppercase tracking-[0.22em] text-[#F3EEE7] transition-colors hover:text-[#C4A35A]"
             onClick={() => api?.scrollNext()}
           >
-            <ChevronRight className="size-5" />
+            Next
             <span className="sr-only">Next frame</span>
-          </Button>
+          </button>
         </div>
       </div>
-      <div className="overflow-hidden border-y border-white/10">
-        <div className="mx-auto max-w-6xl space-y-8 px-5 py-8 md:px-10">
-          <Carousel
-            setApi={setApi}
-            opts={{
-              align: "start",
-              loop: true,
-              skipSnaps: false,
-              containScroll: false,
-            }}
-            className="w-full"
-          >
-            <CarouselContent className="-ml-4">
-              {duplicatedData.map((item, index) => {
-                const isActive = index === selectedIndex;
-                return (
-                  <CarouselItem
-                    key={`${item.title}-${index}`}
-                    className={cn(
-                      "pl-4 transition-all duration-700 ease-in-out motion-reduce:transition-none",
-                      isActive ? "basis-[75%]" : "basis-[12.5%]"
-                    )}
-                  >
-                    <div className="relative overflow-hidden">
-                      {item.slot ? (
-                        <V1MediaImg
-                          slot={item.slot}
-                          pencil={index < slides.length}
-                          src={item.image}
-                          alt=""
-                          className={cn(
-                            "h-[52vh] w-full object-cover transition-all duration-700 motion-reduce:transition-none md:h-[70vh]",
-                            !isActive && "brightness-75"
-                          )}
-                        />
-                      ) : (
-                        <img
-                          src={item.image}
-                          alt=""
-                          className={cn(
-                            "h-[52vh] w-full object-cover transition-all duration-700 motion-reduce:transition-none md:h-[70vh]",
-                            !isActive && "brightness-75"
-                          )}
-                        />
-                      )}
-                    </div>
-                  </CarouselItem>
-                );
-              })}
-            </CarouselContent>
-          </Carousel>
 
-          <div className="max-w-2xl">
-            <h2 className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#F3EEE7]/70">
-              {activeData.title}
-            </h2>
-            <p className="mt-3 text-[16px] leading-relaxed text-[#F3EEE7]/85">
-              {activeData.description}
-            </p>
-          </div>
+      <div className="border-t border-white/10 px-5 py-8 md:px-10 md:py-10">
+        <div className="mx-auto max-w-6xl md:ml-[8%] md:max-w-xl">
+          <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#F3EEE7]/60">
+            {activeData.title}
+          </p>
+          <p
+            className="mt-4 text-[18px] leading-snug tracking-[-0.02em] text-[#F3EEE7] md:text-[22px]"
+            style={{ fontFamily: "'Satoshi', sans-serif" }}
+          >
+            {activeData.description}
+          </p>
         </div>
       </div>
     </section>

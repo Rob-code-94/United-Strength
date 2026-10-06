@@ -9,10 +9,16 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, useInView, useReducedMotion } from "motion/react";
+import { HubCopyText } from "@/components/direction-v1/pages/V1Interior";
 
 export type TestimonialQuote = {
   name: string;
   content: string;
+};
+
+export type TestimonialQuoteCopyPaths = {
+  contentPath: string;
+  namePath: string;
 };
 
 const Quotesvg = () => {
@@ -30,11 +36,20 @@ const Quotesvg = () => {
   );
 };
 
-export default function Testimonial({ quotes }: { quotes: readonly TestimonialQuote[] }) {
+export default function Testimonial({
+  quotes,
+  quoteCopyPaths,
+}: {
+  quotes: readonly TestimonialQuote[];
+  /** Hub copy pencils — parallel to `quotes`. */
+  quoteCopyPaths?: readonly TestimonialQuoteCopyPaths[];
+}) {
   const items = quotes.filter((quote) => quote.content.trim() && quote.name.trim());
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
   const [count, setCount] = React.useState(0);
+  const [canPrev, setCanPrev] = React.useState(false);
+  const [canNext, setCanNext] = React.useState(false);
 
   const ref = React.useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
@@ -45,12 +60,22 @@ export default function Testimonial({ quotes }: { quotes: readonly TestimonialQu
       return;
     }
 
-    setCount(api.scrollSnapList().length);
-    setCurrent(api.selectedScrollSnap());
-
-    api.on("select", () => {
+    const sync = () => {
+      const snaps = api.scrollSnapList().length;
+      setCount(snaps);
       setCurrent(api.selectedScrollSnap());
-    });
+      // Loop mode: Embla can report false until reInit — enable when >1 snap.
+      setCanPrev(snaps > 1 ? true : api.canScrollPrev());
+      setCanNext(snaps > 1 ? true : api.canScrollNext());
+    };
+
+    sync();
+    api.on("select", sync);
+    api.on("reInit", sync);
+    return () => {
+      api.off("select", sync);
+      api.off("reInit", sync);
+    };
   }, [api]);
 
   const scrollPrev = React.useCallback(() => {
@@ -110,9 +135,19 @@ export default function Testimonial({ quotes }: { quotes: readonly TestimonialQu
                   <div className="flex h-full flex-col justify-between gap-8 border border-white/15 p-6 md:p-10">
                     <div className="flex flex-col gap-6">
                       <Quotesvg />
-                      <p className="text-[18px] leading-snug text-[#F3EEE7] md:text-[20px]">
-                        {testimonial.content}
-                      </p>
+                      {quoteCopyPaths?.[index]?.contentPath ? (
+                        <HubCopyText
+                          path={quoteCopyPaths[index]!.contentPath}
+                          as="p"
+                          className="text-[18px] leading-snug text-[#F3EEE7] md:text-[20px]"
+                        >
+                          {testimonial.content}
+                        </HubCopyText>
+                      ) : (
+                        <p className="text-[18px] leading-snug text-[#F3EEE7] md:text-[20px]">
+                          {testimonial.content}
+                        </p>
+                      )}
                     </div>
                     <div className="flex items-center gap-4">
                       <Avatar className="size-11 border-none">
@@ -123,9 +158,19 @@ export default function Testimonial({ quotes }: { quotes: readonly TestimonialQu
                             .join("")}
                         </AvatarFallback>
                       </Avatar>
-                      <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#F3EEE7]/55">
-                        {testimonial.name}
-                      </p>
+                      {quoteCopyPaths?.[index]?.namePath ? (
+                        <HubCopyText
+                          path={quoteCopyPaths[index]!.namePath}
+                          as="p"
+                          className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#F3EEE7]/55"
+                        >
+                          {testimonial.name}
+                        </HubCopyText>
+                      ) : (
+                        <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#F3EEE7]/55">
+                          {testimonial.name}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </CarouselItem>
@@ -154,9 +199,9 @@ export default function Testimonial({ quotes }: { quotes: readonly TestimonialQu
             <Button
               variant="outline"
               size="icon"
-              className="size-11 min-h-11 min-w-11 rounded-none border-white/30 bg-transparent text-[#F3EEE7] hover:bg-white/10"
+              className="size-11 min-h-11 min-w-11 rounded-none border-white/30 bg-transparent text-[#F3EEE7] hover:bg-white/10 disabled:opacity-40"
               onClick={scrollPrev}
-              disabled={!api?.canScrollPrev()}
+              disabled={!canPrev}
             >
               <ChevronLeft className="size-5" />
               <span className="sr-only">Previous slide</span>
@@ -164,9 +209,9 @@ export default function Testimonial({ quotes }: { quotes: readonly TestimonialQu
             <Button
               variant="outline"
               size="icon"
-              className="size-11 min-h-11 min-w-11 rounded-none border-white/30 bg-transparent text-[#F3EEE7] hover:bg-white/10"
+              className="size-11 min-h-11 min-w-11 rounded-none border-white/30 bg-transparent text-[#F3EEE7] hover:bg-white/10 disabled:opacity-40"
               onClick={scrollNext}
-              disabled={!api?.canScrollNext()}
+              disabled={!canNext}
             >
               <ChevronRight className="size-5" />
               <span className="sr-only">Next slide</span>

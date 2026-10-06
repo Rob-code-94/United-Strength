@@ -4,7 +4,7 @@ import { useInView, useReducedMotion } from "motion/react";
 interface NumberTickerProps {
   end: number;
   start?: number;
-  /** Seconds. Matches number-ticker-01 ease-out cubic. */
+  /** Seconds. Matches number-ticker-01 ease-out cubic for `count` mode. */
   duration?: number;
   /** Left-pad with zeros, e.g. 4 → `0001`. */
   pad?: number;
@@ -16,12 +16,17 @@ interface NumberTickerProps {
   immediate?: boolean;
   /** Printed before the digits, e.g. `$`. */
   prefix?: string;
+  /**
+   * `count` — ease from start to end.
+   * `glitch` — brief random-digit flicker, then hard settle (~immediate).
+   */
+  mode?: "count" | "glitch";
   className?: string;
 }
 
 /**
  * Number ticker 01 DNA — count from start to end on enter.
- * `loop` recounts while in view. Static at the target when prefers-reduced-motion.
+ * `glitch` mode flicks digits then lands. Static at the target when prefers-reduced-motion.
  */
 export default function NumberTicker({
   end,
@@ -32,6 +37,7 @@ export default function NumberTicker({
   pauseMs = 900,
   immediate = false,
   prefix = "",
+  mode = "count",
   className,
 }: NumberTickerProps) {
   const reduceMotion = useReducedMotion();
@@ -51,7 +57,9 @@ export default function NumberTicker({
     let pause = 0;
     let cancelled = false;
 
-    const run = () => {
+    const formatLanded = () => end;
+
+    const runCount = () => {
       if (cancelled) return;
       let startTime: number | null = null;
       const step = (timestamp: number) => {
@@ -67,19 +75,49 @@ export default function NumberTicker({
         if (!loop) return;
         pause = window.setTimeout(() => {
           setValue(start);
-          run();
+          runCount();
         }, pauseMs);
       };
       frame = requestAnimationFrame(step);
     };
 
-    run();
+    const runGlitch = () => {
+      if (cancelled) return;
+      const glitchMs = Math.min(Math.max(duration * 1000, 180), 400);
+      const started = performance.now();
+      const span = Math.max(end, 10);
+
+      const step = (timestamp: number) => {
+        if (cancelled) return;
+        const elapsed = timestamp - started;
+        if (elapsed < glitchMs) {
+          const flicker = Math.floor(Math.random() * (span + 1));
+          setValue(flicker);
+          frame = requestAnimationFrame(step);
+          return;
+        }
+        setValue(formatLanded());
+        if (!loop) return;
+        pause = window.setTimeout(() => {
+          setValue(start);
+          runGlitch();
+        }, pauseMs);
+      };
+      frame = requestAnimationFrame(step);
+    };
+
+    if (mode === "glitch") {
+      runGlitch();
+    } else {
+      runCount();
+    }
+
     return () => {
       cancelled = true;
       cancelAnimationFrame(frame);
       window.clearTimeout(pause);
     };
-  }, [duration, end, loop, pauseMs, reduceMotion, shouldPlay, start]);
+  }, [duration, end, loop, mode, pauseMs, reduceMotion, shouldPlay, start]);
 
   const shown = `${prefix}${String(Math.round(value)).padStart(pad, "0")}`;
   const landed = `${prefix}${String(end).padStart(pad, "0")}`;

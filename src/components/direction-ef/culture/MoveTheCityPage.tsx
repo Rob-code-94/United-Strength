@@ -113,9 +113,6 @@ export default function MoveTheCityPage({ onBack, onNav }: PageProps) {
               </li>
             ))}
           </ul>
-          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#5C5C5C]">
-            {c.runs.note}
-          </p>
         </LookbookScrollReveal>
       </section>
 

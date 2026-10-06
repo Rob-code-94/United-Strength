@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
-import type { BrandKitFields } from "@/hub/brand-kit";
+import type { BrandKitFields, MediaLibraryItem } from "@/hub/brand-kit";
+import HubBrandKit from "@/hub/HubBrandKit";
 import HubEditor from "@/hub/HubEditor";
+import HubHome, { type HubMode } from "@/hub/HubHome";
 import HubLogin from "@/hub/HubLogin";
 
 interface EditorPayload {
   draft: BrandKitFields;
   draftUpdatedAt: string;
+  library: MediaLibraryItem[];
 }
 
 export default function HubApp() {
@@ -13,6 +16,7 @@ export default function HubApp() {
   const [authed, setAuthed] = useState(false);
   const [editor, setEditor] = useState<EditorPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [mode, setMode] = useState<HubMode>("home");
 
   useEffect(() => {
     const path = window.location.pathname.replace(/\/$/, "") || "/";
@@ -27,6 +31,7 @@ export default function HubApp() {
     if (!session.ok) {
       setAuthed(false);
       setEditor(null);
+      setMode("home");
       setReady(true);
       return;
     }
@@ -37,14 +42,23 @@ export default function HubApp() {
       return;
     }
     const payload = (await kit.json()) as EditorPayload;
-    setEditor(payload);
+    setEditor({
+      ...payload,
+      library: payload.library ?? [],
+    });
     setAuthed(true);
+    setMode("home");
     setReady(true);
   };
 
   useEffect(() => {
     void load();
   }, []);
+
+  const logout = async () => {
+    await fetch("/api/hub-session", { method: "DELETE" });
+    window.location.assign("/hub");
+  };
 
   return (
     <div className="hub-shell bg-background text-foreground">
@@ -64,8 +78,24 @@ export default function HubApp() {
         </div>
       ) : null}
       {ready && !error && !authed ? <HubLogin onSuccess={() => void load()} /> : null}
-      {ready && !error && authed && editor ? (
-        <HubEditor initial={editor} onChange={setEditor} />
+      {ready && !error && authed && editor && mode === "home" ? (
+        <HubHome onSelect={setMode} onLogout={() => void logout()} />
+      ) : null}
+      {ready && !error && authed && editor && mode === "brand" ? (
+        <HubBrandKit
+          initial={editor}
+          onChange={setEditor}
+          onGoHome={() => setMode("home")}
+          onGoWebsite={() => setMode("website")}
+        />
+      ) : null}
+      {ready && !error && authed && editor && mode === "website" ? (
+        <HubEditor
+          initial={editor}
+          onChange={setEditor}
+          onGoHome={() => setMode("home")}
+          onGoBrandKit={() => setMode("brand")}
+        />
       ) : null}
     </div>
   );

@@ -47,25 +47,97 @@ export const V1_BUILD_START = {
   href: "/start-here/experience",
 } as const;
 
+/** Burn mid chapters — Build-length stack without Strength Standard. */
+export const V1_BURN_SESSION = {
+  n: "02",
+  title: "The Session",
+  headline: "Work. Recover. Repeat.",
+  body: [
+    "Each BURN class is built around intervals — short windows where you give what you have, then recover with intention.",
+    "Coaches keep the room clear: what the interval asks for, how hard to push, and when to settle your breathing so the next effort still has quality.",
+    "The pace is demanding. The structure is simple. You always know what the clock is asking for.",
+  ],
+} as const;
+
+export const V1_BURN_OUTCOMES = {
+  n: "03",
+  title: "What You Build",
+  headline: "Capacity you can feel.",
+  body: [
+    "Over time, BURN builds the engine underneath your training — the ability to work hard, recover faster, and stay composed when the interval gets loud.",
+    "It pairs with BUILD: strength gives you structure; conditioning keeps you capable when life asks for more.",
+  ],
+  metrics: ["Effort", "Recovery", "Endurance", "Focus"],
+} as const;
+
+/** Burn Start Here — mirrors Build conversion (Experience United, not free trial). */
+export const V1_BURN_START = {
+  kicker: "// Start Here",
+  headline: "Experience Burn.",
+  body: "The best way to understand BURN is to experience it. Experience United gives you the opportunity to train with us, meet our coaches, understand how our classes work, and decide if United is the right place for you.",
+  cta: "Experience United",
+  href: "/start-here/experience",
+} as const;
+
 export const V1_PT_STATS = [
   "20+ Years Coaching",
-  "XX+ Years Combined Experience",
-  "XX Coaches",
+  "Decades of Combined Experience",
+  "A Small Coaching Team",
 ] as const;
 
+/** Coaches with Meet the Team profiles — deep-link via `/about/team#coach-{id}`. */
 export const V1_PT_COACHES = [
-  "Todd Johnson",
-  "Jason Katz",
-  "Kara Shaffer",
-  "Logan",
-  "Brian",
-  "Bri",
+  { id: "todd-johnson", name: "Todd Johnson" },
+  { id: "jenna-farkas", name: "Jenna Farkas" },
+  { id: "jason-katz", name: "Jason Katz" },
+  { id: "kara-shaffer", name: "Kara Shaffer" },
 ] as const;
 
 export const V1_FACTS_INTRO = "Questions, answered without the noise.";
 
-/** Keyed by question number. An empty or missing entry stays off the page. */
-export const V1_FACTS_ANSWERS: Readonly<Record<string, string>> = {};
+/**
+ * Keyed by question number. Mapped from FAQ_ITEMS in about-copy (same Copywright FAQ).
+ * An empty or missing entry stays non-interactive on the page.
+ */
+export const V1_FACTS_ANSWERS: Readonly<Record<string, string>> = {
+  "01":
+    "United Strength is a private fitness club in downtown Columbus, Ohio. We offer intentional coaching, structured classes, personal training, and a community built around a shared commitment to health and strength.",
+  "02":
+    "Yes. Membership is selective and reviewed by the team. We're not a traditional open-enrollment gym.",
+  "03":
+    "No. You need to be willing to learn, challenge yourself, and keep showing up. Our coaches meet you where you are.",
+  "04":
+    "Intentional coaching, a selective membership community, structured programming, and a space built to make the practice feel deliberate — not just another place to work out.",
+  "05":
+    "We offer BUILD, BURN, and BALANCE signature classes, personal training (1:1 and private group), and Move the City // Run Club.",
+  "06":
+    "BUILD is our functional strength training class. BURN is our conditioning and HIIT class. BALANCE is coming soon — recovery, mobility, and the quieter side of the practice.",
+  "07":
+    "Yes. Our coaches offer 1:1 coaching and private group training, each built around your goals, your body, and your life. Inquire at training@unitedstrengthgym.com.",
+  "08":
+    "Open gym access depends on your membership. Classes and coaching are the core of how we train — if you want guidance built around you, personal training is the clearest path.",
+  "09":
+    "Move the City is our free run club — open to everyone. No membership required. We get outside, move our bodies, and spend time with people.",
+  "10":
+    "No. Personal training is available to members and non-members. Inquire at training@unitedstrengthgym.com and we will help you find the right fit.",
+  "11":
+    "Membership is selective and reviewed by the team. There is no open checkout on this site. Apply when you're ready; we will follow up.",
+  "12":
+    "United Strength is a community first. The application helps us understand your goals and whether the club is the right fit — belonging over volume.",
+  "13": "Yes. Experience United is how you get to know us — and how we get to know you.",
+  "14":
+    "Experience United is five classes over 14 days — a chance to train with us, meet our coaches, and understand how United works before choosing a membership.",
+  "15":
+    "Membership options are discussed during the application process. We do not publish pricing on this site.",
+  "16":
+    "Yes. Membership terms and cancellations are reviewed with you during the application and onboarding process so expectations are clear before you join.",
+  "17": "237 Cleveland Ave, Columbus, Ohio 43215 — downtown near Columbus State.",
+  "18": "Yes — parking is available behind the building.",
+  "19":
+    "Member access follows the facility hours posted for United Strength. Your coach or the front desk can confirm the current schedule when you join.",
+  "20":
+    "Experience United is the recommended first step — you'll train with us, meet our coaches, understand how our classes work, and decide if United is the right place for you.",
+};
 
 export const V1_FACTS = [
   {
@@ -114,11 +186,11 @@ export const V1_FACTS = [
   },
 ] as const;
 
-/** Membership how-to-join writes $75. The Experience page keeps $70. */
+/** Keep aligned with EXPERIENCE_UNITED stats / closer ($70). */
 export const V1_MEMBERSHIP_EXPERIENCE_JOIN = {
   n: "01",
   title: "Experience United",
-  lines: ["5 Classes", "14 Days", "$75"],
+  lines: ["5 Classes", "14 Days", "$70"],
   body: "Experience United gives you a chance to train with us, meet our coaches and understand how United works before choosing a membership.",
 } as const;
 
@@ -133,19 +205,43 @@ export const V1_MEMBERSHIP_COMPARE = {
   ],
 } as const;
 
-/** Empty `note` stays off the page until Todd writes the hover blurb. */
+/** Hover/tap “why it matters” blurbs — draftable by Todd. */
 export const V1_SPACE_TILES = [
-  { n: "01", title: "The Space", note: "" },
-  { n: "02", title: "Equipment", note: "" },
-  { n: "03", title: "Details", note: "" },
-  { n: "04", title: "Hospitality", note: "" },
-  { n: "05", title: "People", note: "" },
-  { n: "06", title: "Atmosphere", note: "" },
+  {
+    n: "01",
+    title: "The Space",
+    note: "Designed downtown so training feels intentional, not crowded.",
+  },
+  {
+    n: "02",
+    title: "Equipment",
+    note: "Quality tools chosen for strength, conditioning, and longevity.",
+  },
+  {
+    n: "03",
+    title: "Details",
+    note: "Materials and finish that make the room feel considered.",
+  },
+  {
+    n: "04",
+    title: "Hospitality",
+    note: "Clean, cared-for amenities that respect your time here.",
+  },
+  {
+    n: "05",
+    title: "People",
+    note: "Community is the draw — people who know each other and push together.",
+  },
+  {
+    n: "06",
+    title: "Atmosphere",
+    note: "Light, sound, and pace that keep the practice calm and focused.",
+  },
 ] as const;
 
 export const V1_ARCHIVE_ISSUES = [
-  { n: "001", pdf: "" },
-  { n: "002", pdf: "" },
+  { n: "001", pdf: "", coverSlot: "archiveIssue1" as const },
+  { n: "002", pdf: "", coverSlot: "archiveIssue2" as const },
 ] as const;
 
 export const V1_CULTIVATED_001 = {

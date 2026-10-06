@@ -1,5 +1,6 @@
-import { Instagram, Mail } from "lucide-react";
+import { Instagram, Mail, Phone } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
+import { telHref } from "../../hub/brand-kit";
 import { LOOKBOOK_EASE } from "../direction-ef/lookbook";
 import { ClubCrestSVG, StrongerUnitedMark } from "./brand";
 import { useV1Kit } from "./V1Kit";
@@ -35,6 +36,7 @@ export default function V1SiteIndexFooter({ onNav }: Props) {
   const kit = useV1Kit();
   const explore = kit.footer.explore.length > 0 ? kit.footer.explore : EXPLORE_FALLBACK;
   const cream = "var(--v1-cream, #F3EEE7)";
+  const phoneLink = telHref(kit.footer.phone ?? "");
 
   return (
     <footer
@@ -137,6 +139,18 @@ export default function V1SiteIndexFooter({ onNav }: Props) {
               />
             </h3>
             <div className="mt-5 flex items-center justify-center gap-4 md:justify-start">
+              {phoneLink ? (
+                <>
+                  <a
+                    href={phoneLink}
+                    className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center text-[#F3EEE7] transition-opacity hover:opacity-70"
+                    aria-label="Call or text"
+                  >
+                    <Phone className="h-6 w-6" strokeWidth={1.25} />
+                  </a>
+                  <span className="h-6 w-px bg-[#F3EEE7]/35" aria-hidden />
+                </>
+              ) : null}
               <a
                 href={kit.footer.instagramUrl}
                 target="_blank"

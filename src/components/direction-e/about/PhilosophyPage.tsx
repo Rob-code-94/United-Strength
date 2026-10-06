@@ -295,7 +295,7 @@ export default function PhilosophyPage({ onBack }: PageProps) {
           </motion.div>
           <div className="border-t border-white/20 pt-4 flex flex-col gap-2">
             <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-white/50">
-              United Strength Club
+              United Strength
             </p>
             <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-white/40">
               237 Cleveland Ave · Columbus, Ohio

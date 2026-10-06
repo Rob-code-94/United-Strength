@@ -55,7 +55,9 @@ export default function FileUpload02({ slot, onUploaded }: FileUpload02Props) {
             file: new File([], rejected[0]?.errors[0]?.code ?? "file"),
             progress: 0,
             status: "error",
-            errorMessage: tooBig ? "Image must be under 3 MB." : "Use a JPEG, PNG, WebP, or GIF image.",
+            errorMessage: tooBig
+              ? "Stills must be under 3 MB; GIFs under 5 MB."
+              : "Use a JPEG, PNG, WebP, or GIF image.",
             totalSizeText: "0 KB",
           },
         ]);
@@ -63,6 +65,20 @@ export default function FileUpload02({ slot, onUploaded }: FileUpload02Props) {
       }
       const file = acceptedFiles[0];
       if (!file) return;
+      const maxBytes = file.type === "image/gif" ? 5_000_000 : 3_000_000;
+      if (file.size > maxBytes) {
+        setFiles([
+          {
+            id: "rejected",
+            file,
+            progress: 0,
+            status: "error",
+            errorMessage: file.type === "image/gif" ? "GIF must be under 5 MB." : "Image must be under 3 MB.",
+            totalSizeText: formatFileSize(file.size),
+          },
+        ]);
+        return;
+      }
       const id = Math.random().toString(36).slice(2);
       const row: FileWithProgress = {
         id,
@@ -135,7 +151,7 @@ export default function FileUpload02({ slot, onUploaded }: FileUpload02Props) {
       "image/webp": [".webp"],
       "image/gif": [".gif"],
     },
-    maxSize: 3_000_000,
+    maxSize: 5_000_000,
   });
 
   const removeFile = (id: string) => {
@@ -163,7 +179,9 @@ export default function FileUpload02({ slot, onUploaded }: FileUpload02Props) {
                 <p className="text-sm font-medium text-muted-foreground">
                   {isDragActive ? "Drop files here" : "Choose a file or drag & drop it here"}
                 </p>
-                <p className="text-xs text-muted-foreground">JPEG, PNG, WebP, and GIF, up to 3 MB.</p>
+                <p className="text-xs text-muted-foreground">
+                  JPEG, PNG, WebP (3 MB) · GIF still or loop (5 MB)
+                </p>
               </div>
               <Button type="button" variant="outline" className="min-h-[44px] rounded-md font-medium px-6 leading-none cursor-pointer">
                 Browse File

@@ -31,7 +31,7 @@ const LOCKED_NAV: NavSection[] = [
           { label: "BURN", href: "/training/classes/burn" },
           { label: "BALANCE", href: "/training/classes/balance", comingSoon: true },
           {
-            label: "MOVE THE CITY // RUN CLUB",
+            label: "RUN CLUB",
             href: "/training/move-the-city",
           },
         ],
@@ -53,6 +53,11 @@ const LOCKED_NAV: NavSection[] = [
     title: "LONGEVITY",
     kind: "direct",
     item: { label: "Longevity", href: "/longevity", comingSoon: true },
+  },
+  {
+    title: "MOVE THE CITY",
+    kind: "direct",
+    item: { label: "Move the City", href: "/move-the-city", comingSoon: true },
   },
   {
     title: "CULTURE",

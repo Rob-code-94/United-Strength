@@ -62,6 +62,7 @@ import {
   V1ApplyPage,
   V1ArchivePage,
   V1BuildPage,
+  V1BurnPage,
   V1ByDesignPage,
   V1CultivatedPage,
   V1ExperiencePage,
@@ -74,6 +75,7 @@ import {
   V1TeamPage,
 } from "./components/direction-v1/pages";
 import { gymPhotos } from "./assets/images/gym";
+import { INFO_MAILTO } from "./data/contact";
 import { showDevChrome } from "./lib/dev-chrome";
 
 type WorkingDirection = "E" | "EF" | "F" | "V1";
@@ -124,6 +126,7 @@ const COMING_SOON_ROUTES = new Set([
   "/longevity/reflection",
   "/longevity/strength-standard",
   "/longevity/the-trials",
+  "/move-the-city",
   "/training/classes/balance",
 ]);
 
@@ -133,6 +136,7 @@ const COMING_SOON_LABELS: Record<string, string> = {
   "/longevity/reflection": "Reflection",
   "/longevity/strength-standard": "Strength Standard",
   "/longevity/the-trials": "The Trials",
+  "/move-the-city": "Move the City",
   "/training/classes/balance": "BALANCE",
 };
 
@@ -189,8 +193,13 @@ function viewPathFor(resolved: ResolvedRoute): string {
   return "/";
 }
 
-function locationUrl(path: string): string {
-  return `${path}${window.location.search}${window.location.hash}`;
+function locationUrl(path: string, hash = ""): string {
+  return `${path}${window.location.search}${hash}`;
+}
+
+function hrefHash(href: string): string {
+  const i = href.indexOf("#");
+  return i >= 0 ? href.slice(i) : "";
 }
 
 
@@ -199,7 +208,7 @@ const FOOTER_LINKS = [
   { label: "Terms", href: "/terms-of-service" },
   { label: "Privacy", href: "/privacy-policy" },
   { label: "Instagram", href: "https://www.instagram.com/united_strength/" },
-  { label: "Email", href: "mailto:info@unitedstrengthgym.com" }
+  { label: "Email", href: INFO_MAILTO },
 ];
 
 // ----------------------------------------------------------------------
@@ -331,11 +340,12 @@ export default function App() {
     }, 50);
   };
 
-  const writeAddress = (path: string, mode: "push" | "replace") => {
-    if (stripPath(window.location.pathname) === path) return;
-    const url = locationUrl(path);
-    if (mode === "push") window.history.pushState(null, "", url);
-    else window.history.replaceState(null, "", url);
+  const writeAddress = (path: string, mode: "push" | "replace", hash = "") => {
+    const next = locationUrl(path, hash);
+    const current = `${stripPath(window.location.pathname)}${window.location.search}${window.location.hash}`;
+    if (current === next) return;
+    if (mode === "push") window.history.pushState(null, "", next);
+    else window.history.replaceState(null, "", next);
   };
 
   const goSimHome = () => {
@@ -357,11 +367,11 @@ export default function App() {
     }, 3200);
   };
 
-  const showResolvedPage = (path: string) => {
+  const showResolvedPage = (path: string, options?: { skipScrollTop?: boolean }) => {
     setActiveSimRoute(path);
     setIsMenuOpen(false);
     setIsScrolled(false);
-    scrollSimToTop();
+    if (!options?.skipScrollTop) scrollSimToTop();
   };
 
   // Handle navigation and keep the address bar on the same path
@@ -372,11 +382,12 @@ export default function App() {
     }
     if (href.startsWith("mailto:") || href.startsWith("tel:")) return;
 
+    const hash = hrefHash(href);
     const resolved = resolveRoute(href);
     switch (resolved.kind) {
       case "page":
-        showResolvedPage(resolved.path);
-        writeAddress(resolved.path, "push");
+        writeAddress(resolved.path, "push", hash);
+        showResolvedPage(resolved.path, { skipScrollTop: Boolean(hash) });
         return;
       case "home":
         goSimHome();
@@ -784,7 +795,7 @@ export default function App() {
                     data-sim-scroll
                     inert={isMenuOpen ? true : undefined}
                     onScroll={handleSimScroll}
-                    className={`relative flex-1 min-h-0 w-full scrollbar-none flex flex-col [container-type:size] ${
+                    className={`relative flex-1 min-h-0 w-full min-w-0 overflow-x-hidden scrollbar-none flex flex-col [container-type:size] ${
                       isMenuOpen || v1OpeningLocked
                         ? "overflow-y-hidden"
                         : "overflow-y-auto"
@@ -851,7 +862,11 @@ export default function App() {
                           <BuildPage onBack={goSimHome} onNav={triggerNavigation} />
                         )
                       ) : activeSimRoute === "/training/classes/burn" ? (
-                        <BurnPage onBack={goSimHome} onNav={triggerNavigation} />
+                        isV1 ? (
+                          <V1BurnPage onBack={goSimHome} onNav={triggerNavigation} />
+                        ) : (
+                          <BurnPage onBack={goSimHome} onNav={triggerNavigation} />
+                        )
                       ) : activeSimRoute === "/training/classes/balance" ? (
                         <BalancePage onBack={goSimHome} onNav={triggerNavigation} />
                       ) : activeSimRoute === "/training/personal" ||
@@ -1056,7 +1071,7 @@ export default function App() {
                         className="font-serif text-[10px] uppercase tracking-[0.14em] text-white/85 leading-relaxed"
                         style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
                       >
-                        United Strength Club · ©{new Date().getFullYear()}
+                        United Strength · ©{new Date().getFullYear()}
                         <br />
                         Columbus, Ohio
                       </p>
@@ -1147,7 +1162,7 @@ export default function App() {
                 <div className="sticky top-0 bg-white/90 backdrop-blur-xs z-20 px-4 py-3 border-b border-neutral-100 flex justify-between items-center select-none">
                   <Menu className="w-4 h-4 text-neutral-800" />
                   <span className="font-semibold tracking-[0.2em] text-[8px] font-sans text-neutral-900">
-                    UNITED STRENGTH CLUB
+                    UNITED STRENGTH
                   </span>
                   <div className="w-4"></div>
                 </div>
@@ -1545,7 +1560,7 @@ function ConceptAView({ onNav }: SubViewProps) {
           <div className="flex items-center gap-2">
             <USCrestSVG className="w-8 h-8 text-[#181818]" />
             <span className="font-satoshi font-bold tracking-widest text-[9px] uppercase">
-              UNITED STRENGTH CLUB
+              UNITED STRENGTH
             </span>
           </div>
           <p className="font-mono text-[10px] text-[#5C5C5C] leading-normal uppercase">
@@ -1660,7 +1675,7 @@ function ConceptCView({ onNav }: SubViewProps) {
             MEMBER LIMIT ACTIVE
           </span>
           <p className="font-serif italic text-[18px] leading-relaxed text-[#181818]">
-            United Strength Club is a selective downtown sanctuary. Membership is limited, vetted, and strictly private.
+            United Strength is a selective downtown sanctuary. Membership is limited, vetted, and strictly private.
           </p>
         </div>
 
@@ -1698,7 +1713,7 @@ function ConceptCView({ onNav }: SubViewProps) {
           <div className="flex items-center gap-2">
             <USCrestSVG className="w-8 h-8 text-[#181818]" />
             <span className="font-sans font-bold tracking-widest text-[9px] uppercase">
-              UNITED STRENGTH CLUB
+              UNITED STRENGTH
             </span>
           </div>
           <p className="font-mono text-[10px] text-[#5C5C5C] leading-normal uppercase">

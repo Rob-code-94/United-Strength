@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" fill="none" role="img" aria-label="Monday long-run route map">
+  <rect width="640" height="360" fill="#111111"/>
+  <path d="M48 280 C120 260 160 200 220 180 C300 150 340 220 400 200 C470 175 520 120 592 96" stroke="#C4A35A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="48" cy="280" r="10" fill="#C4A35A"/>
+  <circle cx="592" cy="96" r="8" fill="#C4A35A"/>
+  <text x="48" y="318" fill="#C4A35A" font-family="ui-monospace, monospace" font-size="14" letter-spacing="0.16em">START</text>
+  <text x="500" y="80" fill="#C4A35A" font-family="ui-monospace, monospace" font-size="12" letter-spacing="0.14em">LONG</text>
+</svg>

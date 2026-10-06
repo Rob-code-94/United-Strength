@@ -1,4 +1,5 @@
 import { gymPhotos } from "../../assets/images/gym";
+import { INFO_MAILTO, MEMBERSHIP_INBOX } from "../../data/contact";
 
 export type ChapterAlign = "media-left" | "media-right";
 
@@ -33,7 +34,7 @@ export interface FooterColumn {
 }
 
 export const heroCopy = {
-  title: "United Strength Club",
+  title: "United Strength",
   lede: "A private strength practice in Columbus — deliberate, communal, built for longevity.",
   metadata: "( Columbus, OH · Lookbook )",
 } as const;
@@ -42,11 +43,11 @@ export const heroCopy = {
 export const chapters: LookbookChapterData[] = [
   {
     n: "01",
-    title: "United Strength Club",
+    title: "United Strength",
     metadata: "( The Club )",
     body: "A private strength practice on Cleveland Ave — deliberate, communal, built for longevity. Not gym noise.",
     image: gymPhotos.galleryCinematic,
-    imageAlt: "United Strength Club — facility b-roll",
+    imageAlt: "United Strength — facility b-roll",
     align: "media-left",
   },
   {
@@ -129,8 +130,8 @@ export const footerColumns: FooterColumn[] = [
   {
     title: "Contact",
     links: [
-      { label: "info@", href: "mailto:info@unitedstrength.club" },
-      { label: "membership@", href: "mailto:membership@unitedstrength.club" },
+      { label: "info@", href: INFO_MAILTO },
+      { label: "membership@", href: `mailto:${MEMBERSHIP_INBOX}` },
       { label: "237 Cleveland Ave", href: "#" },
     ],
   },

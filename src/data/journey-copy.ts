@@ -5,6 +5,16 @@
  * Membership page shows prices; homepage must stay price-free (Part E).
  */
 
+import {
+  EXPERIENCE_UNITED_MAILTO,
+  INFO_INBOX,
+  INFO_MAILTO,
+  MEMBERSHIP_APPLY_MAILTO,
+  MEMBERSHIP_INBOX,
+  TRAINING_INBOX,
+  TRAINING_INQUIRE_MAILTO,
+} from "./contact";
+
 export { FACILITY_HOURS, FACILITY_ADDRESS } from "./training-copy";
 
 // ── Experience United — Copywright EXPERIENCE UNITED PAGE ($70) ─────────────
@@ -135,7 +145,7 @@ export const EXPERIENCE_UNITED = {
   statsNote: "5 classes · 14 days · $70",
   ctaPrimary: {
     label: "Start Your Experience",
-    href: "mailto:info@unitedstrengthgym.com?subject=Experience%20United",
+    href: EXPERIENCE_UNITED_MAILTO,
   },
   ctaSecondary: { label: "Apply for Membership", href: "/start-here/apply" },
 } as const;
@@ -147,7 +157,7 @@ export const APPLY_MEMBERSHIP = {
   headline: "Apply for Membership",
   lede: "Most gyms start with a membership agreement. We start with a conversation.",
   body: [
-    "At United Strength Club, we believe the best results come from understanding the person before prescribing the plan.",
+    "At United Strength, we believe the best results come from understanding the person before prescribing the plan.",
     "Your goals, schedule, experience, challenges, and motivations all matter. These questions help us learn where you are today, what you're working toward, and how we can best support you along the way.",
     "They also give you an opportunity to reflect on your own goals, priorities, and commitment before getting started.",
   ],
@@ -174,8 +184,7 @@ export const APPLY_MEMBERSHIP = {
   /** null until Todd sends Typeform URL — CTA uses mailto (Part F) */
   typeformUrl: null as string | null,
   beginApplicationLabel: "Begin Application",
-  mailto:
-    "mailto:membership@unitedstrengthgym.com?subject=Membership%20Application",
+  mailto: MEMBERSHIP_APPLY_MAILTO,
   mailtoLabel: "Begin Application",
   experienceHref: "/start-here/experience",
 } as const;
@@ -363,16 +372,16 @@ export const CONTACT_PAGE = {
   address: "237 Cleveland Ave, Columbus, Ohio 43215",
   parking: "Parking behind the building · near Columbus State",
   emails: [
-    { label: "General", href: "mailto:info@unitedstrengthgym.com", display: "info@unitedstrengthgym.com" },
+    { label: "General", href: INFO_MAILTO, display: INFO_INBOX },
     {
       label: "Membership",
-      href: "mailto:membership@unitedstrengthgym.com",
-      display: "membership@unitedstrengthgym.com",
+      href: `mailto:${MEMBERSHIP_INBOX}`,
+      display: MEMBERSHIP_INBOX,
     },
     {
       label: "Training",
-      href: "mailto:training@unitedstrengthgym.com",
-      display: "training@unitedstrengthgym.com",
+      href: TRAINING_INQUIRE_MAILTO,
+      display: TRAINING_INBOX,
     },
   ],
   instagram: {

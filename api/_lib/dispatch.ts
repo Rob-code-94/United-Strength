@@ -1,8 +1,11 @@
 import { readFile } from "node:fs/promises";
 import {
   MEDIA_SLOTS,
+  mergeLibrary,
+  slotsUsingLibraryUrl,
   validateFields,
   type BrandKitStore,
+  type MediaLibraryItem,
   type MediaSlot,
 } from "../../src/hub/brand-kit";
 import { randomBytes } from "node:crypto";
@@ -16,6 +19,7 @@ import {
   sessionCookie,
 } from "./session";
 import { sendApplication, sendHubReset } from "./apply-mail";
+import { sendRunClubSignup } from "./run-club-mail";
 import { loadHubAuth, loadStore, localMediaPath, saveHubAuth, saveMedia, saveStore } from "./store";
 
 export interface HubResult {
@@ -50,11 +54,13 @@ function editorView(store: BrandKitStore) {
     published: store.published,
     draftUpdatedAt: store.draftUpdatedAt,
     publishedUpdatedAt: store.publishedUpdatedAt,
+    library: mergeLibrary(store.library),
   };
 }
 
 const IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
-const MAX_BYTES = 3_000_000;
+const MAX_BYTES_STILL = 3_000_000;
+const MAX_BYTES_GIF = 5_000_000;
 
 function isSlot(value: string): value is MediaSlot {
   return MEDIA_SLOTS.some((slot) => slot.key === value);
@@ -119,6 +125,31 @@ export async function dispatchHub(input: {
     });
     if (result.ok === false) {
       return json(result.status, { error: "Application could not be sent." });
+    }
+    return json(200, { ok: true });
+  }
+
+  if (pathname === "/api/run-club") {
+    if (method !== "POST") return json(405, { error: "Method not allowed." });
+    let payload: { name?: unknown; email?: unknown; mobile?: unknown } = {};
+    try {
+      payload = input.bodyText ? (JSON.parse(input.bodyText) as typeof payload) : {};
+    } catch {
+      return json(400, { error: "Signup could not be read." });
+    }
+    const result = await sendRunClubSignup({
+      name: typeof payload.name === "string" ? payload.name : "",
+      email: typeof payload.email === "string" ? payload.email : "",
+      mobile: typeof payload.mobile === "string" ? payload.mobile : "",
+    });
+    if (result.ok === false) {
+      const message =
+        result.status === 503
+          ? "Email is not connected yet. Try again later."
+          : result.status === 400
+            ? "Enter your name, email, and mobile number."
+            : "Signup could not be sent. Try again.";
+      return json(result.status, { error: message });
     }
     return json(200, { ok: true });
   }
@@ -247,9 +278,9 @@ export async function dispatchHub(input: {
 
   if (pathname === "/api/brand-kit" && method === "POST") {
     if (!authed) return json(401, { error: "Sign in required." });
-    let payload: { action?: string } = {};
+    let payload: { action?: string; slot?: string; libraryId?: string } = {};
     try {
-      payload = input.bodyText ? (JSON.parse(input.bodyText) as { action?: string }) : {};
+      payload = input.bodyText ? (JSON.parse(input.bodyText) as typeof payload) : {};
     } catch {
       return json(400, { error: "Request could not be read." });
     }
@@ -273,6 +304,26 @@ export async function dispatchHub(input: {
         await saveStore(next);
         return json(200, editorView(next));
       }
+      if (payload.action === "assignMedia") {
+        const slot = payload.slot ?? "";
+        const libraryId = payload.libraryId ?? "";
+        if (!isSlot(slot) || !libraryId) {
+          return json(400, { error: "Pick a library image and a media slot." });
+        }
+        const item = mergeLibrary(store.library).find((row) => row.id === libraryId);
+        if (!item) return json(404, { error: "That library image was not found." });
+        const next: BrandKitStore = {
+          ...store,
+          library: mergeLibrary(store.library),
+          draft: {
+            ...store.draft,
+            media: { ...store.draft.media, [slot]: item.url },
+          },
+          draftUpdatedAt: new Date().toISOString(),
+        };
+        await saveStore(next);
+        return json(200, editorView(next));
+      }
       return json(400, { error: "Unknown action." });
     } catch {
       return json(503, { error: "Brand kit could not be updated. Try again." });
@@ -281,7 +332,7 @@ export async function dispatchHub(input: {
 
   if (pathname === "/api/brand-kit/media" && method === "POST") {
     if (!authed) return json(401, { error: "Sign in required." });
-    let payload: { slot?: string; contentType?: string; dataBase64?: string } = {};
+    let payload: { slot?: string; contentType?: string; dataBase64?: string; name?: string } = {};
     try {
       payload = input.bodyText ? (JSON.parse(input.bodyText) as typeof payload) : {};
     } catch {
@@ -298,14 +349,32 @@ export async function dispatchHub(input: {
     } catch {
       return json(400, { error: "Use a JPEG, PNG, WebP, or GIF image." });
     }
-    if (bytes.length === 0 || bytes.length > MAX_BYTES) {
-      return json(400, { error: "Image must be under 3 MB." });
+    const maxBytes = contentType === "image/gif" ? MAX_BYTES_GIF : MAX_BYTES_STILL;
+    if (bytes.length === 0 || bytes.length > maxBytes) {
+      return json(400, {
+        error: contentType === "image/gif" ? "GIF must be under 5 MB." : "Image must be under 3 MB.",
+      });
     }
     try {
+      const id = randomBytes(8).toString("hex");
       const url = await saveMedia(slot, bytes, contentType);
+      const name =
+        typeof payload.name === "string" && payload.name.trim()
+          ? payload.name.trim().slice(0, 120)
+          : `${slot}-${id}`;
+      const item: MediaLibraryItem = {
+        id,
+        url,
+        name,
+        contentType,
+        bytes: bytes.length,
+        createdAt: new Date().toISOString(),
+      };
       const store = await loadStore();
+      const library = [item, ...mergeLibrary(store.library)];
       const next: BrandKitStore = {
         ...store,
+        library,
         draft: {
           ...store.draft,
           media: { ...store.draft.media, [slot]: url },
@@ -313,9 +382,93 @@ export async function dispatchHub(input: {
         draftUpdatedAt: new Date().toISOString(),
       };
       await saveStore(next);
-      return json(200, { url, ...editorView(next) });
+      return json(200, { url, item, ...editorView(next) });
     } catch {
       return json(503, { error: "Upload failed. Try again." });
+    }
+  }
+
+  if (pathname === "/api/brand-kit/library" && method === "POST") {
+    if (!authed) return json(401, { error: "Sign in required." });
+    let payload: { contentType?: string; dataBase64?: string; name?: string } = {};
+    try {
+      payload = input.bodyText ? (JSON.parse(input.bodyText) as typeof payload) : {};
+    } catch {
+      return json(400, { error: "Upload could not be read." });
+    }
+    const contentType = payload.contentType ?? "";
+    if (!IMAGE_TYPES.has(contentType) || typeof payload.dataBase64 !== "string") {
+      return json(400, { error: "Use a JPEG, PNG, WebP, or GIF image." });
+    }
+    let bytes: Buffer;
+    try {
+      bytes = Buffer.from(payload.dataBase64, "base64");
+    } catch {
+      return json(400, { error: "Use a JPEG, PNG, WebP, or GIF image." });
+    }
+    const maxBytes = contentType === "image/gif" ? MAX_BYTES_GIF : MAX_BYTES_STILL;
+    if (bytes.length === 0 || bytes.length > maxBytes) {
+      return json(400, {
+        error: contentType === "image/gif" ? "GIF must be under 5 MB." : "Image must be under 3 MB.",
+      });
+    }
+    try {
+      const id = randomBytes(8).toString("hex");
+      const url = await saveMedia("library", bytes, contentType, id);
+      const name =
+        typeof payload.name === "string" && payload.name.trim()
+          ? payload.name.trim().slice(0, 120)
+          : `upload-${id}`;
+      const item: MediaLibraryItem = {
+        id,
+        url,
+        name,
+        contentType,
+        bytes: bytes.length,
+        createdAt: new Date().toISOString(),
+      };
+      const store = await loadStore();
+      const next: BrandKitStore = {
+        ...store,
+        library: [item, ...mergeLibrary(store.library)],
+      };
+      await saveStore(next);
+      return json(200, { item, ...editorView(next) });
+    } catch {
+      return json(503, { error: "Upload failed. Try again." });
+    }
+  }
+
+  if (pathname === "/api/brand-kit/library" && method === "DELETE") {
+    if (!authed) return json(401, { error: "Sign in required." });
+    let payload: { id?: string } = {};
+    try {
+      payload = input.bodyText ? (JSON.parse(input.bodyText) as typeof payload) : {};
+    } catch {
+      return json(400, { error: "Request could not be read." });
+    }
+    const id = typeof payload.id === "string" ? payload.id.trim() : "";
+    if (!id) return json(400, { error: "Library item id is required." });
+    try {
+      const store = await loadStore();
+      const library = mergeLibrary(store.library);
+      const item = library.find((row) => row.id === id);
+      if (!item) return json(404, { error: "That library image was not found." });
+      const used = slotsUsingLibraryUrl(store, item.url);
+      if (used.length > 0) {
+        return json(400, {
+          error: `Remove this image from ${used.join(", ")} before deleting.`,
+          slots: used,
+        });
+      }
+      const next: BrandKitStore = {
+        ...store,
+        library: library.filter((row) => row.id !== id),
+      };
+      await saveStore(next);
+      return json(200, editorView(next));
+    } catch {
+      return json(503, { error: "Library item could not be deleted." });
     }
   }
 

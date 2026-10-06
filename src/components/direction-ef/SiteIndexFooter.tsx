@@ -1,4 +1,9 @@
 import { motion, useReducedMotion } from "motion/react";
+import {
+  INFO_MAILTO,
+  MEMBERSHIP_INBOX,
+  TRAINING_INQUIRE_MAILTO,
+} from "@/data/contact";
 import { LOOKBOOK_EASE } from "./lookbook";
 
 interface SiteIndexFooterProps {
@@ -29,9 +34,9 @@ const COLUMNS = [
   {
     title: "Contact",
     links: [
-      { label: "info@", href: "mailto:info@unitedstrengthgym.com" },
-      { label: "membership@", href: "mailto:membership@unitedstrengthgym.com" },
-      { label: "training@", href: "mailto:training@unitedstrengthgym.com" },
+      { label: "info@", href: INFO_MAILTO },
+      { label: "membership@", href: `mailto:${MEMBERSHIP_INBOX}` },
+      { label: "training@", href: TRAINING_INQUIRE_MAILTO },
       { label: "237 Cleveland Ave · 43215", href: "/contact" },
     ],
   },
@@ -130,10 +135,10 @@ export default function SiteIndexFooter({ onNav }: SiteIndexFooterProps) {
         <div className="mt-12 pt-6 border-t border-black/10 flex flex-col gap-2 md:flex-row md:items-end md:justify-between md:gap-6">
           <div className="flex flex-col gap-1.5">
             <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#5C5C5C]">
-              United Strength Club · Columbus, Ohio
+              United Strength · Columbus, Ohio
             </p>
             <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#5C5C5C]/80">
-              © 2026 United Strength Club. All rights reserved.
+              © 2026 United Strength. All rights reserved.
             </p>
           </div>
           <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#5C5C5C]/70">
