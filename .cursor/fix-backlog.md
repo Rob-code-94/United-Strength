@@ -571,7 +571,7 @@ Source: all six `CLIENT_QA_REPORT` runs consolidated in plan `qa_reports_fix_spe
 - [x] **UI** — Opening chapter tab optimistic `aria-selected` · 10/07/2026
 - [x] **Bug** — Quiet `/api/hub-session` GET → 200 `{ ok: false }` when logged out · 10/07/2026
 - [x] **Ops** — `RESEND_API_KEY` on Vercel Production + Preview (from local `.env.local`; sensitive) · 10/07/2026
-  - Notes: Redeploy required for runtime. Smoke reset/apply after deploy. From still `onboarding@resend.dev` until domain verified.
+  - Notes: Key present — reset no longer 503 “not connected.” Smoke POST `/api/hub-reset` returns **502** while From is `onboarding@resend.dev` and To is `membership@…` (Resend sandbox only delivers to the account owner until a sending domain is verified). Next: verify `unitedstrengthgym.com` in Resend, set `APPLY_FROM_EMAIL` to that domain, re-smoke.
 - [ ] **Ops** — Mariana production framing (Nick) · open
 - [ ] **Ops** — Ownership transfer push gate · open until transfer walkthrough done
 - [ ] **Other** — QAVER production re-QA after Wave 1 deploy · open

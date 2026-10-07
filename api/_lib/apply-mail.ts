@@ -99,9 +99,14 @@ export async function sendHubReset(input: {
         ].join("\n"),
       }),
     });
-    if (!response.ok) return { ok: false, status: 502 };
+    if (!response.ok) {
+      const detail = (await response.text()).slice(0, 400);
+      console.error("hub-reset Resend failed", response.status, detail);
+      return { ok: false, status: 502 };
+    }
     return { ok: true };
-  } catch {
+  } catch (error) {
+    console.error("hub-reset Resend threw", error);
     return { ok: false, status: 502 };
   }
 }
