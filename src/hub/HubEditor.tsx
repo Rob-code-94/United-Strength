@@ -96,7 +96,7 @@ export default function HubEditor({ initial, onChange, onGoHome, onGoBrandKit }:
       ) : null}
       {tab === "brand" ? (
         <div id="hub-settings-brand">
-          <ColorFields colors={draft.colors} onChange={(colors) => setDraft({ ...draft, colors })} />
+          <ColorFields colors={draft.colors} onChange={(colors) => setDraft((prev) => ({ ...prev, colors }))} />
         </div>
       ) : null}
       {tab === "type" && typeRole ? (
@@ -105,7 +105,7 @@ export default function HubEditor({ initial, onChange, onGoHome, onGoBrandKit }:
             type={draft.type}
             role={typeRole}
             colors={draft.colors}
-            onChange={(type) => setDraft({ ...draft, type })}
+            onChange={(type) => setDraft((prev) => ({ ...prev, type }))}
           />
         </div>
       ) : null}
@@ -143,14 +143,14 @@ export default function HubEditor({ initial, onChange, onGoHome, onGoBrandKit }:
           <FooterFields
             footer={draft.footer}
             copyright={draft.copyright}
-            onFooter={(footer) => setDraft({ ...draft, footer })}
-            onCopyright={(copyright) => setDraft({ ...draft, copyright })}
+            onFooter={(footer) => setDraft((prev) => ({ ...prev, footer }))}
+            onCopyright={(copyright) => setDraft((prev) => ({ ...prev, copyright }))}
           />
         </div>
       ) : null}
       {tab === "faq" ? (
         <div id="hub-settings-faq">
-          <FaqFields faq={draft.faq} onChange={(faq) => setDraft({ ...draft, faq })} />
+          <FaqFields faq={draft.faq} onChange={(faq) => setDraft((prev) => ({ ...prev, faq }))} />
         </div>
       ) : null}
       {tab === "copy" && copyPath ? (
@@ -158,7 +158,7 @@ export default function HubEditor({ initial, onChange, onGoHome, onGoBrandKit }:
           <CopyFields
             pages={draft.pages}
             path={copyPath}
-            onChange={(pages) => setDraft({ ...draft, pages })}
+            onChange={(pages) => setDraft((prev) => ({ ...prev, pages }))}
             onFocusPath={(path) => {
               setCopyPath(path);
               setTypeRole(inferTypeRoleFromPath(path));
@@ -170,7 +170,7 @@ export default function HubEditor({ initial, onChange, onGoHome, onGoBrandKit }:
                 type={draft.type}
                 role={typeRole}
                 colors={draft.colors}
-                onChange={(type) => setDraft({ ...draft, type })}
+                onChange={(type) => setDraft((prev) => ({ ...prev, type }))}
               />
               <p className="mt-3 text-xs text-muted-foreground">
                 Type applies to every {typeRole === "mono" ? "chapter number" : typeRole === "display" ? "display heading" : "body paragraph"}{" "}

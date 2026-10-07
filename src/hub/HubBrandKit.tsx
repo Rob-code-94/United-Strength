@@ -65,7 +65,7 @@ export default function HubBrandKit({ initial, onChange, onGoHome, onGoWebsite }
       </div>
 
       <section className="space-y-4 border-t border-border pt-8">
-        <ColorFields colors={draft.colors} onChange={(colors) => setDraft({ ...draft, colors })} />
+        <ColorFields colors={draft.colors} onChange={(colors) => setDraft((prev) => ({ ...prev, colors }))} />
       </section>
 
       <section className="space-y-4 border-t border-border pt-8">
@@ -97,7 +97,7 @@ export default function HubBrandKit({ initial, onChange, onGoHome, onGoWebsite }
           role={typeRole}
           colors={draft.colors}
           showTitle={false}
-          onChange={(type) => setDraft({ ...draft, type })}
+          onChange={(type) => setDraft((prev) => ({ ...prev, type }))}
         />
       </section>
 

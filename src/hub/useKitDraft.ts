@@ -13,7 +13,9 @@ export interface KitEditorState {
   library: MediaLibraryItem[];
 }
 
-const AUTOSAVE_MS = 800;
+/** Debounce rapid color/font clicks before hitting the network. */
+const AUTOSAVE_MS = 1000;
+const MAX_CONFLICT_RETRIES = 3;
 
 export function useKitDraft(initial: KitEditorState, onChange: (next: KitEditorState) => void) {
   const [draft, setDraft] = useState(() => ({
@@ -29,57 +31,125 @@ export function useKitDraft(initial: KitEditorState, onChange: (next: KitEditorS
   const skipAutosave = useRef(true);
   const draftRef = useRef(draft);
   const expectedRef = useRef(expected);
+  const libraryRef = useRef(library);
   const autosaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const savingRef = useRef(false);
+  const dirtyRef = useRef(false);
+  /** Bumps on every local edit so a slow response cannot clobber newer UI state. */
+  const editRev = useRef(0);
+  const sentRev = useRef(0);
 
-  const applyResponse = (payload: Partial<KitEditorState> & { error?: string }) => {
+  const syncExpected = (nextExpected: string) => {
+    expectedRef.current = nextExpected;
+    setExpected(nextExpected);
+  };
+
+  const applyResponse = (payload: Partial<KitEditorState> & { error?: string }, opts?: { forceDraft?: boolean }) => {
+    if (payload.draftUpdatedAt) {
+      syncExpected(payload.draftUpdatedAt);
+    }
     if (payload.draft && payload.draftUpdatedAt) {
-      const next = {
-        ...payload.draft,
-        faq: mergeFaq(payload.draft.faq),
-        pages: mergePages(payload.draft.pages),
-      };
-      const nextLibrary = mergeLibrary(payload.library ?? library);
-      skipAutosave.current = true;
-      setDraft(next);
+      const nextLibrary = mergeLibrary(payload.library ?? libraryRef.current);
+      if (opts?.forceDraft || sentRev.current === editRev.current) {
+        const next = {
+          ...payload.draft,
+          faq: mergeFaq(payload.draft.faq),
+          pages: mergePages(payload.draft.pages),
+        };
+        skipAutosave.current = true;
+        draftRef.current = next;
+        setDraft(next);
+        libraryRef.current = nextLibrary;
+        setLibrary(nextLibrary);
+        onChange({ draft: next, draftUpdatedAt: payload.draftUpdatedAt, library: nextLibrary });
+        return;
+      }
+      libraryRef.current = nextLibrary;
       setLibrary(nextLibrary);
-      setExpected(payload.draftUpdatedAt);
-      onChange({ draft: next, draftUpdatedAt: payload.draftUpdatedAt, library: nextLibrary });
+      onChange({
+        draft: draftRef.current,
+        draftUpdatedAt: payload.draftUpdatedAt,
+        library: nextLibrary,
+      });
       return;
     }
     if (payload.library) {
       const nextLibrary = mergeLibrary(payload.library);
+      libraryRef.current = nextLibrary;
       setLibrary(nextLibrary);
-      onChange({ draft, draftUpdatedAt: expected, library: nextLibrary });
+      onChange({ draft: draftRef.current, draftUpdatedAt: expectedRef.current, library: nextLibrary });
     }
   };
 
-  const save = async () => {
+  const persist = async (opts?: { manual?: boolean }): Promise<boolean> => {
+    if (savingRef.current) {
+      dirtyRef.current = true;
+      return false;
+    }
+    savingRef.current = true;
+    dirtyRef.current = false;
     setPending(true);
-    setError(null);
-    setMessage(null);
+    if (opts?.manual) {
+      setError(null);
+      setMessage(null);
+    } else {
+      setError(null);
+    }
+
+    let ok = false;
     try {
-      const response = await fetch("/api/brand-kit", {
-        method: "PUT",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ kit: draft, expectedUpdatedAt: expected }),
-      });
-      const payload = (await response.json()) as KitEditorState & { error?: string };
-      if (response.status === 409) {
+      for (let attempt = 0; attempt <= MAX_CONFLICT_RETRIES; attempt++) {
+        sentRev.current = editRev.current;
+        const response = await fetch("/api/brand-kit", {
+          method: "PUT",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            kit: draftRef.current,
+            expectedUpdatedAt: expectedRef.current,
+          }),
+        });
+        const payload = (await response.json()) as KitEditorState & { error?: string };
+
+        if (response.status === 409) {
+          if (typeof payload.draftUpdatedAt === "string" && payload.draftUpdatedAt) {
+            syncExpected(payload.draftUpdatedAt);
+          }
+          // Keep local draft — this is usually our own overlapping autosave, not another editor.
+          if (attempt < MAX_CONFLICT_RETRIES) continue;
+          applyResponse(payload, { forceDraft: true });
+          setError(payload.error ?? "This kit was updated elsewhere. Reload and try again.");
+          break;
+        }
+
+        if (!response.ok) {
+          setError(payload.error ?? "Brand kit could not be saved.");
+          break;
+        }
+
         applyResponse(payload);
-        setError(payload.error ?? "This kit was updated elsewhere. Reload and try again.");
-        return;
+        setMessage(opts?.manual ? "Draft saved. Publish when you want the live site to change." : "Saved draft");
+        ok = true;
+        break;
       }
-      if (!response.ok) {
-        setError(payload.error ?? "Brand kit could not be saved.");
-        return;
-      }
-      applyResponse(payload);
-      setMessage("Draft saved. Publish when you want the live site to change.");
     } catch {
       setError("Brand kit could not be saved. Try again.");
     } finally {
+      savingRef.current = false;
       setPending(false);
+      if (dirtyRef.current) {
+        dirtyRef.current = false;
+        void persist(opts);
+      }
     }
+    return ok;
+  };
+
+  const save = async () => {
+    if (autosaveTimer.current) {
+      clearTimeout(autosaveTimer.current);
+      autosaveTimer.current = null;
+    }
+    await persist({ manual: true });
   };
 
   useEffect(() => {
@@ -91,39 +161,18 @@ export function useKitDraft(initial: KitEditorState, onChange: (next: KitEditorS
   }, [expected]);
 
   useEffect(() => {
+    libraryRef.current = library;
+  }, [library]);
+
+  useEffect(() => {
     if (skipAutosave.current) {
       skipAutosave.current = false;
       return;
     }
+    editRev.current += 1;
     if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
     autosaveTimer.current = setTimeout(() => {
-      void (async () => {
-        setPending(true);
-        setError(null);
-        try {
-          const response = await fetch("/api/brand-kit", {
-            method: "PUT",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({ kit: draftRef.current, expectedUpdatedAt: expectedRef.current }),
-          });
-          const payload = (await response.json()) as KitEditorState & { error?: string };
-          if (response.status === 409) {
-            applyResponse(payload);
-            setError(payload.error ?? "This kit was updated elsewhere. Reload and try again.");
-            return;
-          }
-          if (!response.ok) {
-            setError(payload.error ?? "Brand kit could not be saved.");
-            return;
-          }
-          applyResponse(payload);
-          setMessage("Saved draft");
-        } catch {
-          setError("Brand kit could not be saved. Try again.");
-        } finally {
-          setPending(false);
-        }
-      })();
+      void persist();
     }, AUTOSAVE_MS);
     return () => {
       if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
@@ -132,6 +181,14 @@ export function useKitDraft(initial: KitEditorState, onChange: (next: KitEditorS
   }, [draft]);
 
   const act = async (action: "publish" | "revert") => {
+    if (autosaveTimer.current) {
+      clearTimeout(autosaveTimer.current);
+      autosaveTimer.current = null;
+    }
+    // Flush pending draft before publish/revert so server has latest colors/fonts.
+    if (action === "publish") {
+      await persist({ manual: true });
+    }
     setPending(true);
     setError(null);
     setMessage(null);
@@ -146,7 +203,9 @@ export function useKitDraft(initial: KitEditorState, onChange: (next: KitEditorS
         setError(payload.error ?? "That action failed.");
         return;
       }
-      applyResponse(payload);
+      editRev.current += 1;
+      sentRev.current = editRev.current;
+      applyResponse(payload, { forceDraft: true });
       setMessage(action === "publish" ? "Published. The live V1 site uses this kit." : "Draft reverted to the published kit.");
     } catch {
       setError("That action failed. Try again.");
@@ -160,9 +219,13 @@ export function useKitDraft(initial: KitEditorState, onChange: (next: KitEditorS
     window.location.assign("/hub");
   };
 
+  const setDraftTracked: typeof setDraft = (value) => {
+    setDraft(value);
+  };
+
   return {
     draft,
-    setDraft,
+    setDraft: setDraftTracked,
     library,
     expected,
     message,
@@ -170,7 +233,11 @@ export function useKitDraft(initial: KitEditorState, onChange: (next: KitEditorS
     error,
     setError,
     pending,
-    applyResponse,
+    applyResponse: (payload: Partial<KitEditorState> & { error?: string }) => {
+      editRev.current += 1;
+      sentRev.current = editRev.current;
+      applyResponse(payload, { forceDraft: true });
+    },
     save,
     act,
     logout,
