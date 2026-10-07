@@ -573,6 +573,8 @@ Source: all six `CLIENT_QA_REPORT` runs consolidated in plan `qa_reports_fix_spe
 - [x] **Ops** — `RESEND_API_KEY` on Vercel Production + Preview (from local `.env.local`; sensitive) · 10/07/2026
   - Notes: Key present — reset no longer 503 “not connected.” Smoke POST `/api/hub-reset` returns **502** while From is `onboarding@resend.dev` and To is `membership@…` (Resend sandbox only delivers to the account owner until a sending domain is verified). Next: verify `unitedstrengthgym.com` in Resend, set `APPLY_FROM_EMAIL` to that domain, re-smoke.
 - [ ] **Ops** — Mariana production framing (Nick) · open
-- [ ] **Ops** — Ownership transfer push gate · open until transfer walkthrough done
-- [ ] **Other** — QAVER production re-QA after Wave 1 deploy · open
+- [x] **Ops** — Ownership transfer push gate (Oct WT on `origin/main`) · 10/07/2026
+  - Notes: Wave 1 QAFIX + prior hub kit commits pushed (`a25d1a4`, `464bf00`). Full GitHub/Vercel account transfer walkthrough still a later ownership step.
+- [x] **Other** — QAVER production re-QA after Wave 1 deploy · 10/07/2026
+  - Notes: `qa-report/2026-10-07T13-36-55/` + `-hub/` — tablet overflow 0; hub-session quiet; blockers=false.
 
