@@ -48,7 +48,7 @@ function V1Home({
       <SpaceExperience onNav={onNav} />
       <MembershipPassport onNav={onNav} />
       <StartHere onNav={onNav} />
-      <div className="relative z-[70] -mt-6">
+      <div className="relative z-[70] -mt-6 min-w-0 overflow-x-hidden">
         <V1SiteIndexFooter onNav={onNav} />
       </div>
     </div>

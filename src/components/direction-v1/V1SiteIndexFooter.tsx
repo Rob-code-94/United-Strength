@@ -40,21 +40,21 @@ export default function V1SiteIndexFooter({ onNav }: Props) {
 
   return (
     <footer
-      className="relative px-5 pb-10 pt-16 md:px-10 md:pb-12 md:pt-24"
+      className="relative min-w-0 overflow-x-hidden px-5 pb-10 pt-16 md:px-10 md:pb-12 md:pt-24"
       style={{ backgroundColor: "var(--v1-bg, #181818)", color: cream }}
     >
       <motion.div
-        className="relative z-10 mx-auto w-full max-w-6xl"
+        className="relative z-10 mx-auto w-full min-w-0 max-w-6xl"
         initial={reduceMotion ? false : { opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.2 }}
         transition={{ duration: 0.7, ease: LOOKBOOK_EASE }}
       >
-        {/* Main five-zone row — stack mobile, 5-col desktop */}
-        <div className="flex flex-col items-center gap-12 text-center md:flex-row md:items-center md:justify-between md:gap-6 md:text-left lg:gap-8">
+        {/* Main five-zone row — stack through tablet; 5-col from lg (avoids ~197px bleed at 768) */}
+        <div className="flex flex-col items-center gap-12 text-center lg:flex-row lg:items-center lg:justify-between lg:gap-6 lg:text-left xl:gap-8">
           {/* 1 — Location */}
-          <div className="flex shrink-0 flex-col items-center gap-3 md:max-w-[200px] md:items-start" data-hub-pencil="footer">
-            <div className="flex items-center justify-center gap-2 md:justify-start">
+          <div className="flex min-w-0 flex-col items-center gap-3 lg:max-w-[200px] lg:shrink lg:items-start" data-hub-pencil="footer">
+            <div className="flex items-center justify-center gap-2 lg:justify-start">
               <span
                 className="font-sans text-[13px] font-bold uppercase tracking-[0.14em] text-[#F3EEE7] md:text-[14px]"
                 style={{ fontFamily: "'Satoshi', sans-serif" }}
@@ -76,7 +76,7 @@ export default function V1SiteIndexFooter({ onNav }: Props) {
             </div>
 
             <div
-              className="flex flex-wrap items-center justify-center gap-2 font-sans text-[11px] uppercase tracking-[0.1em] md:justify-start md:text-[12px]"
+              className="flex flex-wrap items-center justify-center gap-2 font-sans text-[11px] uppercase tracking-[0.1em] lg:justify-start md:text-[12px]"
               style={{ color: GOLD }}
             >
               <span>{kit.footer.addressLine}</span>
@@ -90,8 +90,8 @@ export default function V1SiteIndexFooter({ onNav }: Props) {
           </div>
 
           {/* 2 — Explore */}
-          <nav className="flex shrink-0 flex-col items-center md:min-w-[140px] md:items-start" aria-label="Explore">
-            <h3 className={`${sectionLabelClass} flex flex-col items-center md:items-start`}>
+          <nav className="flex min-w-0 flex-col items-center lg:min-w-[140px] lg:shrink lg:items-start" aria-label="Explore">
+            <h3 className={`${sectionLabelClass} flex flex-col items-center lg:items-start`}>
               {kit.footer.exploreLabel}
               <span
                 className="mt-1.5 block h-px w-8"
@@ -99,13 +99,13 @@ export default function V1SiteIndexFooter({ onNav }: Props) {
                 aria-hidden
               />
             </h3>
-            <ul className="mt-4 flex flex-col items-center gap-0.5 md:items-start">
+            <ul className="mt-4 flex flex-col items-center gap-0.5 lg:items-start">
               {explore.map((link) => (
                 <li key={link.label}>
                   <button
                     type="button"
                     onClick={() => onNav(link.href, link.label)}
-                    className={`${exploreLinkClass} justify-center text-center md:justify-start md:text-left`}
+                    className={`${exploreLinkClass} justify-center text-center lg:justify-start lg:text-left`}
                     style={{ fontFamily: "'Satoshi', sans-serif" }}
                   >
                     {link.label}
@@ -116,7 +116,7 @@ export default function V1SiteIndexFooter({ onNav }: Props) {
           </nav>
 
           {/* 3 — Crest */}
-          <div className="flex shrink-0 items-center justify-center py-2 md:px-2" data-hub-pencil="media-crest">
+          <div className="flex shrink-0 items-center justify-center py-2 lg:px-2" data-hub-pencil="media-crest">
             {kit.media.crest ? (
               <img
                 src={kit.media.crest}
@@ -129,8 +129,8 @@ export default function V1SiteIndexFooter({ onNav }: Props) {
           </div>
 
           {/* 4 — Connect */}
-          <div className="flex shrink-0 flex-col items-center md:min-w-[100px] md:items-start">
-            <h3 className={`${sectionLabelClass} flex flex-col items-center md:items-start`}>
+          <div className="flex min-w-0 flex-col items-center lg:min-w-[100px] lg:shrink lg:items-start">
+            <h3 className={`${sectionLabelClass} flex flex-col items-center lg:items-start`}>
               {kit.footer.connectLabel}
               <span
                 className="mt-1.5 block h-px w-8"
@@ -138,7 +138,7 @@ export default function V1SiteIndexFooter({ onNav }: Props) {
                 aria-hidden
               />
             </h3>
-            <div className="mt-5 flex items-center justify-center gap-4 md:justify-start">
+            <div className="mt-5 flex items-center justify-center gap-4 lg:justify-start">
               {phoneLink ? (
                 <>
                   <a
@@ -172,7 +172,7 @@ export default function V1SiteIndexFooter({ onNav }: Props) {
           </div>
 
           {/* 5 — Stronger United */}
-          <div className="flex shrink-0 items-center justify-center md:justify-end" data-hub-pencil="media-strongerUnited">
+          <div className="flex min-w-0 items-center justify-center lg:justify-end lg:shrink" data-hub-pencil="media-strongerUnited">
             <StrongerUnitedMark className="h-11 w-auto max-w-[200px] object-contain object-left sm:h-12 sm:max-w-[220px] md:h-[52px] md:max-w-[240px]" />
           </div>
         </div>

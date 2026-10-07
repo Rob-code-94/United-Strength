@@ -156,7 +156,9 @@ export async function dispatchHub(input: {
 
   if (pathname === "/api/hub-session") {
     if (method === "GET") {
-      return authed ? json(200, { ok: true }) : json(401, { error: "Sign in required." });
+      // Quiet probe: 200 + ok:false avoids a red console 401 on cold /hub.
+      // POST still returns 401 for a bad password; kit writes stay auth-gated.
+      return authed ? json(200, { ok: true }) : json(200, { ok: false });
     }
     if (method === "DELETE") {
       return json(200, { ok: true }, { "set-cookie": clearSessionCookie() });

@@ -28,7 +28,16 @@ export default function HubApp() {
   const load = async () => {
     setError(null);
     const session = await fetch("/api/hub-session");
-    if (!session.ok) {
+    let sessionOk = session.ok;
+    if (sessionOk) {
+      try {
+        const body = (await session.json()) as { ok?: boolean };
+        sessionOk = body.ok === true;
+      } catch {
+        sessionOk = false;
+      }
+    }
+    if (!sessionOk) {
       setAuthed(false);
       setEditor(null);
       setMode("home");

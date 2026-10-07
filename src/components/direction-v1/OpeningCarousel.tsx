@@ -68,12 +68,12 @@ export default function OpeningCarousel({
       const el = scrollerRef.current;
       if (!el) return;
       e.preventDefault();
-      const w = el.clientWidth;
       const next =
         e.key === "ArrowRight"
           ? Math.min(SLIDE_COUNT - 1, active + 1)
           : Math.max(0, active - 1);
-      el.scrollTo({ left: next * w, behavior: "smooth" });
+      setActive(next);
+      el.scrollTo({ left: next * el.clientWidth, behavior: "smooth" });
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -150,7 +150,9 @@ export default function OpeningCarousel({
   const goTo = (index: number) => {
     const el = scrollerRef.current;
     if (!el) return;
-    el.scrollTo({ left: index * el.clientWidth, behavior: "smooth" });
+    const next = Math.max(0, Math.min(SLIDE_COUNT - 1, index));
+    setActive(next);
+    el.scrollTo({ left: next * el.clientWidth, behavior: "smooth" });
   };
 
   return (

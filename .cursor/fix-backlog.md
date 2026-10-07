@@ -556,10 +556,23 @@ Source: deep crawl + browser + hub of `http://localhost:5173`. Report: `qa-repor
 
 ### Open from this run
 
-- [ ] **UI** — Home tablet `scrollportOverflowX: 197` · parked polish 10/06/2026
-  - Notes: Same as 10/04. Mobile/desktop clean. Possible opening carousel / DEV studio chrome. Not a go-live blocker for phone-first.
+- [x] **UI** — Home tablet `scrollportOverflowX: 197` · fixed 10/07/2026
+  - Notes: Cause was V1 footer five-zone `md:flex-row` with `shrink-0` columns (~965px at 768). Stack through tablet; row from `lg`. Also quiet hub-session GET + optimistic opening chapter `aria-selected`.
 - [ ] **Ops** — Pre-transfer gate: **commit + push WT to `main` before GitHub → Vercel transfer** · 10/06/2026
-  - Notes: Transferring today’s `origin/main` without the Oct WT ships old Apply / Escape / Archive behavior. Order: sanitize env → commit/push → transfer GitHub (`UnitedStrength`) → transfer Vercel → paste Resend/hub env → DNS → walkthrough → revoke. See ownership rows above.
+  - Notes: Transferring today’s `origin/main` without the Oct WT ships old Apply / Escape / Archive behavior. Order: sanitize env → commit/push → transfer GitHub (`UnitedStrength`) → transfer Vercel → paste Resend/hub env → DNS → walkthrough → revoke. See ownership rows above. Wave-1 QAFIX commit lands with this sprint.
 - [ ] **Ops** — Mariana embed framing / Nick production (sandbox deny) · still open · 10/06/2026
-  - Notes: `/buy` shell shows correct fallback. Not a local UI bug.
+  - Notes: App shell fallback correct (`MarianaEmbedPage` Open ↗ when framing denied). **Owner: Nick** — production tenant + allow framing, or sign off Open↗-only for `/buy` · `/schedule` · `/account`. Not a local UI bug.
+
+## QA — fix-spec wave 10/07/2026
+
+Source: all six `CLIENT_QA_REPORT` runs consolidated in plan `qa_reports_fix_spec`.
+
+- [x] **UI** — Tablet home overflow (footer 5-zone) · 10/07/2026
+- [x] **UI** — Opening chapter tab optimistic `aria-selected` · 10/07/2026
+- [x] **Bug** — Quiet `/api/hub-session` GET → 200 `{ ok: false }` when logged out · 10/07/2026
+- [x] **Ops** — `RESEND_API_KEY` on Vercel Production + Preview (from local `.env.local`; sensitive) · 10/07/2026
+  - Notes: Redeploy required for runtime. Smoke reset/apply after deploy. From still `onboarding@resend.dev` until domain verified.
+- [ ] **Ops** — Mariana production framing (Nick) · open
+- [ ] **Ops** — Ownership transfer push gate · open until transfer walkthrough done
+- [ ] **Other** — QAVER production re-QA after Wave 1 deploy · open
 
